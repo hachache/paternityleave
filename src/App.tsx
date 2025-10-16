@@ -71,6 +71,9 @@ function App() {
     setRemainingBlocks([]);
     setError(null);
     setSuccessMessage(null);
+
+    // Scroll doucement vers la section de planification après un court délai
+    setTimeout(() => smoothScrollTo(planningRef, -100), 600);
   };
 
   const handleSelectRemainingDay = (date: Date) => {
