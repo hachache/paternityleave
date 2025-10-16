@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
@@ -9,6 +9,8 @@ import { CelebrationModal } from './components/CelebrationModal';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { ProgressStepper } from './components/ProgressStepper';
 import { CalendarLegend } from './components/CalendarLegend';
+import { SectionCard } from './components/SectionCard';
+import { NextStepsCard } from './components/NextStepsCard';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
@@ -46,19 +48,37 @@ function App() {
   const calendarRef = useRef<HTMLDivElement>(null);
   const planningRef = useRef<HTMLDivElement>(null);
   const customModeRef = useRef<HTMLDivElement>(null);
+  const letterRef = useRef<HTMLDivElement>(null);
 
   // Smooth scroll utility
-  const smoothScrollTo = (ref: React.RefObject<HTMLDivElement>, offset = -20) => {
-    if (ref.current) {
-      const elementPosition = ref.current.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset + offset;
+  const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>, offset = -20) => {
+    const node = ref.current;
+    if (!node) return;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
+    const elementPosition = node.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset + offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }, []);
+
+  const scrollIntoViewIfNeeded = useCallback(
+    (ref: React.RefObject<HTMLDivElement>, offset = -20) => {
+      const node = ref.current;
+      if (!node) return;
+
+      const rect = node.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const fullyVisible = rect.top >= 0 && rect.bottom <= viewportHeight;
+
+      if (!fullyVisible) {
+        smoothScrollTo(ref, offset);
+      }
+    },
+    [smoothScrollTo]
+  );
 
   const handleSelectBirthDate = (date: Date) => {
     selectBirthDate(date);
@@ -97,6 +117,14 @@ function App() {
   const handleCancelVisualSelection = () => {
     cancelVisualSelection();
   };
+
+  const previousPlannedDays = useRef(totalPlannedDays);
+  useEffect(() => {
+    if (previousPlannedDays.current < 21 && totalPlannedDays === 21) {
+      scrollIntoViewIfNeeded(letterRef, -120);
+    }
+    previousPlannedDays.current = totalPlannedDays;
+  }, [scrollIntoViewIfNeeded, totalPlannedDays]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -146,6 +174,22 @@ function App() {
               {totalPlannedDays} / 21 jours planifiés
             </p>
           )}
+        </div>
+
+        <div className="max-w-2xl mx-auto mb-8">
+          <SectionCard
+            title="Étapes suivantes"
+            description="Suivez les actions à réaliser pour finaliser votre demande"
+            accent="teal"
+          >
+            <NextStepsCard
+              planningStep={planningStep}
+              totalPlannedDays={totalPlannedDays}
+              hasBirthDate={Boolean(birthDate)}
+              hasMandatory={Boolean(mandatoryPeriod)}
+              remainingBlocks={remainingBlocks.length}
+            />
+          </SectionCard>
         </div>
 
         {/* Celebration Modal */}
@@ -511,7 +555,7 @@ function App() {
             </div>
 
             {mandatoryPeriod && (
-              <div className="max-w-2xl mx-auto mb-8 animate-fade-in-delay">
+              <div ref={letterRef} className="max-w-2xl mx-auto mb-8 animate-fade-in-delay">
                 <LetterGenerator
                   birthDate={birthDate}
                   employerPeriod={employerPeriod}
