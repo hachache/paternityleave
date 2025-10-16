@@ -86,8 +86,7 @@ function App() {
       setSelectionStep('selecting-end');
       setSuccessMessage(`✅ Date de début sélectionnée : ${normalized.toLocaleDateString('fr-FR')}. Cliquez maintenant sur la date de FIN de votre première période.`);
 
-      // Auto-scroll vers le message de succès
-      setTimeout(() => smoothScrollTo(visualSelectionRef, -100), 200);
+      // Pas de scroll, on garde le calendrier visible
       return;
     }
 
@@ -493,23 +492,63 @@ function App() {
         )}
 
         {error && (
-          <div className="mb-6 p-5 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200/80 rounded-2xl animate-shake max-w-2xl mx-auto shadow-md backdrop-blur-sm">
+          <div className="mb-6 p-5 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-2xl animate-shake max-w-2xl mx-auto shadow-lg backdrop-blur-sm">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center mt-0.5">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center mt-0.5 shadow-md">
                 <span className="text-white text-xs font-bold">!</span>
               </div>
-              <p className="text-red-800 text-sm font-medium flex-1">{error}</p>
+              <p className="text-red-900 text-sm font-semibold flex-1">{error}</p>
             </div>
           </div>
         )}
 
-        {successMessage && (
-          <div className="mb-6 p-5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/80 rounded-2xl animate-spring-in max-w-2xl mx-auto shadow-md backdrop-blur-sm">
+        {successMessage && !visualSelectionMode && (
+          <div className="mb-6 p-5 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-2xl animate-slide-up max-w-2xl mx-auto shadow-lg backdrop-blur-sm">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mt-0.5 shadow-sm">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mt-0.5 shadow-md">
                 <span className="text-white text-sm font-bold">✓</span>
               </div>
-              <p className="text-emerald-800 text-sm font-semibold flex-1">{successMessage}</p>
+              <p className="text-emerald-900 text-sm font-semibold flex-1">{successMessage}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Bannière d'instruction pour le mode sélection visuelle - juste au-dessus du calendrier */}
+        {visualSelectionMode && selectionStep !== 'idle' && (
+          <div className="mb-4 max-w-2xl mx-auto animate-slide-up">
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-300 p-4 sm:p-5 shadow-lg glow-pulse">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md animate-pulse-subtle">
+                    {selectionStep === 'selecting-start' ? '1' : '2'}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-base sm:text-lg font-bold text-emerald-900 mb-1">
+                    {selectionStep === 'selecting-start'
+                      ? '📍 Cliquez sur la date de DÉBUT'
+                      : '📍 Cliquez sur la date de FIN'}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-emerald-800">
+                    {selectionStep === 'selecting-start'
+                      ? 'Choisissez le premier jour de votre première période'
+                      : `Choisissez le dernier jour (min. 5 jours)`}
+                  </p>
+                  {selectionStartDate && selectionStep === 'selecting-end' && (
+                    <div className="mt-2 p-2 bg-white/60 rounded-lg border border-emerald-200 animate-scale-in">
+                      <p className="text-xs font-semibold text-emerald-900">
+                        ✓ Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleCancelVisualSelection}
+                  className="flex-shrink-0 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition-apple-smooth hover:shadow-md border border-slate-200 active:scale-95"
+                >
+                  Annuler
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -557,9 +596,9 @@ function App() {
                       setCustomMode(true);
                       setTimeout(() => smoothScrollTo(customModeRef, -100), 300);
                     }}
-                    className="flex-shrink-0 ml-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] text-sm sm:text-base"
+                    className="flex-shrink-0 ml-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold transition-apple-smooth hover:shadow-lg hover:shadow-teal-200/50 hover:scale-[1.05] active:scale-[0.95] text-sm sm:text-base relative overflow-hidden"
                   >
-                    Activer
+                    <span className="relative z-10">Activer</span>
                   </button>
                 </div>
 
@@ -641,9 +680,9 @@ function App() {
                   </p>
                   <button
                     onClick={handleStartVisualSelection}
-                    className="w-full px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg text-sm font-semibold transition-apple-smooth hover:shadow-lg hover:shadow-emerald-200/50 hover:scale-[1.03] active:scale-[0.97] relative overflow-hidden"
                   >
-                    Utiliser ce mode
+                    <span className="relative z-10">Utiliser ce mode</span>
                   </button>
                 </div>
               </div>
@@ -727,53 +766,13 @@ function App() {
           </div>
         )}
 
-        {/* Mode sélection visuelle actif */}
-        {visualSelectionMode && selectionStep !== 'idle' && (
-          <div ref={visualSelectionRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl sm:rounded-3xl border-2 border-emerald-300 p-6 sm:p-8 shadow-xl">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="flex-shrink-0">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg animate-pulse-subtle">
-                    {selectionStep === 'selecting-start' ? '1' : '2'}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl sm:text-2xl font-bold text-emerald-900 mb-2">
-                    {selectionStep === 'selecting-start'
-                      ? 'Sélectionnez la date de DÉBUT'
-                      : 'Sélectionnez la date de FIN'}
-                  </h3>
-                  <p className="text-sm sm:text-base text-emerald-800">
-                    {selectionStep === 'selecting-start'
-                      ? '👆 Cliquez sur le calendrier pour choisir le premier jour de votre première période'
-                      : `👆 Cliquez sur le calendrier pour choisir le dernier jour (minimum 5 jours requis)`}
-                  </p>
-                  {selectionStartDate && selectionStep === 'selecting-end' && (
-                    <div className="mt-3 p-3 bg-white/60 rounded-lg border border-emerald-200">
-                      <p className="text-xs font-semibold text-emerald-900">
-                        📍 Date de début : {selectionStartDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <button
-                onClick={handleCancelVisualSelection}
-                className="w-full px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-slate-200 hover:border-slate-300"
-              >
-                Annuler et revenir en arrière
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Message pendant le placement personnalisé */}
         {customMode && remainingBlocks.length === 1 && !visualSelectionMode && (
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-300 p-6 shadow-xl">
+          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-slide-up">
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-300 p-6 shadow-xl glow-pulse">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg animate-pulse-subtle flex-shrink-0">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-emerald-500 to-green-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg animate-pulse-subtle flex-shrink-0">
                   2
                 </div>
                 <div className="flex-1">
