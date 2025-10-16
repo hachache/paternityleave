@@ -43,6 +43,7 @@ function App() {
 
   // State for celebration modal
   const [showCelebration, setShowCelebration] = useState(false);
+  const hasShownCelebration = useRef(false);
 
   // Refs for smooth scrolling
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -67,12 +68,13 @@ function App() {
   useEffect(() => {
     if (birthDate && mandatoryPeriod && remainingBlocks.length > 0) {
       const totalPlanned = calculateTotalUsedDays(remainingBlocks);
-      if (totalPlanned === 21 && !showCelebration) {
+      if (totalPlanned === 21 && !hasShownCelebration.current) {
+        hasShownCelebration.current = true;
         const timer = setTimeout(() => setShowCelebration(true), 500);
         return () => clearTimeout(timer);
       }
     }
-  }, [remainingBlocks, birthDate, mandatoryPeriod, showCelebration]);
+  }, [remainingBlocks, birthDate, mandatoryPeriod]);
 
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
@@ -358,6 +360,7 @@ function App() {
     setSuccessMessage(null);
     setShowResetConfirm(false);
     setShowCelebration(false);
+    hasShownCelebration.current = false;
     setSplitMode('idle');
     setSplitConfig(null);
     setPreviewBlock(null);
@@ -423,6 +426,9 @@ function App() {
   const handleRemoveBlock = (index: number) => {
     const newBlocks = remainingBlocks.filter((_: LeaveBlock, i: number) => i !== index);
     setRemainingBlocks(newBlocks);
+
+    // Réinitialiser la célébration si on retire des blocs
+    hasShownCelebration.current = false;
   };
 
   const handleClearAllBlocks = () => {
@@ -435,6 +441,9 @@ function App() {
     setVisualSelectionMode(false);
     setSelectionStep('idle');
     setSelectionStartDate(null);
+
+    // Réinitialiser la célébration
+    hasShownCelebration.current = false;
   };
 
   const handleStartVisualSelection = () => {
