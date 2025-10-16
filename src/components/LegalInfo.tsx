@@ -2,10 +2,10 @@ import { BookOpen } from 'lucide-react';
 
 export function LegalInfo() {
   return (
-    <details className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 rounded-2xl shadow-md hover:shadow-xl transition-apple-smooth">
-      <summary className="cursor-pointer p-6 hover:bg-slate-100/50 transition-apple-smooth flex items-center gap-3 active:scale-[0.99] rounded-2xl">
-        <div className="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl">
-          <BookOpen className="w-5 h-5 text-white flex-shrink-0" />
+    <details className="bg-white border border-slate-200 rounded-2xl shadow-md hover:shadow-lg transition-apple-smooth">
+      <summary className="cursor-pointer p-6 hover:bg-slate-100 transition-apple-smooth flex items-center gap-3 active:scale-[0.99] rounded-2xl">
+        <div className="p-2 rounded-xl bg-slate-900 text-white">
+          <BookOpen className="w-5 h-5 flex-shrink-0" />
         </div>
         <span className="text-base font-bold text-slate-800">Cadre légal</span>
       </summary>

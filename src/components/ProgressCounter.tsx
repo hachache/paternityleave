@@ -25,24 +25,18 @@ export function ProgressCounter({ birthDate, remainingBlocks }: ProgressCounterP
 
   return (
     <div className="max-w-2xl mx-auto mb-6 animate-slide-up">
-      <div className={`
-        bg-gradient-to-br from-white to-slate-50 rounded-2xl border-2 p-5 shadow-lg
-        transition-all duration-500
-        ${isComplete
-          ? 'border-emerald-400 shadow-emerald-200/50 shadow-xl'
-          : 'border-slate-200 hover:shadow-xl'
-        }
-      `}>
+      <div
+        className={`rounded-2xl border p-5 shadow-lg transition-all duration-300 ${
+          isComplete ? 'border-emerald-400 shadow-emerald-200/50' : 'border-slate-200 hover:shadow-xl'
+        }`}
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className={`
-              w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shadow-md
-              transition-all duration-500
-              ${isComplete
-                ? 'bg-gradient-to-br from-emerald-500 to-green-500 text-white animate-pulse-subtle scale-110'
-                : 'bg-gradient-to-br from-teal-500 to-emerald-500 text-white'
-              }
-            `}>
+            <div
+              className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shadow-md transition-all duration-300 ${
+                isComplete ? 'bg-emerald-500 text-white scale-105' : 'bg-teal-600 text-white'
+              }`}
+            >
               {isComplete ? '✓' : '📊'}
             </div>
             <div>
@@ -59,7 +53,7 @@ export function ProgressCounter({ birthDate, remainingBlocks }: ProgressCounterP
 
           {!isComplete && daysLeft > 0 && (
             <div className="text-right">
-              <p className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-emerald-600">
+              <p className="text-2xl sm:text-3xl font-bold text-teal-700">
                 {daysLeft}
               </p>
               <p className="text-xs text-slate-500 font-medium">
@@ -83,10 +77,7 @@ export function ProgressCounter({ birthDate, remainingBlocks }: ProgressCounterP
             <div
               className={`
                 h-full rounded-full transition-all duration-700 ease-out
-                ${isComplete
-                  ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-500 animate-pulse-subtle'
-                  : 'bg-gradient-to-r from-teal-500 to-emerald-500'
-                }
+                ${isComplete ? 'bg-emerald-500' : 'bg-teal-600'}
               `}
               style={{ width: `${progressPercentage}%` }}
             />
@@ -94,13 +85,11 @@ export function ProgressCounter({ birthDate, remainingBlocks }: ProgressCounterP
 
           {/* Percentage label */}
           <div className="absolute -top-6 right-0">
-            <span className={`
-              text-xs font-bold px-2 py-1 rounded-lg shadow-sm
-              ${isComplete
-                ? 'bg-emerald-500 text-white'
-                : 'bg-teal-500 text-white'
-              }
-            `}>
+            <span
+              className={`text-xs font-bold px-2 py-1 rounded-lg shadow-sm ${
+                isComplete ? 'bg-emerald-500 text-white' : 'bg-teal-600 text-white'
+              }`}
+            >
               {Math.round(progressPercentage)}%
             </span>
           </div>

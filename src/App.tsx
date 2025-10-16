@@ -6,6 +6,9 @@ import { LegalInfo } from './components/LegalInfo';
 import { LetterGenerator } from './components/LetterGenerator';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import { CelebrationModal } from './components/CelebrationModal';
+import { FeedbackBanner } from './components/FeedbackBanner';
+import { ProgressStepper } from './components/ProgressStepper';
+import { CalendarLegend } from './components/CalendarLegend';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
@@ -23,6 +26,8 @@ function App() {
     selectionStep,
     selectionStartDate,
     showCelebration,
+    planningStep,
+    totalPlannedDays,
     selectBirthDate,
     selectRemainingDay,
     requestReset,
@@ -94,7 +99,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl">
         <header className="mb-8 sm:mb-12 text-center animate-fade-in relative">
           <button
@@ -108,8 +113,8 @@ function App() {
 
           <button
             onClick={handleResetRequest}
-            className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 shadow-lg shadow-teal-200/50 transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 ${birthDate ? 'cursor-pointer' : 'cursor-default'}`}
-            title={birthDate ? "Cliquer pour réinitialiser" : "Calendrier"}
+            className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 bg-teal-600 text-white shadow-lg transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 ${birthDate ? 'cursor-pointer' : 'cursor-default'}`}
+            title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
           >
             <CalendarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </button>
@@ -121,18 +126,27 @@ function App() {
             Planifiez votre congé selon la législation française
           </p>
 
-          {/* Made by badge */}
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-slate-100/80 to-slate-200/80 backdrop-blur-sm rounded-full border border-slate-300/50 shadow-sm hover:shadow-md transition-apple-smooth hover:scale-105 mt-2">
-            <span className="text-xs text-slate-600 font-medium">Made with</span>
-            <span className="text-red-500 animate-pulse-subtle text-base">❤️</span>
-            <span className="text-xs text-slate-600 font-medium">by</span>
-            <span className="text-xs font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-emerald-600">
-              Hedi ACHACHE
-            </span>
-          </div>
+        {/* Made by badge */}
+        <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 rounded-full border border-slate-200 shadow-sm hover:shadow-md transition-apple-smooth hover:scale-105 mt-2">
+          <span className="text-xs text-slate-600 font-medium">Made with</span>
+          <span className="text-red-500 animate-pulse-subtle text-base">❤️</span>
+          <span className="text-xs text-slate-600 font-medium">by</span>
+          <span className="text-xs font-bold text-teal-700">
+            Hedi ACHACHE
+          </span>
+        </div>
         </header>
 
         <ScrollIndicator show={birthDate !== null} />
+
+        <div className="max-w-2xl mx-auto mb-8">
+          <ProgressStepper currentStep={planningStep} />
+          {birthDate && (
+            <p className="mt-3 text-center text-sm text-slate-600">
+              {totalPlannedDays} / 21 jours planifiés
+            </p>
+          )}
+        </div>
 
         {/* Celebration Modal */}
         <CelebrationModal
@@ -145,8 +159,8 @@ function App() {
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fade-in">
             <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-spring-in">
               <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl mb-4">
-                  <RotateCcw className="w-8 h-8 text-white" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500 text-white mb-4 shadow-md">
+                  <RotateCcw className="w-8 h-8" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">
                   Réinitialiser ?
@@ -165,7 +179,7 @@ function App() {
                 </button>
                 <button
                   onClick={handleResetConfirm}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white rounded-xl font-semibold transition-apple-smooth hover:shadow-lg active:scale-[0.98] hover:scale-[1.02]"
+                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-apple-smooth hover:shadow-lg active:scale-[0.98] hover:scale-[1.02]"
                 >
                   Réinitialiser
                 </button>
@@ -174,35 +188,33 @@ function App() {
           </div>
         )}
 
-        {error && (
-          <div className="mb-6 p-5 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-2xl animate-shake max-w-2xl mx-auto shadow-lg backdrop-blur-sm">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center mt-0.5 shadow-md">
-                <span className="text-white text-xs font-bold">!</span>
-              </div>
-              <p className="text-red-900 text-sm font-semibold flex-1">{error}</p>
-            </div>
-          </div>
-        )}
+        {(error || (successMessage && !visualSelectionMode)) && (
+          <div className="max-w-2xl mx-auto space-y-3 mb-6 animate-fade-in">
+            {error && (
+              <FeedbackBanner
+                tone="error"
+                title="Action requise"
+                message={error}
+              />
+            )}
 
-        {successMessage && !visualSelectionMode && (
-          <div className="mb-6 p-5 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-2xl animate-slide-up max-w-2xl mx-auto shadow-lg backdrop-blur-sm">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mt-0.5 shadow-md">
-                <span className="text-white text-sm font-bold">✓</span>
-              </div>
-              <p className="text-emerald-900 text-sm font-semibold flex-1">{successMessage}</p>
-            </div>
+            {successMessage && !visualSelectionMode && (
+              <FeedbackBanner
+                tone="success"
+                title="C’est enregistré"
+                message={successMessage}
+              />
+            )}
           </div>
         )}
 
         {/* Bannière d'instruction pour le mode sélection visuelle - juste au-dessus du calendrier */}
         {visualSelectionMode && selectionStep !== 'idle' && (
           <div className="mb-4 max-w-2xl mx-auto animate-slide-up">
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-300 p-4 sm:p-5 shadow-lg glow-pulse">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5 shadow-lg">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md animate-pulse-subtle">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
                     {selectionStep === 'selecting-start' ? '1' : '2'}
                   </div>
                 </div>
@@ -246,14 +258,17 @@ function App() {
             onSelectRemainingDay={handleSelectRemainingDay}
             onRemoveBlock={handleRemoveBlock}
           />
+          <CalendarLegend />
         </div>
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
           <div ref={planningRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
-            <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl sm:rounded-3xl border-2 border-slate-200/80 p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-apple-smooth">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg transition-apple-smooth">
               <div className="text-center mb-6 sm:mb-8">
-                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl mb-3 sm:mb-4 shadow-lg">
-                  <span className="text-2xl sm:text-3xl">📅</span>
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-700 mb-3 sm:mb-4 shadow-sm">
+                  <span className="text-2xl sm:text-3xl" aria-hidden="true">
+                    📅
+                  </span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
                   Planifiez vos 21 jours restants
@@ -264,7 +279,7 @@ function App() {
               </div>
 
               {/* Mode personnalisé toggle */}
-              <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-200 rounded-2xl p-5 sm:p-6 mb-4">
+              <div className="bg-white border border-teal-200 rounded-2xl p-5 sm:p-6 mb-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex-1">
                     <h4 className="text-base sm:text-lg font-bold text-teal-900 mb-1">
@@ -279,20 +294,20 @@ function App() {
                       setCustomMode(true);
                       setTimeout(() => smoothScrollTo(customModeRef, -100), 300);
                     }}
-                    className="flex-shrink-0 ml-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold transition-apple-smooth hover:shadow-lg hover:shadow-teal-200/50 hover:scale-[1.05] active:scale-[0.95] text-sm sm:text-base relative overflow-hidden"
+                    className="flex-shrink-0 ml-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-semibold transition-apple-smooth hover:shadow-lg hover:scale-[1.03] active:scale-[0.97] text-sm sm:text-base"
                   >
-                    <span className="relative z-10">Activer</span>
+                    Activer
                   </button>
                 </div>
 
                 {/* Prévisualisation */}
-                <div className="bg-white/80 rounded-xl p-3 sm:p-4">
+                <div className="bg-white/90 rounded-xl p-3 sm:p-4">
                   <p className="text-sm text-slate-600 mb-2 text-center">Répartition par défaut : 10j + 11j</p>
                   <div className="flex gap-2">
-                    <div className="flex-1 h-8 sm:h-10 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
+                    <div className="flex-1 h-8 sm:h-10 bg-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
                       10 jours
                     </div>
-                    <div className="flex-1 h-8 sm:h-10 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
+                    <div className="flex-1 h-8 sm:h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
                       11 jours
                     </div>
                   </div>
@@ -312,11 +327,11 @@ function App() {
         {/* Mode personnalisé actif */}
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && !visualSelectionMode && (
           <div ref={customModeRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
-            <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl sm:rounded-3xl border-2 border-teal-300 p-6 sm:p-8 shadow-xl">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-teal-200 p-6 sm:p-8 shadow-lg">
               <div className="flex items-start gap-4 mb-6">
                 <div className="flex-shrink-0">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                    ⚙️
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-md">
+                    <span aria-hidden="true">⚙️</span>
                   </div>
                 </div>
                 <div className="flex-1">
@@ -332,10 +347,10 @@ function App() {
               {/* Deux options : Slider ou Sélection visuelle */}
               <div className="grid sm:grid-cols-2 gap-4 mb-6">
                 {/* Option 1 : Avec Slider */}
-                <div className="bg-white rounded-2xl p-5 border-2 border-teal-200 hover:border-teal-400 transition-all">
+                <div className="bg-white rounded-2xl p-5 border border-teal-200 hover:border-teal-400 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-500 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0">
-                      🎚️
+                    <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl flex-shrink-0">
+                      <span aria-hidden="true">🎚️</span>
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">Avec curseur</h4>
@@ -348,10 +363,10 @@ function App() {
                 </div>
 
                 {/* Option 2 : Sélection visuelle */}
-                <div className="bg-white rounded-2xl p-5 border-2 border-emerald-200 hover:border-emerald-400 transition-all">
+                <div className="bg-white rounded-2xl p-5 border border-emerald-200 hover:border-emerald-400 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0">
-                      👆
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl flex-shrink-0">
+                      <span aria-hidden="true">👆</span>
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">Sélection directe</h4>
@@ -363,9 +378,9 @@ function App() {
                   </p>
                   <button
                     onClick={handleStartVisualSelection}
-                    className="w-full px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg text-sm font-semibold transition-apple-smooth hover:shadow-lg hover:shadow-emerald-200/50 hover:scale-[1.03] active:scale-[0.97] relative overflow-hidden"
+                    className="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-apple-smooth hover:shadow-lg hover:scale-[1.02] active:scale-[0.97]"
                   >
-                    <span className="relative z-10">Utiliser ce mode</span>
+                    Utiliser ce mode
                   </button>
                 </div>
               </div>
@@ -377,16 +392,16 @@ function App() {
                     Choisissez la répartition de vos 21 jours
                   </p>
                   <div className="flex gap-2 justify-center items-center mb-3">
-                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-teal-400 to-teal-500 rounded-xl shadow-md">
+                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-teal-600 text-white shadow-md">
                       <div className="text-center">
-                        <div className="text-2xl sm:text-3xl font-bold text-white">{customFirstBlockDays}</div>
+                        <div className="text-2xl sm:text-3xl font-bold">{customFirstBlockDays}</div>
                         <div className="text-[10px] text-white/90">jours</div>
                       </div>
                     </div>
                     <div className="text-2xl text-slate-400 font-bold">+</div>
-                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl shadow-md">
+                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-emerald-600 text-white shadow-md">
                       <div className="text-center">
-                        <div className="text-2xl sm:text-3xl font-bold text-white">{21 - customFirstBlockDays}</div>
+                        <div className="text-2xl sm:text-3xl font-bold">{21 - customFirstBlockDays}</div>
                         <div className="text-[10px] text-white/90">jours</div>
                       </div>
                     </div>
@@ -396,13 +411,13 @@ function App() {
                 {/* Barre visuelle */}
                 <div className="flex gap-2 mb-4">
                   <div
-                    className="h-12 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                    className="h-12 rounded-lg bg-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
                     style={{ width: `${(customFirstBlockDays / 21) * 100}%` }}
                   >
                     Période 1
                   </div>
                   <div
-                    className="h-12 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                    className="h-12 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
                     style={{ width: `${((21 - customFirstBlockDays) / 21) * 100}%` }}
                   >
                     Période 2
@@ -453,9 +468,9 @@ function App() {
         {/* Message pendant le placement personnalisé */}
         {customMode && remainingBlocks.length === 1 && !visualSelectionMode && (
           <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-slide-up">
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-300 p-6 shadow-xl glow-pulse">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-lg">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-emerald-500 to-green-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg animate-pulse-subtle flex-shrink-0">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-md flex-shrink-0">
                   2
                 </div>
                 <div className="flex-1">
@@ -476,7 +491,7 @@ function App() {
           <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
             <button
               onClick={handleClearAllBlocks}
-              className="w-full px-4 py-3 bg-gradient-to-r from-red-50 to-rose-50 hover:from-red-100 hover:to-rose-100 text-red-700 hover:text-red-800 border-2 border-red-200 hover:border-red-300 rounded-2xl text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+              className="w-full px-4 py-3 bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 border border-red-200 hover:border-red-300 rounded-2xl text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
             >
               🗑️ Effacer tous les blocs et recommencer
             </button>
@@ -513,7 +528,7 @@ function App() {
           <div className="text-center mt-8 max-w-2xl mx-auto animate-fade-in-delay">
             <button
               onClick={handleResetRequest}
-              className="px-8 py-3 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 rounded-xl hover:from-slate-200 hover:to-slate-300 hover:shadow-lg transition-apple-smooth text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-2 mx-auto"
+              className="px-8 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl hover:shadow-lg transition-apple-smooth text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-2 mx-auto"
             >
               <RotateCcw className="w-4 h-4" />
               Réinitialiser

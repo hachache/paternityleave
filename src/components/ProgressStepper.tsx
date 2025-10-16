@@ -13,12 +13,15 @@ export function ProgressStepper({ currentStep }: ProgressStepperProps) {
 
   return (
     <div className="max-w-2xl mx-auto mb-8 px-4 animate-slide-up">
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-slate-200 p-4 sm:p-6 shadow-lg">
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-lg">
         <div className="flex items-center justify-between relative">
           {/* Progress bar background */}
-          <div className="absolute top-5 left-0 right-0 h-1 bg-slate-200 rounded-full -z-0" style={{ top: '20px' }}>
+          <div
+            className="absolute left-0 right-0 h-1 rounded-full bg-slate-200"
+            style={{ top: '20px' }}
+          >
             <div
-              className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full transition-all duration-700 ease-out"
+              className="h-full rounded-full bg-teal-500 transition-all duration-500 ease-out"
               style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
             />
           </div>
@@ -35,14 +38,14 @@ export function ProgressStepper({ currentStep }: ProgressStepperProps) {
                 <div
                   className={`
                     w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-base
-                    transition-all duration-500 ease-out
-                    ${isCompleted ? 'bg-gradient-to-br from-emerald-500 to-green-500 text-white shadow-lg scale-100' : ''}
-                    ${isCurrent ? 'bg-gradient-to-br from-teal-500 to-emerald-500 text-white shadow-xl scale-110 animate-pulse-subtle' : ''}
-                    ${isPending ? 'bg-slate-200 text-slate-400 scale-90' : ''}
+                    transition-all duration-300 ease-out
+                    ${isCompleted ? 'bg-emerald-500 text-white shadow-md' : ''}
+                    ${isCurrent ? 'bg-teal-600 text-white shadow-md scale-110' : ''}
+                    ${isPending ? 'bg-slate-200 text-slate-500 scale-95' : ''}
                   `}
                 >
                   {isCompleted ? (
-                    <Check className="w-5 h-5 sm:w-6 sm:h-6 animate-scale-in" strokeWidth={3} />
+                    <Check className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={3} />
                   ) : (
                     <span>{step.number}</span>
                   )}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { differenceInDays, startOfDay } from 'date-fns';
 import {
   calculateAutomaticRemainingPeriod,
@@ -28,17 +28,27 @@ export function usePaternityPlanning() {
 
   const hasShownCelebration = useRef(false);
 
+  const totalPlannedDays = useMemo(
+    () => calculateTotalUsedDays(remainingBlocks),
+    [remainingBlocks]
+  );
+
   useEffect(() => {
     if (birthDate && mandatoryPeriod && remainingBlocks.length > 0) {
-      const totalPlanned = calculateTotalUsedDays(remainingBlocks);
-      if (totalPlanned === 21 && !hasShownCelebration.current) {
+      if (totalPlannedDays === 21 && !hasShownCelebration.current) {
         hasShownCelebration.current = true;
         const timer = setTimeout(() => setShowCelebration(true), 500);
         return () => clearTimeout(timer);
       }
     }
     return undefined;
-  }, [birthDate, mandatoryPeriod, remainingBlocks]);
+  }, [birthDate, mandatoryPeriod, remainingBlocks, totalPlannedDays]);
+
+  const planningStep = useMemo(() => {
+    if (!birthDate) return 1;
+    if (totalPlannedDays === 21) return 3;
+    return 2;
+  }, [birthDate, totalPlannedDays]);
 
   const selectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
@@ -202,10 +212,10 @@ export function usePaternityPlanning() {
     const totalUsedDays = calculateTotalUsedDays(remainingBlocks);
     const daysLeft = 21 - totalUsedDays;
 
-  if (daysLeft === 0) {
-    setSuccessMessage('🎉 Planning complet ! Vous avez planifié les 28 jours de congé paternité (3j + 4j + 21j)');
-    return;
-  }
+    if (daysLeft === 0) {
+      setSuccessMessage('🎉 Planning complet ! Vous avez planifié les 28 jours de congé paternité (3j + 4j + 21j)');
+      return;
+    }
 
     const autoBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, daysLeft);
 
@@ -319,6 +329,8 @@ export function usePaternityPlanning() {
     startVisualSelection,
     cancelVisualSelection,
     hideCelebration,
+    planningStep,
+    totalPlannedDays,
     setCustomMode,
     setCustomFirstBlockDays
   };

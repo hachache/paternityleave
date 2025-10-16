@@ -11,7 +11,13 @@ interface SummaryProps {
   onRemoveBlock: (index: number) => void;
 }
 
-export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingBlocks, onRemoveBlock }: SummaryProps) {
+export function Summary({
+  birthDate,
+  employerPeriod,
+  mandatoryPeriod,
+  remainingBlocks,
+  onRemoveBlock
+}: SummaryProps) {
   if (!birthDate) {
     return null;
   }
@@ -22,10 +28,10 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
   const remainingDaysLeft = 21 - totalRemainingDays;
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg transition-apple-smooth">
       <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-        <div className="p-2 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl">
-          <CheckCircle2 className="w-5 h-5 text-white" />
+        <div className="p-2 rounded-xl bg-teal-100 text-teal-700">
+          <CheckCircle2 className="w-5 h-5" />
         </div>
         Votre planning
       </h2>
@@ -42,9 +48,9 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
         </div>
 
         {employerPeriod && (
-          <div className="bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-5 mb-3 transition-apple-smooth hover:shadow-lg hover:scale-[1.02] animate-slide-in border border-sky-200/50">
-            <p className="font-bold text-sky-900 text-base mb-2 flex items-center gap-2">
-              <span className="w-2 h-2 bg-sky-500 rounded-full"></span>
+          <div className="rounded-2xl border border-sky-200 bg-sky-50 p-5 mb-3 transition-apple-smooth hover:shadow-md">
+            <p className="font-semibold text-sky-900 text-base mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 bg-sky-500 rounded-full" />
               Période employeur
             </p>
             <p className="text-sm text-sky-700 mb-2 font-medium">3 jours ouvrés</p>
@@ -56,9 +62,9 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
         )}
 
         {mandatoryPeriod && (
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 mb-3 transition-apple-smooth hover:shadow-lg hover:scale-[1.02] animate-slide-in border border-amber-200/50">
-            <p className="font-bold text-amber-900 text-base mb-2 flex items-center gap-2">
-              <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 mb-3 transition-apple-smooth hover:shadow-md">
+            <p className="font-semibold text-amber-900 text-base mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 bg-amber-500 rounded-full" />
               Période obligatoire
             </p>
             <p className="text-sm text-amber-700 mb-2 font-medium">4 jours calendaires</p>
@@ -69,25 +75,35 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
           </div>
         )}
 
-        <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-5 transition-apple-smooth hover:shadow-lg hover:scale-[1.01] animate-slide-in border border-teal-200/50">
-          <p className="font-bold text-teal-900 text-base mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 bg-teal-500 rounded-full"></span>
+        <div className="rounded-2xl border border-teal-200 bg-teal-50 p-5 transition-apple-smooth hover:shadow-md">
+          <p className="font-semibold text-teal-900 text-base mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 bg-teal-500 rounded-full" />
             Jours fractionnables
           </p>
           {remainingBlocks.length > 0 ? (
             <div className="space-y-3">
               {remainingBlocks.map((block, index) => (
-                <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 group hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 transition-apple-smooth hover:shadow-md relative cursor-pointer border border-teal-200/30 hover:border-red-300" onClick={() => onRemoveBlock(index)}>
+                <div
+                  key={index}
+                  className="bg-white rounded-xl p-4 group hover:bg-red-50 transition-apple-smooth hover:shadow-md cursor-pointer border border-teal-200/40 hover:border-red-300"
+                  onClick={() => onRemoveBlock(index)}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="text-sm text-teal-700 font-bold mb-2 group-hover:text-red-700 transition-apple">Bloc {index + 1}</p>
-                      <p className="text-sm text-teal-900 mb-1 group-hover:text-red-900 transition-apple font-medium">
+                      <p className="text-sm text-teal-700 font-semibold mb-2 group-hover:text-red-700 transition-colors">
+                        Bloc {index + 1}
+                      </p>
+                      <p className="text-sm text-slate-900 mb-1 group-hover:text-red-900 transition-colors font-medium">
                         Du {format(block.start, 'd MMM', { locale: fr })} au{' '}
                         {format(block.end, 'd MMM yyyy', { locale: fr })}
                       </p>
-                      <p className="text-xs text-teal-600 group-hover:text-red-600 transition-apple font-semibold">{countCalendarDays(block.start, block.end)} jours</p>
+                      <p className="text-xs text-slate-500 group-hover:text-red-600 transition-colors font-semibold">
+                        {countCalendarDays(block.start, block.end)} jours
+                      </p>
                     </div>
-                    <span className="text-xs text-slate-400 group-hover:text-red-600 font-semibold transition-apple">✕ Supprimer</span>
+                    <span className="text-xs text-slate-400 group-hover:text-red-600 font-semibold transition-colors">
+                      ✕ Supprimer
+                    </span>
                   </div>
                 </div>
               ))}
@@ -99,10 +115,10 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
 
         <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-200">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-slate-400 animate-pulse-subtle" />
+            <Clock className="w-4 h-4 text-slate-400" />
             <div>
               <p className="text-xs text-slate-500">Jours restants</p>
-              <p className="text-slate-900 font-semibold text-2xl transition-apple">
+              <p className="text-slate-900 font-semibold text-2xl">
                 {remainingDaysLeft}
               </p>
             </div>

@@ -65,10 +65,10 @@ export function LetterGenerator({
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg transition-apple-smooth">
       <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-        <div className="p-2 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl">
-          <Mail className="w-5 h-5 text-white" />
+        <div className="p-2 rounded-xl bg-slate-900 text-white">
+          <Mail className="w-5 h-5" />
         </div>
         Courrier de demande
       </h2>
@@ -155,7 +155,7 @@ export function LetterGenerator({
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-2xl p-6 mb-6 shadow-inner">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 mb-6">
         <pre className="whitespace-pre-wrap text-sm text-slate-800 font-mono leading-relaxed">
           {generateLetter()}
         </pre>
@@ -163,7 +163,7 @@ export function LetterGenerator({
 
       <button
         onClick={handleCopy}
-        className="w-full px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl hover:from-slate-800 hover:to-slate-700 hover:shadow-xl transition-apple-smooth font-semibold flex items-center justify-center gap-3 active:scale-[0.98] hover:scale-[1.02]"
+        className="w-full px-6 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl hover:shadow-xl transition-apple-smooth font-semibold flex items-center justify-center gap-3 active:scale-[0.98] hover:scale-[1.02]"
       >
         {copied ? (
           <>

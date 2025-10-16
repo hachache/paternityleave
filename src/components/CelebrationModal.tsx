@@ -37,14 +37,14 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
       >
         {/* Confetti effect avec CSS */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
+          {[...Array(16)].map((_, i) => (
             <div
               key={i}
               className="confetti"
               style={{
                 left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 0.5}s`,
-                backgroundColor: ['#14b8a6', '#10b981', '#f59e0b', '#0ea5e9'][Math.floor(Math.random() * 4)]
+                animationDelay: `${Math.random() * 0.4}s`,
+                backgroundColor: ['#0f766e', '#14b8a6', '#f59e0b'][Math.floor(Math.random() * 3)]
               }}
             />
           ))}
@@ -52,7 +52,7 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
 
         {/* Contenu */}
         <div className="text-center relative z-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full mb-4 animate-bounce-slow shadow-lg">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-full mb-4 shadow-lg">
             <CheckCircle className="w-12 h-12 text-white" strokeWidth={2.5} />
           </div>
 
@@ -64,7 +64,10 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
             Votre planning de congé paternité est complet
           </p>
 
-          <div className="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl p-4 mt-4 border-2 border-emerald-200 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div
+            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 mt-4 animate-slide-up"
+            style={{ animationDelay: '0.2s' }}
+          >
             <p className="text-sm font-semibold text-emerald-900">
               ✓ 28 jours planifiés avec succès
             </p>
@@ -82,7 +85,7 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
               setIsVisible(false);
               setTimeout(onClose, 300);
             }}
-            className="mt-6 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-105 active:scale-95 w-full"
+            className="mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-105 active:scale-95 w-full"
           >
             Super ! 👍
           </button>

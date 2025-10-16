@@ -335,3 +335,26 @@
 .slider-thumb::-moz-range-thumb:active {
   transform: scale(1.1);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-shake,
+  .animate-fade-in,
+  .animate-fade-in-delay,
+  .animate-bounce-subtle,
+  .animate-slide-in,
+  .animate-pulse-subtle,
+  .animate-spring-in,
+  .animate-slide-up,
+  .animate-scale-in,
+  .glow-pulse,
+  .pulse-glow-hover:hover {
+    animation: none !important;
+  }
+}
