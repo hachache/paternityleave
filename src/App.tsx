@@ -30,6 +30,10 @@ function App() {
   const [splitConfig, setSplitConfig] = useState<[number, number] | null>(null);
   const [previewBlock, setPreviewBlock] = useState<LeaveBlock | null>(null);
 
+  // New state for custom mode
+  const [customMode, setCustomMode] = useState(false);
+  const [customFirstBlockDays, setCustomFirstBlockDays] = useState(10);
+
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
     setBirthDate(normalized);
@@ -52,7 +56,68 @@ function App() {
 
     if (!birthDate || !mandatoryPeriod) return;
 
-    // Si on est en mode split interactif
+    // Si on est en mode personnalisé (custom mode)
+    if (customMode && remainingBlocks.length === 0) {
+      // Premier clic : placer le premier bloc
+      const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, customFirstBlockDays);
+
+      if (!firstBlock) {
+        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
+        return;
+      }
+
+      const validation = validateRemainingBlock(
+        firstBlock.start,
+        firstBlock.end,
+        birthDate,
+        employerPeriod,
+        mandatoryPeriod,
+        remainingBlocks,
+        0
+      );
+
+      if (!validation.valid) {
+        setError(validation.error || 'Bloc invalide');
+        return;
+      }
+
+      setRemainingBlocks([firstBlock]);
+      setSuccessMessage(`✅ Premier bloc de ${customFirstBlockDays} jours placé ! Cliquez sur une autre date pour placer les ${21 - customFirstBlockDays} jours restants.`);
+      return;
+    }
+
+    if (customMode && remainingBlocks.length === 1) {
+      // Deuxième clic : placer le second bloc
+      const remainingDays = 21 - customFirstBlockDays;
+      const secondBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, remainingDays);
+
+      if (!secondBlock) {
+        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
+        return;
+      }
+
+      const validation = validateRemainingBlock(
+        secondBlock.start,
+        secondBlock.end,
+        birthDate,
+        employerPeriod,
+        mandatoryPeriod,
+        remainingBlocks,
+        customFirstBlockDays
+      );
+
+      if (!validation.valid) {
+        setError(validation.error || 'Bloc invalide');
+        return;
+      }
+
+      setRemainingBlocks([...remainingBlocks, secondBlock]);
+      setCustomMode(false);
+      setSuccessMessage('🎉 Planning complet ! Les 21 jours ont été planifiés en 2 périodes personnalisées.');
+      return;
+    }
+
+    // Si on est en mode split interactif (ancien système - on le garde pour compatibilité)
     if (splitMode === 'placing-first' && splitConfig) {
       const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, splitConfig[0]);
 
@@ -112,7 +177,7 @@ function App() {
       return;
     }
 
-    // Mode normal (automatique)
+    // Mode simple/automatique : 1 clic = 21 jours
     const totalUsedDays = remainingBlocks.reduce((sum: number, block: LeaveBlock) =>
       sum + (differenceInDays(block.end, block.start) + 1), 0
     );
@@ -147,6 +212,9 @@ function App() {
 
     setRemainingBlocks([...remainingBlocks, autoBlock]);
     setError(null);
+    if (!customMode) {
+      setSuccessMessage('✅ Les 21 jours ont été planifiés automatiquement !');
+    }
   };
 
   const handleResetRequest = () => {
@@ -165,6 +233,7 @@ function App() {
     setSplitMode('idle');
     setSplitConfig(null);
     setPreviewBlock(null);
+    setCustomMode(false);
   };
 
   const handleResetCancel = () => {
@@ -235,6 +304,7 @@ function App() {
     setSuccessMessage(null);
     setSplitMode('idle');
     setSplitConfig(null);
+    setCustomMode(false);
   };
 
   return (
@@ -346,95 +416,178 @@ function App() {
           />
         </div>
 
-        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && splitMode === 'idle' && (
-          <div className="max-w-3xl mx-auto mb-8 animate-fade-in">
-            <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl border-2 border-slate-200/80 p-8 shadow-xl hover:shadow-2xl transition-apple-smooth">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl mb-4 shadow-lg">
-                  <span className="text-3xl">📅</span>
+        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && splitMode === 'idle' && !customMode && (
+          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in">
+            <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl sm:rounded-3xl border-2 border-slate-200/80 p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-apple-smooth">
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl mb-3 sm:mb-4 shadow-lg">
+                  <span className="text-2xl sm:text-3xl">📅</span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
                   Planifiez vos 21 jours restants
                 </h3>
-                <p className="text-slate-600 text-sm">
-                  Choisissez comment organiser vos congés paternité
+                <p className="text-slate-600 text-sm px-4">
+                  Cliquez sur une date dans le calendrier pour placer vos 21 jours automatiquement
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Option 1: Tout d'un coup */}
-                <div className="group bg-white rounded-2xl border-2 border-slate-200 p-6 hover:border-teal-400 hover:shadow-xl transition-all cursor-pointer">
-                  <div className="text-center mb-4">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-teal-400 to-teal-500 rounded-2xl mb-3 shadow-lg group-hover:scale-110 transition-all">
-                      <span className="text-4xl font-bold text-white">21</span>
-                    </div>
-                    <h4 className="text-lg font-bold text-slate-900 mb-2">Tout d'un coup</h4>
-                    <p className="text-sm text-slate-600 mb-4">
-                      21 jours consécutifs<br />après la période obligatoire
+              {/* Mode personnalisé toggle */}
+              <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-200 rounded-2xl p-5 sm:p-6 mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="text-base sm:text-lg font-bold text-teal-900 mb-1">
+                      Mode personnalisé
+                    </h4>
+                    <p className="text-xs sm:text-sm text-teal-700">
+                      Choisissez vous-même où placer vos 2 périodes (min. 5j chacune)
                     </p>
                   </div>
                   <button
-                    onClick={handleAutomaticPlanning}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                    onClick={() => setCustomMode(true)}
+                    className="flex-shrink-0 ml-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] text-sm sm:text-base"
                   >
-                    Planifier
+                    Activer
                   </button>
                 </div>
 
-                {/* Option 2: En 2 périodes */}
-                <div className="group bg-white rounded-2xl border-2 border-slate-200 p-6 hover:border-emerald-400 hover:shadow-xl transition-all">
-                  <div className="text-center mb-4">
-                    <div className="flex gap-2 justify-center mb-3">
-                      <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-500 rounded-xl shadow-md group-hover:scale-110 transition-all">
-                        <span className="text-2xl font-bold text-white">{firstBlockDays}</span>
-                      </div>
-                      <div className="flex items-center justify-center w-4 h-16 text-slate-400 font-bold">
-                        +
-                      </div>
-                      <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl shadow-md group-hover:scale-110 transition-all">
-                        <span className="text-2xl font-bold text-white">{21 - firstBlockDays}</span>
+                {/* Prévisualisation */}
+                <div className="bg-white/80 rounded-xl p-3 sm:p-4">
+                  <p className="text-xs text-slate-600 mb-2 text-center">Répartition par défaut : 10j + 11j</p>
+                  <div className="flex gap-2">
+                    <div className="flex-1 h-8 sm:h-10 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
+                      10 jours
+                    </div>
+                    <div className="flex-1 h-8 sm:h-10 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
+                      11 jours
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Instructions simples */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                <p className="text-sm text-slate-700 font-medium">
+                  💡 <span className="font-semibold">Mode simple</span> : 1 clic sur le calendrier = 21 jours placés d'un coup
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mode personnalisé actif */}
+        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && (
+          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
+            <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl sm:rounded-3xl border-2 border-teal-300 p-6 sm:p-8 shadow-xl">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    ⚙️
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-teal-900 mb-2">
+                    Mode personnalisé activé
+                  </h3>
+                  <p className="text-sm sm:text-base text-teal-800">
+                    Ajustez la répartition, puis cliquez 2 fois sur le calendrier pour placer vos périodes
+                  </p>
+                </div>
+              </div>
+
+              {/* Slider personnalisé */}
+              <div className="bg-white rounded-2xl p-5 sm:p-6 mb-4 shadow-md">
+                <div className="text-center mb-4">
+                  <p className="text-sm font-semibold text-slate-700 mb-3">
+                    Choisissez la répartition de vos 21 jours
+                  </p>
+                  <div className="flex gap-2 justify-center items-center mb-3">
+                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-teal-400 to-teal-500 rounded-xl shadow-md">
+                      <div className="text-center">
+                        <div className="text-2xl sm:text-3xl font-bold text-white">{customFirstBlockDays}</div>
+                        <div className="text-[10px] text-white/90">jours</div>
                       </div>
                     </div>
-                    <h4 className="text-lg font-bold text-slate-900 mb-2">En 2 périodes</h4>
-                    <p className="text-sm text-slate-600 mb-4">
-                      Fractionnez selon vos besoins<br />
-                      <span className="text-xs text-slate-500">(minimum 5j par bloc)</span>
-                    </p>
-                  </div>
-
-                  {/* Slider interactif */}
-                  <div className="mb-4 bg-slate-50 rounded-xl p-4">
-                    <div className="flex gap-2 mb-3">
-                      <div
-                        className="h-10 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                        style={{ width: `${(firstBlockDays / 21) * 100}%` }}
-                      >
-                        {firstBlockDays}j
-                      </div>
-                      <div
-                        className="h-10 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                        style={{ width: `${((21 - firstBlockDays) / 21) * 100}%` }}
-                      >
-                        {21 - firstBlockDays}j
+                    <div className="text-2xl text-slate-400 font-bold">+</div>
+                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl shadow-md">
+                      <div className="text-center">
+                        <div className="text-2xl sm:text-3xl font-bold text-white">{21 - customFirstBlockDays}</div>
+                        <div className="text-[10px] text-white/90">jours</div>
                       </div>
                     </div>
-                    <input
-                      type="range"
-                      min="5"
-                      max="16"
-                      value={firstBlockDays}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstBlockDays(Number(e.target.value))}
-                      className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb"
-                      disabled={splitMode !== 'idle'}
-                    />
                   </div>
+                </div>
 
-                  <button
-                    onClick={handleStartInteractiveSplit}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                {/* Barre visuelle */}
+                <div className="flex gap-2 mb-4">
+                  <div
+                    className="h-12 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                    style={{ width: `${(customFirstBlockDays / 21) * 100}%` }}
                   >
-                    Commencer le placement
-                  </button>
+                    Période 1
+                  </div>
+                  <div
+                    className="h-12 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                    style={{ width: `${((21 - customFirstBlockDays) / 21) * 100}%` }}
+                  >
+                    Période 2
+                  </div>
+                </div>
+
+                {/* Slider */}
+                <input
+                  type="range"
+                  min="5"
+                  max="16"
+                  value={customFirstBlockDays}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomFirstBlockDays(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb mb-2"
+                />
+                <p className="text-xs text-slate-500 text-center">
+                  Déplacez le curseur • Minimum 5 jours par période
+                </p>
+              </div>
+
+              {/* Instructions et boutons */}
+              <div className="bg-white/60 rounded-xl p-4 mb-4 border-2 border-teal-200">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-8 h-8 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
+                  <p className="text-sm text-teal-900 font-medium">
+                    Cliquez sur le calendrier pour placer le 1er bloc de <span className="font-bold">{customFirstBlockDays} jours</span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
+                  <p className="text-sm text-emerald-900 font-medium">
+                    Puis cliquez à nouveau pour placer le 2ème bloc de <span className="font-bold">{21 - customFirstBlockDays} jours</span>
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setCustomMode(false)}
+                className="w-full px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-slate-200 hover:border-slate-300"
+              >
+                Annuler et revenir au mode simple
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Message pendant le placement personnalisé */}
+        {customMode && remainingBlocks.length === 1 && (
+          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-300 p-6 shadow-xl">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg animate-pulse-subtle flex-shrink-0">
+                  2
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-lg sm:text-xl font-bold text-emerald-900 mb-1">
+                    Placez maintenant le second bloc
+                  </h4>
+                  <p className="text-sm text-emerald-800">
+                    Cliquez sur une date dans le calendrier pour placer les {21 - customFirstBlockDays} jours restants
+                  </p>
                 </div>
               </div>
             </div>

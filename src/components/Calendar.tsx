@@ -164,8 +164,8 @@ export function Calendar({
 
       {birthDate && remainingBlocks.length === 0 && mandatoryPeriod && (
         <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
-          <p className="text-xs sm:text-sm text-teal-900 text-center font-semibold mb-2">
-            ✨ Choisissez votre mode de planification ci-dessous
+          <p className="text-xs sm:text-sm text-teal-900 text-center font-semibold">
+            👇 Cliquez sur une date du calendrier ou utilisez le mode personnalisé ci-dessous
           </p>
         </div>
       )}
