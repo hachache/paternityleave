@@ -1,0 +1,112 @@
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Calendar, CheckCircle2, Clock } from 'lucide-react';
+import { LeaveBlock, countCalendarDays } from '../utils/paternityLeave';
+
+interface SummaryProps {
+  birthDate: Date | null;
+  employerPeriod: LeaveBlock | null;
+  mandatoryPeriod: LeaveBlock | null;
+  remainingBlocks: LeaveBlock[];
+  onRemoveBlock: (index: number) => void;
+}
+
+export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingBlocks, onRemoveBlock }: SummaryProps) {
+  if (!birthDate) {
+    return null;
+  }
+
+  const totalRemainingDays = remainingBlocks.reduce((sum, block) =>
+    sum + countCalendarDays(block.start, block.end), 0
+  );
+  const remainingDaysLeft = 21 - totalRemainingDays;
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-apple">
+      <h2 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+        <CheckCircle2 className="w-5 h-5 text-slate-500" />
+        Votre planning
+      </h2>
+
+      <div className="space-y-4">
+        <div className="flex items-start gap-3 pb-4 border-b border-slate-200 mb-4">
+          <Calendar className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs font-medium text-slate-500 mb-1">Date de naissance</p>
+            <p className="text-slate-900 font-medium text-sm capitalize">
+              {format(birthDate, 'EEEE d MMMM yyyy', { locale: fr })}
+            </p>
+          </div>
+        </div>
+
+        {employerPeriod && (
+          <div className="bg-sky-50 rounded-lg p-4 mb-3 transition-apple hover:shadow-md hover:scale-[1.01] animate-slide-in">
+            <p className="font-medium text-sky-900 text-sm mb-1">
+              Période employeur
+            </p>
+            <p className="text-xs text-sky-700 mb-2">3 jours ouvrés</p>
+            <p className="text-xs text-sky-800">
+              Du {format(employerPeriod.start, 'd MMM', { locale: fr })} au{' '}
+              {format(employerPeriod.end, 'd MMM yyyy', { locale: fr })}
+            </p>
+          </div>
+        )}
+
+        {mandatoryPeriod && (
+          <div className="bg-amber-50 rounded-lg p-4 mb-3 transition-apple hover:shadow-md hover:scale-[1.01] animate-slide-in">
+            <p className="font-medium text-amber-900 text-sm mb-1">
+              Période obligatoire
+            </p>
+            <p className="text-xs text-amber-700 mb-2">4 jours calendaires</p>
+            <p className="text-xs text-amber-800">
+              Du {format(mandatoryPeriod.start, 'd MMM', { locale: fr })} au{' '}
+              {format(mandatoryPeriod.end, 'd MMM yyyy', { locale: fr })}
+            </p>
+          </div>
+        )}
+
+        <div className="bg-teal-50 rounded-lg p-4 transition-apple-smooth hover:shadow-md hover:scale-[1.01] animate-slide-in">
+          <p className="font-medium text-teal-900 text-sm mb-3">
+            Jours fractionnables
+          </p>
+          {remainingBlocks.length > 0 ? (
+            <div className="space-y-2">
+              {remainingBlocks.map((block, index) => (
+                <div key={index} className="bg-white rounded-lg p-3 group hover:bg-red-50 transition-apple-smooth hover:shadow-md relative cursor-pointer" onClick={() => onRemoveBlock(index)}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs text-teal-700 font-medium mb-1 group-hover:text-red-700 transition-apple">Bloc {index + 1}</p>
+                      <p className="text-xs text-teal-900 mb-1 group-hover:text-red-900 transition-apple">
+                        Du {format(block.start, 'd MMM', { locale: fr })} au{' '}
+                        {format(block.end, 'd MMM yyyy', { locale: fr })}
+                      </p>
+                      <p className="text-xs text-teal-600 group-hover:text-red-600 transition-apple">{countCalendarDays(block.start, block.end)} jours</p>
+                    </div>
+                    <span className="text-xs text-slate-400 group-hover:text-red-600 font-medium transition-apple">Cliquer pour supprimer</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-teal-700">Aucun bloc planifié</p>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-200">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-slate-400 animate-pulse-subtle" />
+            <div>
+              <p className="text-xs text-slate-500">Jours restants</p>
+              <p className="text-slate-900 font-semibold text-2xl transition-apple">
+                {remainingDaysLeft}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-slate-500">sur 21 jours</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
