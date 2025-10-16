@@ -41,7 +41,7 @@ export function getFrenchHolidays(year: number): Date[] {
 
 export function isWeekend(date: Date): boolean {
   const day = date.getDay();
-  return day === 0;
+  return day === 0 || day === 6;
 }
 
 export function isFrenchHoliday(date: Date, holidays: Date[]): boolean {

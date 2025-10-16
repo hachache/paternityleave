@@ -131,11 +131,13 @@ export function isDateInRange(date: Date, start: Date, end: Date): boolean {
 
 export function calculateAutomaticRemainingPeriod(
   birthDate: Date,
-  mandatoryEnd: Date,
+  startDateOrMandatoryEnd: Date,
   daysNeeded: number = 21
 ): LeaveBlock | null {
   const sixMonthsLimit = addDays(birthDate, 180);
-  let start = addDays(mandatoryEnd, 1);
+  // Si la date fournie est déjà une date de début valide, on l'utilise directement
+  // Sinon, on considère que c'est la fin de la période obligatoire
+  let start = startOfDay(startDateOrMandatoryEnd);
 
   if (isAfter(start, sixMonthsLimit)) {
     return null;

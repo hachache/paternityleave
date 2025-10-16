@@ -1,4 +1,4 @@
-import { addDays, addMonths, format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, isAfter, startOfDay } from 'date-fns';
+import { addDays, addMonths, format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, isAfter } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -12,7 +12,6 @@ interface CalendarProps {
   mandatoryPeriod: LeaveBlock | null;
   remainingBlocks: LeaveBlock[];
   onSelectRemainingDay: (date: Date) => void;
-  selectionStart: Date | null;
   onRemoveBlock: (index: number) => void;
 }
 
@@ -23,7 +22,6 @@ export function Calendar({
   mandatoryPeriod,
   remainingBlocks,
   onSelectRemainingDay,
-  selectionStart,
   onRemoveBlock
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -61,16 +59,6 @@ export function Calendar({
     for (const block of remainingBlocks) {
       if (isDateInRange(date, block.start, block.end)) {
         return 'remaining';
-      }
-    }
-
-    if (selectionStart && !isSameDay(date, selectionStart)) {
-      const start = startOfDay(selectionStart);
-      const end = startOfDay(date);
-      const rangeStart = isAfter(end, start) ? start : end;
-      const rangeEnd = isAfter(end, start) ? end : start;
-      if (isDateInRange(date, rangeStart, rangeEnd) && isSelectable(date)) {
-        return 'selection';
       }
     }
 
@@ -148,9 +136,7 @@ export function Calendar({
     } else if (dayType === 'mandatory') {
       classes += 'bg-amber-500 text-white font-medium ';
     } else if (dayType === 'remaining') {
-      classes += 'bg-teal-500 text-white font-medium ';
-    } else if (dayType === 'selection') {
-      classes += 'bg-teal-100 text-teal-900 ';
+      classes += 'bg-teal-500 text-white font-medium cursor-pointer hover:bg-teal-600 ';
     } else if (selectable && isCurrentMonth) {
       classes += 'hover:bg-slate-100 hover:shadow-sm cursor-pointer text-slate-900 active:scale-95 ';
     } else {
@@ -167,19 +153,30 @@ export function Calendar({
   const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-10 shadow-sm hover:shadow-xl transition-apple-smooth card-hover-3d">
+    <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/50 p-10 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
       {!birthDate && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 backdrop-blur-sm animate-spring-in shadow-sm">
-          <p className="text-sm text-slate-700 text-center font-medium">
-            Cliquez sur un jour du calendrier pour sélectionner la date de naissance
+        <div className="mb-6 p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
+          <p className="text-sm text-teal-900 text-center font-semibold">
+            👶 Cliquez sur un jour du calendrier pour sélectionner la date de naissance
           </p>
         </div>
       )}
 
-      {birthDate && !selectionStart && remainingBlocks.length === 0 && mandatoryPeriod && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-200 backdrop-blur-sm animate-spring-in shadow-sm">
-          <p className="text-sm text-teal-800 text-center font-medium">
-            Utilisez la planification automatique ci-dessous ou cliquez manuellement sur un jour pour commencer à sélectionner vos blocs (minimum 5 jours consécutifs)
+      {birthDate && remainingBlocks.length === 0 && mandatoryPeriod && (
+        <div className="mb-6 p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
+          <p className="text-sm text-teal-900 text-center font-semibold mb-2">
+            ✨ Planifiez vos 21 jours restants
+          </p>
+          <p className="text-xs text-teal-700 text-center">
+            Cliquez sur un jour dans le calendrier pour placer automatiquement les 21 jours à partir de cette date
+          </p>
+        </div>
+      )}
+
+      {birthDate && remainingBlocks.length > 0 && (
+        <div className="mb-6 p-5 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200/60 backdrop-blur-sm animate-spring-in shadow-md">
+          <p className="text-sm text-emerald-900 text-center font-semibold">
+            ✓ Vous pouvez cliquer sur les blocs verts pour les supprimer ou ajouter d'autres périodes
           </p>
         </div>
       )}
@@ -187,20 +184,20 @@ export function Calendar({
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={previousMonth}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-apple-smooth active:scale-95 hover:shadow-md hover:scale-105"
+          className="p-3 hover:bg-slate-100/80 rounded-xl transition-apple-smooth active:scale-95 hover:shadow-lg hover:scale-105 border border-transparent hover:border-slate-200"
         >
-          <ChevronLeft className="w-5 h-5 text-slate-600" />
+          <ChevronLeft className="w-6 h-6 text-slate-600" />
         </button>
 
-        <h2 className="text-lg font-semibold text-slate-900 capitalize">
+        <h2 className="text-xl font-bold text-slate-900 capitalize tracking-tight">
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
 
         <button
           onClick={nextMonth}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-apple-smooth active:scale-95 hover:shadow-md hover:scale-105"
+          className="p-3 hover:bg-slate-100/80 rounded-xl transition-apple-smooth active:scale-95 hover:shadow-lg hover:scale-105 border border-transparent hover:border-slate-200"
         >
-          <ChevronRight className="w-5 h-5 text-slate-600" />
+          <ChevronRight className="w-6 h-6 text-slate-600" />
         </button>
       </div>
 
@@ -213,44 +210,45 @@ export function Calendar({
       </div>
 
       <div className="grid grid-cols-7 gap-4">
-        {days.map((day, index) => (
-          <button
-            key={index}
-            onClick={() => handleDayClick(day)}
-            className={getDayClasses(day)}
-            disabled={!isSelectable(day) && getDayType(day) === null}
-          >
-            {format(day, 'd')}
-          </button>
-        ))}
+        {days.map((day, index) => {
+          const dayType = getDayType(day);
+          const selectable = isSelectable(day);
+          // Les jours sont cliquables si : ils sont sélectionnables OU si c'est un bloc vert (remaining) OU si c'est la date de naissance
+          const isClickable = selectable || dayType === 'remaining' || (birthDate && isSameDay(day, birthDate));
+
+          return (
+            <button
+              key={index}
+              onClick={() => handleDayClick(day)}
+              className={getDayClasses(day)}
+              disabled={!isClickable}
+            >
+              {format(day, 'd')}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-slate-200">
+      <div className="mt-8 pt-6 border-t border-slate-200/60">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-5 h-5 bg-slate-900 rounded"></div>
-            <span className="text-slate-700 font-medium">Naissance</span>
+          <div className="flex items-center gap-3 group">
+            <div className="w-6 h-6 bg-slate-900 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
+            <span className="text-slate-700 font-semibold">Naissance</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-5 h-5 bg-sky-500 rounded"></div>
-            <span className="text-slate-700 font-medium">Employeur (3j)</span>
+          <div className="flex items-center gap-3 group">
+            <div className="w-6 h-6 bg-sky-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
+            <span className="text-slate-700 font-semibold">Employeur (3j)</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-5 h-5 bg-amber-500 rounded"></div>
-            <span className="text-slate-700 font-medium">Obligatoire (4j)</span>
+          <div className="flex items-center gap-3 group">
+            <div className="w-6 h-6 bg-amber-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
+            <span className="text-slate-700 font-semibold">Obligatoire (4j)</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-5 h-5 bg-teal-500 rounded"></div>
-            <span className="text-slate-700 font-medium">Restants</span>
+          <div className="flex items-center gap-3 group">
+            <div className="w-6 h-6 bg-teal-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
+            <span className="text-slate-700 font-semibold">Restants</span>
           </div>
         </div>
       </div>
-
-      {selectionStart && (
-        <div className="mt-4 p-3 bg-teal-50 rounded-xl text-sm text-teal-900 backdrop-blur-sm animate-slide-in border border-teal-200">
-          <p className="text-teal-800 font-medium">Cliquez sur une date de fin (minimum 5 jours calendaires)</p>
-        </div>
-      )}
     </div>
   );
 }

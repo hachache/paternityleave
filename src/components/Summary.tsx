@@ -22,9 +22,11 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
   const remainingDaysLeft = 21 - totalRemainingDays;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-apple">
-      <h2 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
-        <CheckCircle2 className="w-5 h-5 text-slate-500" />
+    <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
+      <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+        <div className="p-2 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl">
+          <CheckCircle2 className="w-5 h-5 text-white" />
+        </div>
         Votre planning
       </h2>
 
@@ -40,12 +42,13 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
         </div>
 
         {employerPeriod && (
-          <div className="bg-sky-50 rounded-lg p-4 mb-3 transition-apple hover:shadow-md hover:scale-[1.01] animate-slide-in">
-            <p className="font-medium text-sky-900 text-sm mb-1">
+          <div className="bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-5 mb-3 transition-apple-smooth hover:shadow-lg hover:scale-[1.02] animate-slide-in border border-sky-200/50">
+            <p className="font-bold text-sky-900 text-base mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 bg-sky-500 rounded-full"></span>
               Période employeur
             </p>
-            <p className="text-xs text-sky-700 mb-2">3 jours ouvrés</p>
-            <p className="text-xs text-sky-800">
+            <p className="text-sm text-sky-700 mb-2 font-medium">3 jours ouvrés</p>
+            <p className="text-sm text-sky-800">
               Du {format(employerPeriod.start, 'd MMM', { locale: fr })} au{' '}
               {format(employerPeriod.end, 'd MMM yyyy', { locale: fr })}
             </p>
@@ -53,42 +56,44 @@ export function Summary({ birthDate, employerPeriod, mandatoryPeriod, remainingB
         )}
 
         {mandatoryPeriod && (
-          <div className="bg-amber-50 rounded-lg p-4 mb-3 transition-apple hover:shadow-md hover:scale-[1.01] animate-slide-in">
-            <p className="font-medium text-amber-900 text-sm mb-1">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 mb-3 transition-apple-smooth hover:shadow-lg hover:scale-[1.02] animate-slide-in border border-amber-200/50">
+            <p className="font-bold text-amber-900 text-base mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
               Période obligatoire
             </p>
-            <p className="text-xs text-amber-700 mb-2">4 jours calendaires</p>
-            <p className="text-xs text-amber-800">
+            <p className="text-sm text-amber-700 mb-2 font-medium">4 jours calendaires</p>
+            <p className="text-sm text-amber-800">
               Du {format(mandatoryPeriod.start, 'd MMM', { locale: fr })} au{' '}
               {format(mandatoryPeriod.end, 'd MMM yyyy', { locale: fr })}
             </p>
           </div>
         )}
 
-        <div className="bg-teal-50 rounded-lg p-4 transition-apple-smooth hover:shadow-md hover:scale-[1.01] animate-slide-in">
-          <p className="font-medium text-teal-900 text-sm mb-3">
+        <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-5 transition-apple-smooth hover:shadow-lg hover:scale-[1.01] animate-slide-in border border-teal-200/50">
+          <p className="font-bold text-teal-900 text-base mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 bg-teal-500 rounded-full"></span>
             Jours fractionnables
           </p>
           {remainingBlocks.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {remainingBlocks.map((block, index) => (
-                <div key={index} className="bg-white rounded-lg p-3 group hover:bg-red-50 transition-apple-smooth hover:shadow-md relative cursor-pointer" onClick={() => onRemoveBlock(index)}>
+                <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 group hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 transition-apple-smooth hover:shadow-md relative cursor-pointer border border-teal-200/30 hover:border-red-300" onClick={() => onRemoveBlock(index)}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="text-xs text-teal-700 font-medium mb-1 group-hover:text-red-700 transition-apple">Bloc {index + 1}</p>
-                      <p className="text-xs text-teal-900 mb-1 group-hover:text-red-900 transition-apple">
+                      <p className="text-sm text-teal-700 font-bold mb-2 group-hover:text-red-700 transition-apple">Bloc {index + 1}</p>
+                      <p className="text-sm text-teal-900 mb-1 group-hover:text-red-900 transition-apple font-medium">
                         Du {format(block.start, 'd MMM', { locale: fr })} au{' '}
                         {format(block.end, 'd MMM yyyy', { locale: fr })}
                       </p>
-                      <p className="text-xs text-teal-600 group-hover:text-red-600 transition-apple">{countCalendarDays(block.start, block.end)} jours</p>
+                      <p className="text-xs text-teal-600 group-hover:text-red-600 transition-apple font-semibold">{countCalendarDays(block.start, block.end)} jours</p>
                     </div>
-                    <span className="text-xs text-slate-400 group-hover:text-red-600 font-medium transition-apple">Cliquer pour supprimer</span>
+                    <span className="text-xs text-slate-400 group-hover:text-red-600 font-semibold transition-apple">✕ Supprimer</span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-teal-700">Aucun bloc planifié</p>
+            <p className="text-sm text-teal-700 font-medium">Aucun bloc planifié</p>
           )}
         </div>
 

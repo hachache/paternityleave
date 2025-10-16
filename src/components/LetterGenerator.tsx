@@ -65,16 +65,18 @@ export function LetterGenerator({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-apple-smooth card-hover-3d">
-      <h2 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
-        <Mail className="w-5 h-5 text-slate-500" />
+    <div className="bg-white/80 backdrop-blur-xl border border-slate-200/50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
+      <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+        <div className="p-2 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl">
+          <Mail className="w-5 h-5 text-white" />
+        </div>
         Courrier de demande
       </h2>
 
       <div className="space-y-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               Lieu
             </label>
             <input
@@ -82,11 +84,11 @@ export function LetterGenerator({
               value={lieu}
               onChange={(e) => setLieu(e.target.value)}
               placeholder="Paris"
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm transition-apple hover:border-slate-400"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               Date de rédaction
             </label>
             <input
@@ -94,14 +96,14 @@ export function LetterGenerator({
               value={dateRedaction}
               onChange={(e) => setDateRedaction(e.target.value)}
               placeholder="01/01/2024"
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm transition-apple hover:border-slate-400"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               Prénom
             </label>
             <input
@@ -109,11 +111,11 @@ export function LetterGenerator({
               value={prenom}
               onChange={(e) => setPrenom(e.target.value)}
               placeholder="Jean"
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm transition-apple hover:border-slate-400"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               Nom
             </label>
             <input
@@ -121,13 +123,13 @@ export function LetterGenerator({
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               placeholder="Dupont"
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm transition-apple hover:border-slate-400"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-sm font-semibold text-slate-700 mb-2">
             Adresse
           </label>
           <input
@@ -135,12 +137,12 @@ export function LetterGenerator({
             value={adresse}
             onChange={(e) => setAdresse(e.target.value)}
             placeholder="123 Rue de la République, 75001 Paris"
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm"
+            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-sm font-semibold text-slate-700 mb-2">
             Fonction
           </label>
           <input
@@ -148,12 +150,12 @@ export function LetterGenerator({
             value={fonction}
             onChange={(e) => setFonction(e.target.value)}
             placeholder="Développeur"
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm"
+            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
           />
         </div>
       </div>
 
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-4 shadow-inner">
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-2xl p-6 mb-6 shadow-inner">
         <pre className="whitespace-pre-wrap text-sm text-slate-800 font-mono leading-relaxed">
           {generateLetter()}
         </pre>
@@ -161,7 +163,7 @@ export function LetterGenerator({
 
       <button
         onClick={handleCopy}
-        className="w-full md:w-auto px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 hover:shadow-lg transition-apple font-medium flex items-center justify-center gap-2 active:scale-[0.96] hover:scale-[1.02]"
+        className="w-full px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl hover:from-slate-800 hover:to-slate-700 hover:shadow-xl transition-apple-smooth font-semibold flex items-center justify-center gap-3 active:scale-[0.98] hover:scale-[1.02]"
       >
         {copied ? (
           <>
