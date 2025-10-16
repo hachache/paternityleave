@@ -12,18 +12,8 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
   useEffect(() => {
     if (show) {
       setIsVisible(true);
-      let closeTimer: NodeJS.Timeout;
-
-      // Auto-fermer après 4 secondes
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-        closeTimer = setTimeout(onClose, 300); // Attendre la fin de l'animation
-      }, 4000);
-
-      return () => {
-        clearTimeout(timer);
-        if (closeTimer) clearTimeout(closeTimer);
-      };
+    } else {
+      setIsVisible(false);
     }
   }, [show]);
 
@@ -36,10 +26,6 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
         transition-opacity duration-300
         ${isVisible ? 'opacity-100' : 'opacity-0'}
       `}
-      onClick={() => {
-        setIsVisible(false);
-        setTimeout(onClose, 300);
-      }}
     >
       <div
         className={`
