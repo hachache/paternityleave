@@ -101,6 +101,12 @@ function App() {
 
     // Mode de sélection visuelle
     if (visualSelectionMode && selectionStep === 'selecting-start') {
+      // Vérifier que la date de début n'est pas avant la naissance
+      if (normalized < birthDate) {
+        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
+        return;
+      }
+
       setSelectionStartDate(normalized);
       setSelectionStep('selecting-end');
       setSuccessMessage(`✅ Date de début sélectionnée : ${normalized.toLocaleDateString('fr-FR')}. Cliquez maintenant sur la date de FIN de votre première période.`);
@@ -164,6 +170,12 @@ function App() {
 
     // Si on est en mode personnalisé (custom mode)
     if (customMode && remainingBlocks.length === 0) {
+      // Vérifier que la date n'est pas avant la naissance
+      if (normalized < birthDate) {
+        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
+        return;
+      }
+
       // Premier clic : placer le premier bloc
       const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, customFirstBlockDays);
 
@@ -227,6 +239,12 @@ function App() {
 
     // Si on est en mode split interactif (ancien système - on le garde pour compatibilité)
     if (splitMode === 'placing-first' && splitConfig) {
+      // Vérifier que la date n'est pas avant la naissance
+      if (normalized < birthDate) {
+        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
+        return;
+      }
+
       const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, splitConfig[0]);
 
       if (!firstBlock) {
