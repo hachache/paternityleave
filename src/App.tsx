@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { startOfDay, differenceInDays, addDays } from 'date-fns';
-import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
+import { Calendar as CalendarIcon, RotateCcw, Undo2 } from 'lucide-react';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
 import { LegalInfo } from './components/LegalInfo';
 import { LetterGenerator } from './components/LetterGenerator';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import { ProgressStepper } from './components/ProgressStepper';
+import { ProgressCounter } from './components/ProgressCounter';
+import { CelebrationModal } from './components/CelebrationModal';
 import {
   calculateEmployerPeriod,
   calculateMandatoryPeriod,
@@ -40,6 +42,13 @@ function App() {
   const [selectionStep, setSelectionStep] = useState<'idle' | 'selecting-start' | 'selecting-end'>('idle');
   const [selectionStartDate, setSelectionStartDate] = useState<Date | null>(null);
 
+  // State for undo/redo functionality
+  const [history, setHistory] = useState<LeaveBlock[][]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // State for celebration modal
+  const [showCelebration, setShowCelebration] = useState(false);
+
   // Refs for smooth scrolling
   const calendarRef = useRef<HTMLDivElement>(null);
   const planningRef = useRef<HTMLDivElement>(null);
@@ -58,6 +67,34 @@ function App() {
       });
     }
   };
+
+  // Save to history for undo functionality
+  const saveToHistory = (blocks: LeaveBlock[]) => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push([...blocks]);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
+
+  // Undo last action
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+      setRemainingBlocks(history[historyIndex - 1]);
+    }
+  };
+
+  // Check if planning is complete and show celebration
+  useEffect(() => {
+    if (birthDate && mandatoryPeriod && remainingBlocks.length > 0) {
+      const totalPlanned = remainingBlocks.reduce((sum, block) =>
+        sum + (differenceInDays(block.end, block.start) + 1), 0
+      );
+      if (totalPlanned === 21 && !showCelebration) {
+        setTimeout(() => setShowCelebration(true), 500);
+      }
+    }
+  }, [remainingBlocks, birthDate, mandatoryPeriod, showCelebration]);
 
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
@@ -137,7 +174,9 @@ function App() {
         return;
       }
 
-      setRemainingBlocks([firstBlock]);
+      const newBlocks = [firstBlock];
+      setRemainingBlocks(newBlocks);
+      saveToHistory(newBlocks);
       setVisualSelectionMode(false);
       setSelectionStep('idle');
       setSelectionStartDate(null);
@@ -171,7 +210,9 @@ function App() {
         return;
       }
 
-      setRemainingBlocks([firstBlock]);
+      const newBlocks = [firstBlock];
+      setRemainingBlocks(newBlocks);
+      saveToHistory(newBlocks);
       setSuccessMessage(`✅ Premier bloc de ${customFirstBlockDays} jours placé ! Cliquez sur une autre date pour placer les ${21 - customFirstBlockDays} jours restants.`);
       return;
     }
@@ -201,7 +242,9 @@ function App() {
         return;
       }
 
-      setRemainingBlocks([...remainingBlocks, secondBlock]);
+      const newBlocks = [...remainingBlocks, secondBlock];
+      setRemainingBlocks(newBlocks);
+      saveToHistory(newBlocks);
       setCustomMode(false);
       setSuccessMessage('🎉 Planning complet ! Les 21 jours ont été planifiés en 2 périodes personnalisées.');
       return;
@@ -231,7 +274,9 @@ function App() {
         return;
       }
 
-      setRemainingBlocks([firstBlock]);
+      const newBlocks = [firstBlock];
+      setRemainingBlocks(newBlocks);
+      saveToHistory(newBlocks);
       setSplitMode('placing-second');
       setSuccessMessage(`✅ Premier bloc de ${splitConfig[0]} jours placé ! Cliquez maintenant sur le calendrier pour placer le second bloc de ${splitConfig[1]} jours.`);
       return;
@@ -260,7 +305,9 @@ function App() {
         return;
       }
 
-      setRemainingBlocks([...remainingBlocks, secondBlock]);
+      const newBlocks = [...remainingBlocks, secondBlock];
+      setRemainingBlocks(newBlocks);
+      saveToHistory(newBlocks);
       setSplitMode('idle');
       setSplitConfig(null);
       setSuccessMessage('🎉 Planning complet ! Les 21 jours ont été planifiés en 2 périodes distinctes.');
@@ -300,7 +347,9 @@ function App() {
       return;
     }
 
-    setRemainingBlocks([...remainingBlocks, autoBlock]);
+    const newBlocks = [...remainingBlocks, autoBlock];
+    setRemainingBlocks(newBlocks);
+    saveToHistory(newBlocks);
     setError(null);
     if (!customMode) {
       setSuccessMessage('✅ Les 21 jours ont été planifiés automatiquement !');
@@ -355,7 +404,9 @@ function App() {
       return;
     }
 
-    setRemainingBlocks([...remainingBlocks, autoBlock]);
+    const newBlocks = [...remainingBlocks, autoBlock];
+    setRemainingBlocks(newBlocks);
+    saveToHistory(newBlocks);
     setError(null);
     setSuccessMessage('✅ Les 21 jours ont été planifiés automatiquement !');
   };
@@ -471,6 +522,20 @@ function App() {
             }
           />
         )}
+
+        {/* Progress Counter */}
+        {birthDate && (
+          <ProgressCounter
+            birthDate={birthDate}
+            remainingBlocks={remainingBlocks}
+          />
+        )}
+
+        {/* Celebration Modal */}
+        <CelebrationModal
+          show={showCelebration}
+          onClose={() => setShowCelebration(false)}
+        />
 
         {/* Modal de confirmation de réinitialisation */}
         {showResetConfirm && (
@@ -844,15 +909,29 @@ function App() {
           </div>
         )}
 
-        {/* Bouton pour effacer les blocs */}
+        {/* Boutons Undo et Effacer */}
         {remainingBlocks.length > 0 && splitMode === 'idle' && (
           <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
-            <button
-              onClick={handleClearAllBlocks}
-              className="w-full px-4 py-3 bg-gradient-to-r from-red-50 to-rose-50 hover:from-red-100 hover:to-rose-100 text-red-700 hover:text-red-800 border-2 border-red-200 hover:border-red-300 rounded-2xl text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
-            >
-              🗑️ Effacer tous les blocs et recommencer
-            </button>
+            <div className="flex gap-3">
+              {/* Undo button */}
+              {historyIndex > 0 && (
+                <button
+                  onClick={handleUndo}
+                  className="flex-shrink-0 px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 text-slate-700 hover:text-slate-900 border-2 border-slate-200 hover:border-slate-300 rounded-2xl text-sm font-semibold transition-all hover:shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2"
+                >
+                  <Undo2 className="w-4 h-4" />
+                  <span>Annuler</span>
+                </button>
+              )}
+
+              {/* Clear all button */}
+              <button
+                onClick={handleClearAllBlocks}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-red-50 to-rose-50 hover:from-red-100 hover:to-rose-100 text-red-700 hover:text-red-800 border-2 border-red-200 hover:border-red-300 rounded-2xl text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+              >
+                🗑️ Effacer tous les blocs
+              </button>
+            </div>
           </div>
         )}
 
