@@ -6,8 +6,6 @@ import { Summary } from './components/Summary';
 import { LegalInfo } from './components/LegalInfo';
 import { LetterGenerator } from './components/LetterGenerator';
 import { ScrollIndicator } from './components/ScrollIndicator';
-import { ProgressStepper } from './components/ProgressStepper';
-import { ProgressCounter } from './components/ProgressCounter';
 import { CelebrationModal } from './components/CelebrationModal';
 import {
   calculateEmployerPeriod,
@@ -84,17 +82,18 @@ function App() {
     }
   };
 
-  // Check if planning is complete and show celebration
+  // Check if planning is complete and show celebration (ONCE)
   useEffect(() => {
     if (birthDate && mandatoryPeriod && remainingBlocks.length > 0) {
       const totalPlanned = remainingBlocks.reduce((sum, block) =>
         sum + (differenceInDays(block.end, block.start) + 1), 0
       );
       if (totalPlanned === 21 && !showCelebration) {
-        setTimeout(() => setShowCelebration(true), 500);
+        const timer = setTimeout(() => setShowCelebration(true), 500);
+        return () => clearTimeout(timer);
       }
     }
-  }, [remainingBlocks, birthDate, mandatoryPeriod, showCelebration]);
+  }, [remainingBlocks, birthDate, mandatoryPeriod]);
 
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
@@ -511,25 +510,6 @@ function App() {
         </header>
 
         <ScrollIndicator show={birthDate !== null} />
-
-        {/* Progress Stepper */}
-        {birthDate && (
-          <ProgressStepper
-            currentStep={
-              !birthDate ? 1 :
-              remainingBlocks.length === 0 ? 2 :
-              3
-            }
-          />
-        )}
-
-        {/* Progress Counter */}
-        {birthDate && (
-          <ProgressCounter
-            birthDate={birthDate}
-            remainingBlocks={remainingBlocks}
-          />
-        )}
 
         {/* Celebration Modal */}
         <CelebrationModal
