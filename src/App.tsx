@@ -121,6 +121,11 @@ function App() {
     cancelVisualSelection();
   };
 
+  // Scroll to top on initial page load
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
   const previousPlannedDays = useRef(totalPlannedDays);
   useEffect(() => {
     if (previousPlannedDays.current < 21 && totalPlannedDays === 21) {
