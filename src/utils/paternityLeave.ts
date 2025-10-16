@@ -142,6 +142,12 @@ export function countCalendarDays(start: Date, end: Date): number {
   return differenceInDays(end, start) + 1;
 }
 
+export function calculateTotalUsedDays(blocks: LeaveBlock[]): number {
+  return blocks.reduce((sum, block) =>
+    sum + (differenceInDays(block.end, block.start) + 1), 0
+  );
+}
+
 export function isDateInRange(date: Date, start: Date, end: Date): boolean {
   const d = startOfDay(date);
   const s = startOfDay(start);
@@ -172,6 +178,11 @@ export function calculateAutomaticRemainingPeriod(
   // Si la date fournie est déjà une date de début valide, on l'utilise directement
   // Sinon, on considère que c'est la fin de la période obligatoire
   let start = startOfDay(startDateOrMandatoryEnd);
+
+  // Les jours fractionnables ne peuvent pas être posés avant la naissance
+  if (isBefore(start, birthDate)) {
+    return null;
+  }
 
   if (isAfter(start, sixMonthsLimit)) {
     return null;

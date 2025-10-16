@@ -12,15 +12,20 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
   useEffect(() => {
     if (show) {
       setIsVisible(true);
+      let closeTimer: NodeJS.Timeout;
+
       // Auto-fermer après 4 secondes
       const timer = setTimeout(() => {
         setIsVisible(false);
-        setTimeout(onClose, 300); // Attendre la fin de l'animation
+        closeTimer = setTimeout(onClose, 300); // Attendre la fin de l'animation
       }, 4000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        if (closeTimer) clearTimeout(closeTimer);
+      };
     }
-  }, [show, onClose]);
+  }, [show]);
 
   if (!show && !isVisible) return null;
 
