@@ -11,6 +11,7 @@ import { ProgressStepper } from './components/ProgressStepper';
 import { CalendarLegend } from './components/CalendarLegend';
 import { SectionCard } from './components/SectionCard';
 import { NextStepsCard } from './components/NextStepsCard';
+import { NavigationAnchor } from './components/NavigationAnchor';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
@@ -138,7 +139,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-20">
         <header className="mb-8 sm:mb-12 text-center animate-fade-in relative">
           <button
             onClick={handleResetRequest}
@@ -176,6 +177,8 @@ function App() {
         </header>
 
         <ScrollIndicator show={birthDate !== null} />
+
+        <NavigationAnchor show={birthDate !== null} />
 
         <div className="max-w-2xl mx-auto mb-8">
           <ProgressStepper currentStep={planningStep} />
@@ -302,7 +305,7 @@ function App() {
           </div>
         )}
 
-        <div ref={calendarRef} className="mb-6 sm:mb-8 max-w-2xl mx-auto scroll-mt-20">
+        <div ref={calendarRef} className="mb-6 sm:mb-8 max-w-2xl mx-auto scroll-mt-20" id="calendar">
           <Calendar
             birthDate={birthDate}
             onSelectBirthDate={handleSelectBirthDate}
@@ -554,7 +557,7 @@ function App() {
 
         {birthDate && (
           <>
-            <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
+            <div className="max-w-2xl mx-auto mb-8 animate-fade-in" id="summary">
               <Summary
                 birthDate={birthDate}
                 employerPeriod={employerPeriod}
@@ -565,7 +568,7 @@ function App() {
             </div>
 
             {mandatoryPeriod && (
-              <div ref={letterRef} className="max-w-2xl mx-auto mb-8 animate-fade-in-delay">
+              <div ref={letterRef} className="max-w-2xl mx-auto mb-8 animate-fade-in-delay" id="letter">
                 <LetterGenerator
                   birthDate={birthDate}
                   employerPeriod={employerPeriod}
@@ -590,7 +593,7 @@ function App() {
           </div>
         )}
 
-        <div className="mt-16 max-w-2xl mx-auto mb-12">
+        <div className="mt-16 max-w-2xl mx-auto mb-12" id="legal">
           <LegalInfo />
         </div>
       </div>
