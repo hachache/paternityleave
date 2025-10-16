@@ -26,14 +26,14 @@ export function addWorkingDays(startDate: Date, days: number): Date {
   let current = startOfDay(startDate);
   let count = 0;
 
-  if (isWorkingDay(current)) {
-    count = 1;
-  }
-
+  // Compter les jours ouvrés à partir de startDate (inclus)
   while (count < days) {
-    current = addDays(current, 1);
     if (isWorkingDay(current)) {
       count++;
+    }
+    // Si on n'a pas encore atteint le nombre de jours requis, avancer
+    if (count < days) {
+      current = addDays(current, 1);
     }
   }
 
