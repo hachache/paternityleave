@@ -21,7 +21,9 @@ function App() {
   const [mandatoryPeriod, setMandatoryPeriod] = useState<LeaveBlock | null>(null);
   const [remainingBlocks, setRemainingBlocks] = useState<LeaveBlock[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [firstBlockDays, setFirstBlockDays] = useState(10);
 
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
@@ -35,11 +37,13 @@ function App() {
 
     setRemainingBlocks([]);
     setError(null);
+    setSuccessMessage(null);
   };
 
   const handleSelectRemainingDay = (date: Date) => {
     const normalized = startOfDay(date);
     setError(null);
+    setSuccessMessage(null);
 
     if (!birthDate || !mandatoryPeriod) return;
 
@@ -50,7 +54,7 @@ function App() {
     const daysLeft = 21 - totalUsedDays;
 
     if (daysLeft === 0) {
-      setError('Tous les 21 jours ont déjà été planifiés');
+      setSuccessMessage('🎉 Planning complet ! Vous avez planifié les 28 jours de congé paternité (3j + 4j + 21j)');
       return;
     }
 
@@ -93,6 +97,7 @@ function App() {
     setMandatoryPeriod(null);
     setRemainingBlocks([]);
     setError(null);
+    setSuccessMessage(null);
     setShowResetConfirm(false);
   };
 
@@ -138,15 +143,28 @@ function App() {
       return;
     }
 
-    const blocks = calculateFractionnedPeriods(birthDate, mandatoryPeriod.end, config);
+    setError(null);
+    setSuccessMessage(null);
+
+    const { blocks, error: fractionError } = calculateFractionnedPeriods(birthDate, mandatoryPeriod.end, config);
 
     if (blocks.length === 0) {
-      setError('Impossible de planifier : la période dépasse les 6 mois après la naissance');
+      setError(fractionError || 'Impossible de planifier cette répartition');
       return;
     }
 
     setRemainingBlocks(blocks);
-    setError(null);
+
+    // Show success message explaining what was done and what to do next
+    const totalConfiguredDays = config.reduce((sum, days) => sum + days, 0);
+    const plannedDays = blocks.reduce((sum, block) => sum + block.days, 0);
+    const remainingDays = totalConfiguredDays - plannedDays;
+
+    if (remainingDays > 0) {
+      setSuccessMessage(`✅ Premier bloc de ${blocks[0].days} jours placé ! Cliquez sur le calendrier pour placer les ${remainingDays} jours restants.`);
+    } else {
+      setSuccessMessage('✅ Répartition fractionnée appliquée automatiquement !');
+    }
   };
 
   const handleRemoveBlock = (index: number) => {
@@ -157,6 +175,7 @@ function App() {
   const handleClearAllBlocks = () => {
     setRemainingBlocks([]);
     setError(null);
+    setSuccessMessage(null);
   };
 
   return (
@@ -182,9 +201,19 @@ function App() {
           <h1 className="text-6xl font-bold text-slate-900 mb-4 tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
             Congé Paternité
           </h1>
-          <p className="text-slate-600 text-lg font-medium">
+          <p className="text-slate-600 text-lg font-medium mb-4">
             Planifiez votre congé selon la législation française
           </p>
+
+          {/* Made by badge */}
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-slate-100/80 to-slate-200/80 backdrop-blur-sm rounded-full border border-slate-300/50 shadow-sm hover:shadow-md transition-apple-smooth hover:scale-105 mt-2">
+            <span className="text-xs text-slate-600 font-medium">Made with</span>
+            <span className="text-red-500 animate-pulse-subtle text-base">❤️</span>
+            <span className="text-xs text-slate-600 font-medium">by</span>
+            <span className="text-xs font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-emerald-600">
+              Hedi ACHACHE
+            </span>
+          </div>
         </header>
 
         <ScrollIndicator show={birthDate !== null} />
@@ -234,6 +263,17 @@ function App() {
           </div>
         )}
 
+        {successMessage && (
+          <div className="mb-6 p-5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/80 rounded-2xl animate-spring-in max-w-2xl mx-auto shadow-md backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mt-0.5 shadow-sm">
+                <span className="text-white text-sm font-bold">✓</span>
+              </div>
+              <p className="text-emerald-800 text-sm font-semibold flex-1">{successMessage}</p>
+            </div>
+          </div>
+        )}
+
         <div className="mb-8 max-w-2xl mx-auto">
           <Calendar
             birthDate={birthDate}
@@ -271,21 +311,54 @@ function App() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-600 mb-2">Planifier en blocs fractionnés :</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => handleFractionnedPlanning([10, 11])}
-                      className="px-3 py-2.5 bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-900 border border-slate-300 hover:border-teal-400 rounded-lg text-sm font-medium transition-apple-smooth hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      2 blocs (10j + 11j)
-                    </button>
-                    <button
-                      onClick={() => handleFractionnedPlanning([7, 7, 7])}
-                      className="px-3 py-2.5 bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-900 border border-slate-300 hover:border-teal-400 rounded-lg text-sm font-medium transition-apple-smooth hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      3 blocs (7j + 7j + 7j)
-                    </button>
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-slate-700">Planifier en 2 blocs fractionnés</p>
+                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">21 jours total</span>
+                    </div>
+
+                    <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-4">
+                      {/* Visual blocks preview */}
+                      <div className="flex gap-2 items-center">
+                        <div
+                          className="h-12 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                          style={{ width: `${(firstBlockDays / 21) * 100}%` }}
+                        >
+                          {firstBlockDays}j
+                        </div>
+                        <div
+                          className="h-12 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                          style={{ width: `${((21 - firstBlockDays) / 21) * 100}%` }}
+                        >
+                          {21 - firstBlockDays}j
+                        </div>
+                      </div>
+
+                      {/* Slider */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-slate-600 flex items-center justify-between">
+                          <span>Répartition des jours</span>
+                          <span className="text-teal-600">Bloc 1: {firstBlockDays}j • Bloc 2: {21 - firstBlockDays}j</span>
+                        </label>
+                        <input
+                          type="range"
+                          min="5"
+                          max="16"
+                          value={firstBlockDays}
+                          onChange={(e) => setFirstBlockDays(Number(e.target.value))}
+                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+                        />
+                        <p className="text-xs text-slate-500 text-center">Minimum 5 jours par bloc</p>
+                      </div>
+
+                      <button
+                        onClick={() => handleFractionnedPlanning([firstBlockDays, 21 - firstBlockDays])}
+                        className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-lg font-semibold transition-apple-smooth hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                      >
+                        <span>Appliquer cette répartition</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -340,21 +413,9 @@ function App() {
           </div>
         )}
 
-        <div className="mt-16 max-w-2xl mx-auto">
+        <div className="mt-16 max-w-2xl mx-auto mb-12">
           <LegalInfo />
         </div>
-
-        {/* Footer */}
-        <footer className="mt-20 pb-12 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-100/80 to-slate-200/80 backdrop-blur-sm rounded-full border border-slate-300/50 shadow-sm hover:shadow-md transition-apple-smooth hover:scale-105">
-            <span className="text-sm text-slate-600 font-medium">Made with</span>
-            <span className="text-red-500 animate-pulse-subtle text-lg">❤️</span>
-            <span className="text-sm text-slate-600 font-medium">by</span>
-            <span className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-emerald-600">
-              Hedi ACHACHE
-            </span>
-          </div>
-        </footer>
       </div>
     </div>
   );

@@ -161,33 +161,36 @@ export function calculateFractionnedPeriods(
   birthDate: Date,
   mandatoryEnd: Date,
   blocksConfig: number[]
-): LeaveBlock[] {
+): { blocks: LeaveBlock[]; error?: string } {
   const sixMonthsLimit = addDays(birthDate, 180);
   const blocks: LeaveBlock[] = [];
-  let currentStart = addDays(mandatoryEnd, 1);
 
-  for (const blockDays of blocksConfig) {
-    if (blockDays < 5) continue;
-
-    if (isAfter(currentStart, sixMonthsLimit)) {
-      break;
-    }
-
-    const end = addDays(currentStart, blockDays - 1);
-
-    if (isAfter(end, sixMonthsLimit)) {
-      break;
-    }
-
-    blocks.push({
-      start: currentStart,
-      end,
-      days: blockDays,
-      type: 'remaining'
-    });
-
-    currentStart = addDays(end, 1);
+  if (blocksConfig.length === 0) {
+    return { blocks, error: 'Configuration de blocs invalide' };
   }
 
-  return blocks;
+  const firstBlockLength = blocksConfig[0];
+  if (firstBlockLength < 5) {
+    return { blocks, error: 'Chaque bloc doit contenir au moins 5 jours calendaires consécutifs' };
+  }
+
+  const currentStart = addDays(mandatoryEnd, 1);
+
+  if (isAfter(currentStart, sixMonthsLimit)) {
+    return { blocks, error: 'Impossible de planifier : la période dépasse les 6 mois après la naissance' };
+  }
+
+  const end = addDays(currentStart, firstBlockLength - 1);
+  if (isAfter(end, sixMonthsLimit)) {
+    return { blocks, error: 'Impossible de planifier : la période dépasse les 6 mois après la naissance' };
+  }
+
+  blocks.push({
+    start: currentStart,
+    end,
+    days: firstBlockLength,
+    type: 'remaining'
+  });
+
+  return { blocks };
 }
