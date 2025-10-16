@@ -34,6 +34,11 @@ function App() {
   const [customMode, setCustomMode] = useState(false);
   const [customFirstBlockDays, setCustomFirstBlockDays] = useState(10);
 
+  // State for visual selection mode
+  const [visualSelectionMode, setVisualSelectionMode] = useState(false);
+  const [selectionStep, setSelectionStep] = useState<'idle' | 'selecting-start' | 'selecting-end'>('idle');
+  const [selectionStartDate, setSelectionStartDate] = useState<Date | null>(null);
+
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
     setBirthDate(normalized);
@@ -55,6 +60,66 @@ function App() {
     setSuccessMessage(null);
 
     if (!birthDate || !mandatoryPeriod) return;
+
+    // Mode de sélection visuelle
+    if (visualSelectionMode && selectionStep === 'selecting-start') {
+      setSelectionStartDate(normalized);
+      setSelectionStep('selecting-end');
+      setSuccessMessage(`✅ Date de début sélectionnée : ${normalized.toLocaleDateString('fr-FR')}. Cliquez maintenant sur la date de FIN de votre première période.`);
+      return;
+    }
+
+    if (visualSelectionMode && selectionStep === 'selecting-end' && selectionStartDate) {
+      // Calculer le nombre de jours entre les deux dates
+      const daysDiff = differenceInDays(normalized, selectionStartDate) + 1;
+
+      if (daysDiff < 5) {
+        setError('La première période doit contenir au minimum 5 jours');
+        return;
+      }
+
+      if (daysDiff > 16) {
+        setError('La première période ne peut pas dépasser 16 jours (il doit rester au moins 5 jours pour la 2ème période)');
+        return;
+      }
+
+      if (normalized <= selectionStartDate) {
+        setError('La date de fin doit être après la date de début');
+        return;
+      }
+
+      // Créer le premier bloc
+      const firstBlock = {
+        start: selectionStartDate,
+        end: normalized,
+        days: daysDiff,
+        type: 'remaining' as const
+      };
+
+      // Valider le bloc
+      const validation = validateRemainingBlock(
+        firstBlock.start,
+        firstBlock.end,
+        birthDate,
+        employerPeriod,
+        mandatoryPeriod,
+        [],
+        0
+      );
+
+      if (!validation.valid) {
+        setError(validation.error || 'Bloc invalide');
+        return;
+      }
+
+      setRemainingBlocks([firstBlock]);
+      setVisualSelectionMode(false);
+      setSelectionStep('idle');
+      setSelectionStartDate(null);
+      setCustomMode(false);
+      setSuccessMessage(`✅ Premier bloc de ${daysDiff} jours placé ! Cliquez sur le calendrier pour placer les ${21 - daysDiff} jours restants.`);
+      return;
+    }
 
     // Si on est en mode personnalisé (custom mode)
     if (customMode && remainingBlocks.length === 0) {
@@ -234,6 +299,9 @@ function App() {
     setSplitConfig(null);
     setPreviewBlock(null);
     setCustomMode(false);
+    setVisualSelectionMode(false);
+    setSelectionStep('idle');
+    setSelectionStartDate(null);
   };
 
   const handleResetCancel = () => {
@@ -305,6 +373,23 @@ function App() {
     setSplitMode('idle');
     setSplitConfig(null);
     setCustomMode(false);
+    setVisualSelectionMode(false);
+    setSelectionStep('idle');
+    setSelectionStartDate(null);
+  };
+
+  const handleStartVisualSelection = () => {
+    setVisualSelectionMode(true);
+    setSelectionStep('selecting-start');
+    setSuccessMessage('🎯 Mode sélection visuelle activé ! Cliquez sur la date de DÉBUT de votre première période.');
+  };
+
+  const handleCancelVisualSelection = () => {
+    setVisualSelectionMode(false);
+    setSelectionStep('idle');
+    setSelectionStartDate(null);
+    setError(null);
+    setSuccessMessage(null);
   };
 
   return (
@@ -475,7 +560,7 @@ function App() {
         )}
 
         {/* Mode personnalisé actif */}
-        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && (
+        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && !visualSelectionMode && (
           <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
             <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl sm:rounded-3xl border-2 border-teal-300 p-6 sm:p-8 shadow-xl">
               <div className="flex items-start gap-4 mb-6">
@@ -486,11 +571,52 @@ function App() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl sm:text-2xl font-bold text-teal-900 mb-2">
-                    Mode personnalisé activé
+                    Mode personnalisé
                   </h3>
-                  <p className="text-sm sm:text-base text-teal-800">
-                    Ajustez la répartition, puis cliquez 2 fois sur le calendrier pour placer vos périodes
+                  <p className="text-sm sm:text-base text-teal-800 mb-4">
+                    Choisissez votre méthode de sélection
                   </p>
+                </div>
+              </div>
+
+              {/* Deux options : Slider ou Sélection visuelle */}
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                {/* Option 1 : Avec Slider */}
+                <div className="bg-white rounded-2xl p-5 border-2 border-teal-200 hover:border-teal-400 transition-all">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-500 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0">
+                      🎚️
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">Avec curseur</h4>
+                      <p className="text-xs text-slate-600">Ajustez puis placez</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                    Utilisez le curseur pour choisir la répartition, puis cliquez 2 fois sur le calendrier
+                  </p>
+                </div>
+
+                {/* Option 2 : Sélection visuelle */}
+                <div className="bg-white rounded-2xl p-5 border-2 border-emerald-200 hover:border-emerald-400 transition-all">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0">
+                      👆
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">Sélection directe</h4>
+                      <p className="text-xs text-slate-600">Cliquez début + fin</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                    Cliquez sur la date de début, puis sur la date de fin de votre 1ère période
+                  </p>
+                  <button
+                    onClick={handleStartVisualSelection}
+                    className="w-full px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Utiliser ce mode
+                  </button>
                 </div>
               </div>
 
@@ -573,8 +699,49 @@ function App() {
           </div>
         )}
 
+        {/* Mode sélection visuelle actif */}
+        {visualSelectionMode && selectionStep !== 'idle' && (
+          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl sm:rounded-3xl border-2 border-emerald-300 p-6 sm:p-8 shadow-xl">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg animate-pulse-subtle">
+                    {selectionStep === 'selecting-start' ? '1' : '2'}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-emerald-900 mb-2">
+                    {selectionStep === 'selecting-start'
+                      ? 'Sélectionnez la date de DÉBUT'
+                      : 'Sélectionnez la date de FIN'}
+                  </h3>
+                  <p className="text-sm sm:text-base text-emerald-800">
+                    {selectionStep === 'selecting-start'
+                      ? '👆 Cliquez sur le calendrier pour choisir le premier jour de votre première période'
+                      : `👆 Cliquez sur le calendrier pour choisir le dernier jour (minimum 5 jours requis)`}
+                  </p>
+                  {selectionStartDate && selectionStep === 'selecting-end' && (
+                    <div className="mt-3 p-3 bg-white/60 rounded-lg border border-emerald-200">
+                      <p className="text-xs font-semibold text-emerald-900">
+                        📍 Date de début : {selectionStartDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={handleCancelVisualSelection}
+                className="w-full px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-slate-200 hover:border-slate-300"
+              >
+                Annuler et revenir en arrière
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Message pendant le placement personnalisé */}
-        {customMode && remainingBlocks.length === 1 && (
+        {customMode && remainingBlocks.length === 1 && !visualSelectionMode && (
           <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
             <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-300 p-6 shadow-xl">
               <div className="flex items-center gap-4">
