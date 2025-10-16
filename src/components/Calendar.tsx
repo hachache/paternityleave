@@ -3,7 +3,7 @@ import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { isWeekend, isFrenchHoliday, getFrenchHolidays } from '../utils/holidays';
-import { LeaveBlock, isDateInRange } from '../utils/paternityLeave';
+import { LeaveBlock, isDateInRange, isDateInBlock } from '../utils/paternityLeave';
 
 interface CalendarProps {
   birthDate: Date | null;
@@ -48,16 +48,16 @@ export function Calendar({
 
     if (isSameDay(date, birthDate)) return 'birth';
 
-    if (employerPeriod && isDateInRange(date, employerPeriod.start, employerPeriod.end)) {
+    if (employerPeriod && isDateInBlock(date, employerPeriod)) {
       return 'employer';
     }
 
-    if (mandatoryPeriod && isDateInRange(date, mandatoryPeriod.start, mandatoryPeriod.end)) {
+    if (mandatoryPeriod && isDateInBlock(date, mandatoryPeriod)) {
       return 'mandatory';
     }
 
     for (const block of remainingBlocks) {
-      if (isDateInRange(date, block.start, block.end)) {
+      if (isDateInBlock(date, block)) {
         return 'remaining';
       }
     }

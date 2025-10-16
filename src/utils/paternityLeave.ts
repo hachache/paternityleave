@@ -6,6 +6,7 @@ export interface LeaveBlock {
   end: Date;
   days: number;
   type: 'employer' | 'mandatory' | 'remaining';
+  workingDatesOnly?: Date[]; // Pour la période employeur : stocke uniquement les jours ouvrés
 }
 
 export function getNextWorkingDay(date: Date): Date {
@@ -47,13 +48,27 @@ export function calculateEmployerPeriod(birthDate: Date): LeaveBlock {
     start = getNextWorkingDay(start);
   }
 
-  const end = addWorkingDays(start, 3);
+  // Collecter les 3 jours ouvrés individuels
+  const workingDates: Date[] = [];
+  let current = start;
+
+  while (workingDates.length < 3) {
+    if (isWorkingDay(current)) {
+      workingDates.push(new Date(current));
+    }
+    if (workingDates.length < 3) {
+      current = addDays(current, 1);
+    }
+  }
+
+  const end = workingDates[workingDates.length - 1];
 
   return {
     start,
     end,
     days: 3,
-    type: 'employer'
+    type: 'employer',
+    workingDatesOnly: workingDates
   };
 }
 
@@ -127,6 +142,20 @@ export function isDateInRange(date: Date, start: Date, end: Date): boolean {
   const s = startOfDay(start);
   const e = startOfDay(end);
   return (isSameDay(d, s) || isAfter(d, s)) && (isSameDay(d, e) || isBefore(d, e));
+}
+
+export function isDateInBlock(date: Date, block: LeaveBlock): boolean {
+  const d = startOfDay(date);
+
+  // Pour la période employeur, vérifier dans workingDatesOnly
+  if (block.type === 'employer' && block.workingDatesOnly) {
+    return block.workingDatesOnly.some(workingDate =>
+      isSameDay(d, startOfDay(workingDate))
+    );
+  }
+
+  // Pour les autres types, utiliser la logique normale
+  return isDateInRange(d, block.start, block.end);
 }
 
 export function calculateAutomaticRemainingPeriod(
