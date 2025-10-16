@@ -119,7 +119,7 @@ export function Calendar({
     const isWeekendDay = isWeekend(date);
     const selectable = isSelectable(date);
 
-    let classes = 'aspect-square flex items-center justify-center text-xs sm:text-sm md:text-base rounded-lg transition-apple-smooth relative font-medium min-h-[2.5rem] sm:min-h-[3rem] touch-manipulation ';
+    let classes = 'aspect-square flex items-center justify-center text-xs sm:text-sm md:text-base rounded-xl transition-all duration-300 relative font-medium min-h-[2.5rem] sm:min-h-[3rem] touch-manipulation ripple-effect ';
 
     if (!isCurrentMonth) {
       classes += 'text-gray-300 ';
@@ -130,15 +130,15 @@ export function Calendar({
     }
 
     if (dayType === 'birth') {
-      classes += 'bg-slate-900 text-white font-semibold shadow-lg ';
+      classes += 'bg-slate-900 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 ';
     } else if (dayType === 'employer') {
-      classes += 'bg-sky-500 text-white font-medium shadow-md ';
+      classes += 'bg-sky-500 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 ';
     } else if (dayType === 'mandatory') {
-      classes += 'bg-amber-500 text-white font-medium shadow-md ';
+      classes += 'bg-amber-500 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 ';
     } else if (dayType === 'remaining') {
-      classes += 'bg-teal-500 text-white font-medium cursor-pointer hover:bg-teal-600 active:bg-teal-700 shadow-md ';
+      classes += 'bg-teal-500 text-white font-medium cursor-pointer hover:bg-teal-600 hover:shadow-lg hover:scale-110 active:scale-95 active:bg-teal-700 shadow-md ';
     } else if (selectable && isCurrentMonth) {
-      classes += 'hover:bg-slate-100 hover:shadow-sm cursor-pointer text-slate-900 active:scale-95 active:bg-slate-200 ';
+      classes += 'hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 hover:border-2 hover:border-teal-300 hover:shadow-md cursor-pointer text-slate-900 hover:scale-105 active:scale-95 active:bg-slate-200 pulse-glow-hover ';
     } else {
       classes += 'text-slate-300 ';
     }

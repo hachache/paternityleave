@@ -6,6 +6,7 @@ import { Summary } from './components/Summary';
 import { LegalInfo } from './components/LegalInfo';
 import { LetterGenerator } from './components/LetterGenerator';
 import { ScrollIndicator } from './components/ScrollIndicator';
+import { ProgressStepper } from './components/ProgressStepper';
 import {
   calculateEmployerPeriod,
   calculateMandatoryPeriod,
@@ -459,6 +460,17 @@ function App() {
         </header>
 
         <ScrollIndicator show={birthDate !== null} />
+
+        {/* Progress Stepper */}
+        {birthDate && (
+          <ProgressStepper
+            currentStep={
+              !birthDate ? 1 :
+              remainingBlocks.length === 0 ? 2 :
+              3
+            }
+          />
+        )}
 
         {/* Modal de confirmation de réinitialisation */}
         {showResetConfirm && (
