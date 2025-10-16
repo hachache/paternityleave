@@ -1,4 +1,4 @@
-import { addDays, addMonths, format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, isAfter } from 'date-fns';
+import { addDays, addMonths, format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, isAfter, isBefore } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -67,6 +67,9 @@ export function Calendar({
 
   const isSelectable = (date: Date): boolean => {
     if (!birthDate) return true;
+
+    // Les jours fractionnables ne peuvent pas être posés avant la naissance
+    if (isBefore(date, birthDate)) return false;
 
     const sixMonthsLimit = addDays(birthDate, 180);
     if (isAfter(date, sixMonthsLimit)) return false;

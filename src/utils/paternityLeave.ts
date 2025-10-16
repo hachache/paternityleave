@@ -95,6 +95,11 @@ export function validateRemainingBlock(
 ): { valid: boolean; error?: string } {
   const sixMonthsLimit = addDays(birthDate, 180);
 
+  // Les jours fractionnables ne peuvent pas être posés AVANT la naissance
+  if (isBefore(start, birthDate)) {
+    return { valid: false, error: 'Les jours fractionnables ne peuvent pas être posés avant la date de naissance' };
+  }
+
   if (isAfter(end, sixMonthsLimit)) {
     return { valid: false, error: 'Les jours doivent être pris dans les 6 mois suivant la naissance' };
   }
