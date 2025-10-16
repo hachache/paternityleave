@@ -3,7 +3,7 @@ import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { isWeekend, isFrenchHoliday, getFrenchHolidays } from '../utils/holidays';
-import { LeaveBlock, isDateInRange, isDateInBlock } from '../utils/paternityLeave';
+import { LeaveBlock, getSixMonthsLimit, isDateInRange, isDateInBlock } from '../utils/paternityLeave';
 
 interface CalendarProps {
   birthDate: Date | null;
@@ -31,14 +31,15 @@ export function Calendar({
   const calendarStart = startOfWeek(monthStart, { locale: fr });
   const calendarEnd = endOfWeek(monthEnd, { locale: fr });
 
-  const holidays = getFrenchHolidays(currentMonth.getFullYear());
-
   const days: Date[] = [];
   let day = calendarStart;
   while (day <= calendarEnd) {
     days.push(day);
     day = addDays(day, 1);
   }
+
+  const holidayYears = Array.from(new Set(days.map(date => date.getFullYear())));
+  const holidays = holidayYears.flatMap(year => getFrenchHolidays(year));
 
   const previousMonth = () => setCurrentMonth(addMonths(currentMonth, -1));
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -71,7 +72,7 @@ export function Calendar({
     // Les jours fractionnables ne peuvent pas être posés avant la naissance
     if (isBefore(date, birthDate)) return false;
 
-    const sixMonthsLimit = addDays(birthDate, 180);
+    const sixMonthsLimit = getSixMonthsLimit(birthDate);
     if (isAfter(date, sixMonthsLimit)) return false;
 
     if (employerPeriod && isDateInRange(date, employerPeriod.start, employerPeriod.end)) {
@@ -159,7 +160,7 @@ export function Calendar({
     <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/50 p-4 sm:p-6 md:p-10 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
       {!birthDate && (
         <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
-          <p className="text-xs sm:text-sm text-teal-900 text-center font-semibold">
+          <p className="text-sm sm:text-base text-teal-900 text-center font-semibold">
             👶 Cliquez sur un jour du calendrier pour sélectionner la date de naissance
           </p>
         </div>
@@ -167,7 +168,7 @@ export function Calendar({
 
       {birthDate && remainingBlocks.length === 0 && mandatoryPeriod && (
         <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
-          <p className="text-xs sm:text-sm text-teal-900 text-center font-semibold">
+          <p className="text-sm sm:text-base text-teal-900 text-center font-semibold">
             👇 Cliquez sur une date du calendrier ou utilisez le mode personnalisé ci-dessous
           </p>
         </div>
@@ -175,7 +176,7 @@ export function Calendar({
 
       {birthDate && remainingBlocks.length > 0 && (
         <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200/60 backdrop-blur-sm animate-spring-in shadow-md">
-          <p className="text-xs sm:text-sm text-emerald-900 text-center font-semibold">
+          <p className="text-sm sm:text-base text-emerald-900 text-center font-semibold">
             ✓ Cliquez sur les blocs verts pour les supprimer
           </p>
         </div>

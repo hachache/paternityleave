@@ -1,4 +1,4 @@
-import { addDays, differenceInDays, isAfter, isBefore, isSameDay, startOfDay } from 'date-fns';
+import { addDays, addMonths, differenceInDays, isAfter, isBefore, isSameDay, startOfDay } from 'date-fns';
 import { isWorkingDay } from './holidays';
 
 export interface LeaveBlock {
@@ -84,6 +84,10 @@ export function calculateMandatoryPeriod(employerEnd: Date): LeaveBlock {
   };
 }
 
+export function getSixMonthsLimit(birthDate: Date): Date {
+  return startOfDay(addMonths(birthDate, 6));
+}
+
 export function validateRemainingBlock(
   start: Date,
   end: Date,
@@ -93,7 +97,7 @@ export function validateRemainingBlock(
   existingBlocks: LeaveBlock[],
   totalUsedDays: number
 ): { valid: boolean; error?: string } {
-  const sixMonthsLimit = addDays(birthDate, 180);
+  const sixMonthsLimit = getSixMonthsLimit(birthDate);
 
   // Les jours fractionnables ne peuvent pas être posés AVANT la naissance
   if (isBefore(start, birthDate)) {
@@ -174,10 +178,10 @@ export function calculateAutomaticRemainingPeriod(
   startDateOrMandatoryEnd: Date,
   daysNeeded: number = 21
 ): LeaveBlock | null {
-  const sixMonthsLimit = addDays(birthDate, 180);
+  const sixMonthsLimit = getSixMonthsLimit(birthDate);
   // Si la date fournie est déjà une date de début valide, on l'utilise directement
   // Sinon, on considère que c'est la fin de la période obligatoire
-  let start = startOfDay(startDateOrMandatoryEnd);
+  const start = startOfDay(startDateOrMandatoryEnd);
 
   // Les jours fractionnables ne peuvent pas être posés avant la naissance
   if (isBefore(start, birthDate)) {
@@ -207,7 +211,7 @@ export function calculateFractionnedPeriods(
   mandatoryEnd: Date,
   blocksConfig: number[]
 ): { blocks: LeaveBlock[]; error?: string } {
-  const sixMonthsLimit = addDays(birthDate, 180);
+  const sixMonthsLimit = getSixMonthsLimit(birthDate);
   const blocks: LeaveBlock[] = [];
 
   if (blocksConfig.length === 0) {

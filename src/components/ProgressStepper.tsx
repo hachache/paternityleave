@@ -24,7 +24,7 @@ export function ProgressStepper({ currentStep }: ProgressStepperProps) {
           </div>
 
           {/* Steps */}
-          {steps.map((step, index) => {
+          {steps.map(step => {
             const isCompleted = currentStep > step.number;
             const isCurrent = currentStep === step.number;
             const isPending = currentStep < step.number;

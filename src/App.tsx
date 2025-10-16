@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import { startOfDay, differenceInDays, addDays } from 'date-fns';
+import { useRef } from 'react';
 import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
@@ -7,49 +6,41 @@ import { LegalInfo } from './components/LegalInfo';
 import { LetterGenerator } from './components/LetterGenerator';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import { CelebrationModal } from './components/CelebrationModal';
-import {
-  calculateEmployerPeriod,
-  calculateMandatoryPeriod,
-  validateRemainingBlock,
-  calculateAutomaticRemainingPeriod,
-  calculateFractionnedPeriods,
-  calculateTotalUsedDays,
-  LeaveBlock
-} from './utils/paternityLeave';
+import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
-  const [birthDate, setBirthDate] = useState<Date | null>(null);
-  const [employerPeriod, setEmployerPeriod] = useState<LeaveBlock | null>(null);
-  const [mandatoryPeriod, setMandatoryPeriod] = useState<LeaveBlock | null>(null);
-  const [remainingBlocks, setRemainingBlocks] = useState<LeaveBlock[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [firstBlockDays, setFirstBlockDays] = useState(10);
-
-  // New state for interactive split mode
-  const [splitMode, setSplitMode] = useState<'idle' | 'placing-first' | 'placing-second'>('idle');
-  const [splitConfig, setSplitConfig] = useState<[number, number] | null>(null);
-  const [previewBlock, setPreviewBlock] = useState<LeaveBlock | null>(null);
-
-  // New state for custom mode
-  const [customMode, setCustomMode] = useState(false);
-  const [customFirstBlockDays, setCustomFirstBlockDays] = useState(10);
-
-  // State for visual selection mode
-  const [visualSelectionMode, setVisualSelectionMode] = useState(false);
-  const [selectionStep, setSelectionStep] = useState<'idle' | 'selecting-start' | 'selecting-end'>('idle');
-  const [selectionStartDate, setSelectionStartDate] = useState<Date | null>(null);
-
-  // State for celebration modal
-  const [showCelebration, setShowCelebration] = useState(false);
-  const hasShownCelebration = useRef(false);
+  const {
+    birthDate,
+    employerPeriod,
+    mandatoryPeriod,
+    remainingBlocks,
+    error,
+    successMessage,
+    showResetConfirm,
+    customMode,
+    customFirstBlockDays,
+    visualSelectionMode,
+    selectionStep,
+    selectionStartDate,
+    showCelebration,
+    selectBirthDate,
+    selectRemainingDay,
+    requestReset,
+    confirmReset,
+    cancelReset,
+    removeBlock,
+    clearAllBlocks,
+    startVisualSelection,
+    cancelVisualSelection,
+    hideCelebration,
+    setCustomMode,
+    setCustomFirstBlockDays
+  } = usePaternityPlanning();
 
   // Refs for smooth scrolling
   const calendarRef = useRef<HTMLDivElement>(null);
   const planningRef = useRef<HTMLDivElement>(null);
   const customModeRef = useRef<HTMLDivElement>(null);
-  const visualSelectionRef = useRef<HTMLDivElement>(null);
 
   // Smooth scroll utility
   const smoothScrollTo = (ref: React.RefObject<HTMLDivElement>, offset = -20) => {
@@ -64,403 +55,42 @@ function App() {
     }
   };
 
-  // Check if planning is complete and show celebration (ONCE)
-  useEffect(() => {
-    if (birthDate && mandatoryPeriod && remainingBlocks.length > 0) {
-      const totalPlanned = calculateTotalUsedDays(remainingBlocks);
-      if (totalPlanned === 21 && !hasShownCelebration.current) {
-        hasShownCelebration.current = true;
-        const timer = setTimeout(() => setShowCelebration(true), 500);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [remainingBlocks, birthDate, mandatoryPeriod]);
-
   const handleSelectBirthDate = (date: Date) => {
-    const normalized = startOfDay(date);
-    setBirthDate(normalized);
-
-    const employer = calculateEmployerPeriod(normalized);
-    setEmployerPeriod(employer);
-
-    const mandatory = calculateMandatoryPeriod(employer.end);
-    setMandatoryPeriod(mandatory);
-
-    setRemainingBlocks([]);
-    setError(null);
-    setSuccessMessage(null);
-
-    // Scroll doucement vers la section de planification après un court délai
+    selectBirthDate(date);
     setTimeout(() => smoothScrollTo(planningRef, -100), 600);
   };
 
   const handleSelectRemainingDay = (date: Date) => {
-    const normalized = startOfDay(date);
-    setError(null);
-    setSuccessMessage(null);
-
-    if (!birthDate || !mandatoryPeriod) return;
-
-    // Mode de sélection visuelle
-    if (visualSelectionMode && selectionStep === 'selecting-start') {
-      // Vérifier que la date de début n'est pas avant la naissance
-      if (normalized < birthDate) {
-        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
-        return;
-      }
-
-      setSelectionStartDate(normalized);
-      setSelectionStep('selecting-end');
-      setSuccessMessage(`✅ Date de début sélectionnée : ${normalized.toLocaleDateString('fr-FR')}. Cliquez maintenant sur la date de FIN de votre première période.`);
-
-      // Pas de scroll, on garde le calendrier visible
-      return;
-    }
-
-    if (visualSelectionMode && selectionStep === 'selecting-end' && selectionStartDate) {
-      // Calculer le nombre de jours entre les deux dates
-      const daysDiff = differenceInDays(normalized, selectionStartDate) + 1;
-
-      if (daysDiff < 5) {
-        setError('La première période doit contenir au minimum 5 jours');
-        return;
-      }
-
-      if (daysDiff > 16) {
-        setError('La première période ne peut pas dépasser 16 jours (il doit rester au moins 5 jours pour la 2ème période)');
-        return;
-      }
-
-      if (normalized <= selectionStartDate) {
-        setError('La date de fin doit être après la date de début');
-        return;
-      }
-
-      // Créer le premier bloc
-      const firstBlock = {
-        start: selectionStartDate,
-        end: normalized,
-        days: daysDiff,
-        type: 'remaining' as const
-      };
-
-      // Valider le bloc
-      const validation = validateRemainingBlock(
-        firstBlock.start,
-        firstBlock.end,
-        birthDate,
-        employerPeriod,
-        mandatoryPeriod,
-        [],
-        0
-      );
-
-      if (!validation.valid) {
-        setError(validation.error || 'Bloc invalide');
-        return;
-      }
-
-      const newBlocks = [firstBlock];
-      setRemainingBlocks(newBlocks);
-      setVisualSelectionMode(false);
-      setSelectionStep('idle');
-      setSelectionStartDate(null);
-      setCustomMode(false);
-      setSuccessMessage(`✅ Premier bloc de ${daysDiff} jours placé ! Cliquez sur le calendrier pour placer les ${21 - daysDiff} jours restants.`);
-      return;
-    }
-
-    // Si on est en mode personnalisé (custom mode)
-    if (customMode && remainingBlocks.length === 0) {
-      // Vérifier que la date n'est pas avant la naissance
-      if (normalized < birthDate) {
-        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
-        return;
-      }
-
-      // Premier clic : placer le premier bloc
-      const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, customFirstBlockDays);
-
-      if (!firstBlock) {
-        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
-        return;
-      }
-
-      const validation = validateRemainingBlock(
-        firstBlock.start,
-        firstBlock.end,
-        birthDate,
-        employerPeriod,
-        mandatoryPeriod,
-        remainingBlocks,
-        0
-      );
-
-      if (!validation.valid) {
-        setError(validation.error || 'Bloc invalide');
-        return;
-      }
-
-      const newBlocks = [firstBlock];
-      setRemainingBlocks(newBlocks);
-      setSuccessMessage(`✅ Premier bloc de ${customFirstBlockDays} jours placé ! Cliquez sur une autre date pour placer les ${21 - customFirstBlockDays} jours restants.`);
-      return;
-    }
-
-    if (customMode && remainingBlocks.length === 1) {
-      // Deuxième clic : placer le second bloc
-      const remainingDays = 21 - customFirstBlockDays;
-      const secondBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, remainingDays);
-
-      if (!secondBlock) {
-        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
-        return;
-      }
-
-      const validation = validateRemainingBlock(
-        secondBlock.start,
-        secondBlock.end,
-        birthDate,
-        employerPeriod,
-        mandatoryPeriod,
-        remainingBlocks,
-        customFirstBlockDays
-      );
-
-      if (!validation.valid) {
-        setError(validation.error || 'Bloc invalide');
-        return;
-      }
-
-      const newBlocks = [...remainingBlocks, secondBlock];
-      setRemainingBlocks(newBlocks);
-      setCustomMode(false);
-      setSuccessMessage('🎉 Planning complet ! Les 21 jours ont été planifiés en 2 périodes personnalisées.');
-      return;
-    }
-
-    // Si on est en mode split interactif (ancien système - on le garde pour compatibilité)
-    if (splitMode === 'placing-first' && splitConfig) {
-      // Vérifier que la date n'est pas avant la naissance
-      if (normalized < birthDate) {
-        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
-        return;
-      }
-
-      const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, splitConfig[0]);
-
-      if (!firstBlock) {
-        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
-        return;
-      }
-
-      const validation = validateRemainingBlock(
-        firstBlock.start,
-        firstBlock.end,
-        birthDate,
-        employerPeriod,
-        mandatoryPeriod,
-        remainingBlocks,
-        0
-      );
-
-      if (!validation.valid) {
-        setError(validation.error || 'Bloc invalide');
-        return;
-      }
-
-      const newBlocks = [firstBlock];
-      setRemainingBlocks(newBlocks);
-      setSplitMode('placing-second');
-      setSuccessMessage(`✅ Premier bloc de ${splitConfig[0]} jours placé ! Cliquez maintenant sur le calendrier pour placer le second bloc de ${splitConfig[1]} jours.`);
-      return;
-    }
-
-    if (splitMode === 'placing-second' && splitConfig) {
-      const secondBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, splitConfig[1]);
-
-      if (!secondBlock) {
-        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
-        return;
-      }
-
-      const validation = validateRemainingBlock(
-        secondBlock.start,
-        secondBlock.end,
-        birthDate,
-        employerPeriod,
-        mandatoryPeriod,
-        remainingBlocks,
-        splitConfig[0]
-      );
-
-      if (!validation.valid) {
-        setError(validation.error || 'Bloc invalide');
-        return;
-      }
-
-      const newBlocks = [...remainingBlocks, secondBlock];
-      setRemainingBlocks(newBlocks);
-      setSplitMode('idle');
-      setSplitConfig(null);
-      setSuccessMessage('🎉 Planning complet ! Les 21 jours ont été planifiés en 2 périodes distinctes.');
-      return;
-    }
-
-    // Mode simple/automatique : 1 clic = 21 jours
-    const totalUsedDays = calculateTotalUsedDays(remainingBlocks);
-    const daysLeft = 21 - totalUsedDays;
-
-    if (daysLeft === 0) {
-      setSuccessMessage('🎉 Planning complet ! Vous avez planifié les 28 jours de congé paternité (3j + 4j + 21j)');
-      return;
-    }
-
-    const autoBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, daysLeft);
-
-    if (!autoBlock) {
-      setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
-      return;
-    }
-
-    const validation = validateRemainingBlock(
-      autoBlock.start,
-      autoBlock.end,
-      birthDate,
-      employerPeriod,
-      mandatoryPeriod,
-      remainingBlocks,
-      totalUsedDays
-    );
-
-    if (!validation.valid) {
-      setError(validation.error || 'Bloc invalide');
-      return;
-    }
-
-    const newBlocks = [...remainingBlocks, autoBlock];
-    setRemainingBlocks(newBlocks);
-    setError(null);
-    if (!customMode) {
-      setSuccessMessage('✅ Les 21 jours ont été planifiés automatiquement !');
-    }
+    selectRemainingDay(date);
   };
 
   const handleResetRequest = () => {
-    if (!birthDate) return;
-    setShowResetConfirm(true);
+    requestReset();
   };
 
   const handleResetConfirm = () => {
-    setBirthDate(null);
-    setEmployerPeriod(null);
-    setMandatoryPeriod(null);
-    setRemainingBlocks([]);
-    setError(null);
-    setSuccessMessage(null);
-    setShowResetConfirm(false);
-    setShowCelebration(false);
-    hasShownCelebration.current = false;
-    setSplitMode('idle');
-    setSplitConfig(null);
-    setPreviewBlock(null);
-    setCustomMode(false);
-    setVisualSelectionMode(false);
-    setSelectionStep('idle');
-    setSelectionStartDate(null);
+    confirmReset();
   };
 
   const handleResetCancel = () => {
-    setShowResetConfirm(false);
-  };
-
-  const handleAutomaticPlanning = () => {
-    if (!birthDate || !mandatoryPeriod) return;
-
-    const totalUsedDays = calculateTotalUsedDays(remainingBlocks);
-    const daysLeft = 21 - totalUsedDays;
-    if (daysLeft < 5) {
-      setError('Il ne reste pas assez de jours disponibles pour créer un bloc (minimum 5 jours)');
-      return;
-    }
-
-    // Utiliser le jour après la fin de la période obligatoire comme date de début
-    const startDate = addDays(mandatoryPeriod.end, 1);
-    const autoBlock = calculateAutomaticRemainingPeriod(birthDate, startDate, daysLeft);
-
-    if (!autoBlock) {
-      setError('Impossible de planifier automatiquement : la période dépasse les 6 mois après la naissance');
-      return;
-    }
-
-    const newBlocks = [...remainingBlocks, autoBlock];
-    setRemainingBlocks(newBlocks);
-    setError(null);
-    setSuccessMessage('✅ Les 21 jours ont été planifiés automatiquement !');
-  };
-
-  const handleStartInteractiveSplit = () => {
-    if (!birthDate || !mandatoryPeriod) return;
-
-    const totalUsedDays = calculateTotalUsedDays(remainingBlocks);
-
-    if (totalUsedDays > 0) {
-      setError('Veuillez d\'abord effacer tous les blocs pour utiliser le mode fractionnement');
-      return;
-    }
-
-    setError(null);
-    setSuccessMessage(`🎯 Mode fractionnement activé ! Cliquez sur le calendrier pour placer le premier bloc de ${firstBlockDays} jours.`);
-    setSplitMode('placing-first');
-    setSplitConfig([firstBlockDays, 21 - firstBlockDays]);
-  };
-
-  const handleCancelSplitMode = () => {
-    setSplitMode('idle');
-    setSplitConfig(null);
-    setPreviewBlock(null);
-    setError(null);
-    setSuccessMessage(null);
+    cancelReset();
   };
 
   const handleRemoveBlock = (index: number) => {
-    const newBlocks = remainingBlocks.filter((_: LeaveBlock, i: number) => i !== index);
-    setRemainingBlocks(newBlocks);
-
-    // Réinitialiser la célébration si on retire des blocs
-    hasShownCelebration.current = false;
+    removeBlock(index);
   };
 
   const handleClearAllBlocks = () => {
-    setRemainingBlocks([]);
-    setError(null);
-    setSuccessMessage(null);
-    setSplitMode('idle');
-    setSplitConfig(null);
-    setCustomMode(false);
-    setVisualSelectionMode(false);
-    setSelectionStep('idle');
-    setSelectionStartDate(null);
-
-    // Réinitialiser la célébration
-    hasShownCelebration.current = false;
+    clearAllBlocks();
   };
 
   const handleStartVisualSelection = () => {
-    setVisualSelectionMode(true);
-    setSelectionStep('selecting-start');
-    setSuccessMessage('🎯 Mode sélection visuelle activé ! Cliquez sur la date de DÉBUT de votre première période.');
-
-    // Auto-scroll vers le calendrier après un court délai pour l'animation
+    startVisualSelection();
     setTimeout(() => smoothScrollTo(calendarRef, -100), 300);
   };
 
   const handleCancelVisualSelection = () => {
-    setVisualSelectionMode(false);
-    setSelectionStep('idle');
-    setSelectionStartDate(null);
-    setError(null);
-    setSuccessMessage(null);
+    cancelVisualSelection();
   };
 
   return (
@@ -507,7 +137,7 @@ function App() {
         {/* Celebration Modal */}
         <CelebrationModal
           show={showCelebration}
-          onClose={() => setShowCelebration(false)}
+          onClose={hideCelebration}
         />
 
         {/* Modal de confirmation de réinitialisation */}
@@ -582,14 +212,14 @@ function App() {
                       ? '📍 Cliquez sur la date de DÉBUT'
                       : '📍 Cliquez sur la date de FIN'}
                   </h4>
-                  <p className="text-xs sm:text-sm text-emerald-800">
+                  <p className="text-sm sm:text-base text-emerald-800">
                     {selectionStep === 'selecting-start'
                       ? 'Choisissez le premier jour de votre première période'
                       : `Choisissez le dernier jour (min. 5 jours)`}
                   </p>
                   {selectionStartDate && selectionStep === 'selecting-end' && (
                     <div className="mt-2 p-2 bg-white/60 rounded-lg border border-emerald-200 animate-scale-in">
-                      <p className="text-xs font-semibold text-emerald-900">
+                      <p className="text-sm font-semibold text-emerald-900">
                         ✓ Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                       </p>
                     </div>
@@ -618,7 +248,7 @@ function App() {
           />
         </div>
 
-        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && splitMode === 'idle' && !customMode && (
+        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
           <div ref={planningRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
             <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl sm:rounded-3xl border-2 border-slate-200/80 p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-apple-smooth">
               <div className="text-center mb-6 sm:mb-8">
@@ -640,7 +270,7 @@ function App() {
                     <h4 className="text-base sm:text-lg font-bold text-teal-900 mb-1">
                       Mode personnalisé
                     </h4>
-                    <p className="text-xs sm:text-sm text-teal-700">
+                    <p className="text-sm sm:text-base text-teal-700">
                       Choisissez vous-même où placer vos 2 périodes (min. 5j chacune)
                     </p>
                   </div>
@@ -657,7 +287,7 @@ function App() {
 
                 {/* Prévisualisation */}
                 <div className="bg-white/80 rounded-xl p-3 sm:p-4">
-                  <p className="text-xs text-slate-600 mb-2 text-center">Répartition par défaut : 10j + 11j</p>
+                  <p className="text-sm text-slate-600 mb-2 text-center">Répartition par défaut : 10j + 11j</p>
                   <div className="flex gap-2">
                     <div className="flex-1 h-8 sm:h-10 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
                       10 jours
@@ -709,10 +339,10 @@ function App() {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">Avec curseur</h4>
-                      <p className="text-xs text-slate-600">Ajustez puis placez</p>
+                      <p className="text-sm text-slate-600">Ajustez puis placez</p>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                  <p className="text-sm text-slate-600 mb-3 leading-relaxed">
                     Utilisez le curseur pour choisir la répartition, puis cliquez 2 fois sur le calendrier
                   </p>
                 </div>
@@ -725,10 +355,10 @@ function App() {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">Sélection directe</h4>
-                      <p className="text-xs text-slate-600">Cliquez début + fin</p>
+                      <p className="text-sm text-slate-600">Cliquez début + fin</p>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                  <p className="text-sm text-slate-600 mb-3 leading-relaxed">
                     Cliquez sur la date de début, puis sur la date de fin de votre 1ère période
                   </p>
                   <button
@@ -788,7 +418,7 @@ function App() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomFirstBlockDays(Number(e.target.value))}
                   className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb mb-2"
                 />
-                <p className="text-xs text-slate-500 text-center">
+                <p className="text-sm text-slate-500 text-center">
                   Déplacez le curseur • Minimum 5 jours par période
                 </p>
               </div>
@@ -841,49 +471,8 @@ function App() {
           </div>
         )}
 
-        {/* Mode split actif - Instructions */}
-        {splitMode !== 'idle' && splitConfig && (
-          <div className="max-w-3xl mx-auto mb-8 animate-spring-in">
-            <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl border-2 border-teal-300 p-8 shadow-xl">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg animate-pulse-subtle">
-                    {splitMode === 'placing-first' ? '1' : '2'}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-teal-900 mb-2">
-                    {splitMode === 'placing-first'
-                      ? `Placez le premier bloc de ${splitConfig[0]} jours`
-                      : `Placez le second bloc de ${splitConfig[1]} jours`}
-                  </h3>
-                  <p className="text-teal-800 mb-4">
-                    👆 Cliquez sur une date dans le calendrier ci-dessus pour placer le {splitMode === 'placing-first' ? 'premier' : 'second'} bloc
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={handleCancelSplitMode}
-                      className="px-6 py-2.5 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-slate-200 hover:border-slate-300"
-                    >
-                      Annuler
-                    </button>
-                    {splitMode === 'placing-second' && (
-                      <button
-                        onClick={handleClearAllBlocks}
-                        className="px-6 py-2.5 bg-white hover:bg-red-50 text-red-600 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-red-200 hover:border-red-300"
-                      >
-                        Recommencer
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Bouton Effacer tous les blocs */}
-        {remainingBlocks.length > 0 && splitMode === 'idle' && (
+        {remainingBlocks.length > 0 && (
           <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
             <button
               onClick={handleClearAllBlocks}
