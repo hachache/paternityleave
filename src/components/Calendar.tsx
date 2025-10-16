@@ -228,21 +228,21 @@ export function Calendar({
 
       <div className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 border-t border-slate-200/60">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
-          <div className="flex items-center gap-3 group">
-            <div className="w-6 h-6 bg-slate-900 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
-            <span className="text-slate-700 font-semibold">Naissance</span>
+          <div className="flex items-center gap-2 sm:gap-3 group">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-slate-900 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth flex-shrink-0"></div>
+            <span className="text-slate-700 font-semibold leading-tight">Naissance</span>
           </div>
-          <div className="flex items-center gap-3 group">
-            <div className="w-6 h-6 bg-sky-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
-            <span className="text-slate-700 font-semibold">Employeur (3j)</span>
+          <div className="flex items-center gap-2 sm:gap-3 group">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-sky-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth flex-shrink-0"></div>
+            <span className="text-slate-700 font-semibold leading-tight">Employeur<br className="md:hidden" /><span className="text-[10px] sm:text-xs text-slate-500"> (3j ouvrés)</span></span>
           </div>
-          <div className="flex items-center gap-3 group">
-            <div className="w-6 h-6 bg-amber-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
-            <span className="text-slate-700 font-semibold">Obligatoire (4j)</span>
+          <div className="flex items-center gap-2 sm:gap-3 group">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-amber-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth flex-shrink-0"></div>
+            <span className="text-slate-700 font-semibold leading-tight">Obligatoire<br className="md:hidden" /><span className="text-[10px] sm:text-xs text-slate-500"> (4j)</span></span>
           </div>
-          <div className="flex items-center gap-3 group">
-            <div className="w-6 h-6 bg-teal-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
-            <span className="text-slate-700 font-semibold">Restants</span>
+          <div className="flex items-center gap-2 sm:gap-3 group">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-teal-500 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth flex-shrink-0"></div>
+            <span className="text-slate-700 font-semibold leading-tight">Fractionnables<br className="md:hidden" /><span className="text-[10px] sm:text-xs text-slate-500"> (21j max)</span></span>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { startOfDay, differenceInDays, addDays } from 'date-fns';
 import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
 import { Calendar } from './components/Calendar';
@@ -39,6 +39,25 @@ function App() {
   const [selectionStep, setSelectionStep] = useState<'idle' | 'selecting-start' | 'selecting-end'>('idle');
   const [selectionStartDate, setSelectionStartDate] = useState<Date | null>(null);
 
+  // Refs for smooth scrolling
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const planningRef = useRef<HTMLDivElement>(null);
+  const customModeRef = useRef<HTMLDivElement>(null);
+  const visualSelectionRef = useRef<HTMLDivElement>(null);
+
+  // Smooth scroll utility
+  const smoothScrollTo = (ref: React.RefObject<HTMLDivElement>, offset = -20) => {
+    if (ref.current) {
+      const elementPosition = ref.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset + offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
     setBirthDate(normalized);
@@ -66,6 +85,9 @@ function App() {
       setSelectionStartDate(normalized);
       setSelectionStep('selecting-end');
       setSuccessMessage(`✅ Date de début sélectionnée : ${normalized.toLocaleDateString('fr-FR')}. Cliquez maintenant sur la date de FIN de votre première période.`);
+
+      // Auto-scroll vers le message de succès
+      setTimeout(() => smoothScrollTo(visualSelectionRef, -100), 200);
       return;
     }
 
@@ -382,6 +404,9 @@ function App() {
     setVisualSelectionMode(true);
     setSelectionStep('selecting-start');
     setSuccessMessage('🎯 Mode sélection visuelle activé ! Cliquez sur la date de DÉBUT de votre première période.');
+
+    // Auto-scroll vers le calendrier après un court délai pour l'animation
+    setTimeout(() => smoothScrollTo(calendarRef, -100), 300);
   };
 
   const handleCancelVisualSelection = () => {
@@ -413,10 +438,10 @@ function App() {
             <CalendarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </button>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
             Congé Paternité
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4">
+          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-2xl mx-auto">
             Planifiez votre congé selon la législation française
           </p>
 
@@ -489,7 +514,7 @@ function App() {
           </div>
         )}
 
-        <div className="mb-6 sm:mb-8 max-w-2xl mx-auto">
+        <div ref={calendarRef} className="mb-6 sm:mb-8 max-w-2xl mx-auto scroll-mt-20">
           <Calendar
             birthDate={birthDate}
             onSelectBirthDate={handleSelectBirthDate}
@@ -502,7 +527,7 @@ function App() {
         </div>
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && splitMode === 'idle' && !customMode && (
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in">
+          <div ref={planningRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
             <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl sm:rounded-3xl border-2 border-slate-200/80 p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-apple-smooth">
               <div className="text-center mb-6 sm:mb-8">
                 <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl mb-3 sm:mb-4 shadow-lg">
@@ -528,7 +553,10 @@ function App() {
                     </p>
                   </div>
                   <button
-                    onClick={() => setCustomMode(true)}
+                    onClick={() => {
+                      setCustomMode(true);
+                      setTimeout(() => smoothScrollTo(customModeRef, -100), 300);
+                    }}
                     className="flex-shrink-0 ml-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] text-sm sm:text-base"
                   >
                     Activer
@@ -561,7 +589,7 @@ function App() {
 
         {/* Mode personnalisé actif */}
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && !visualSelectionMode && (
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
+          <div ref={customModeRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
             <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl sm:rounded-3xl border-2 border-teal-300 p-6 sm:p-8 shadow-xl">
               <div className="flex items-start gap-4 mb-6">
                 <div className="flex-shrink-0">
@@ -701,7 +729,7 @@ function App() {
 
         {/* Mode sélection visuelle actif */}
         {visualSelectionMode && selectionStep !== 'idle' && (
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in">
+          <div ref={visualSelectionRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
             <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl sm:rounded-3xl border-2 border-emerald-300 p-6 sm:p-8 shadow-xl">
               <div className="flex items-start gap-4 mb-4">
                 <div className="flex-shrink-0">
