@@ -119,7 +119,7 @@ export function Calendar({
     const isWeekendDay = isWeekend(date);
     const selectable = isSelectable(date);
 
-    let classes = 'aspect-square flex items-center justify-center text-base rounded-lg transition-apple-smooth relative font-medium min-h-[3rem] ';
+    let classes = 'aspect-square flex items-center justify-center text-xs sm:text-sm md:text-base rounded-lg transition-apple-smooth relative font-medium min-h-[2.5rem] sm:min-h-[3rem] touch-manipulation ';
 
     if (!isCurrentMonth) {
       classes += 'text-gray-300 ';
@@ -130,15 +130,15 @@ export function Calendar({
     }
 
     if (dayType === 'birth') {
-      classes += 'bg-slate-900 text-white font-semibold ';
+      classes += 'bg-slate-900 text-white font-semibold shadow-lg ';
     } else if (dayType === 'employer') {
-      classes += 'bg-sky-500 text-white font-medium ';
+      classes += 'bg-sky-500 text-white font-medium shadow-md ';
     } else if (dayType === 'mandatory') {
-      classes += 'bg-amber-500 text-white font-medium ';
+      classes += 'bg-amber-500 text-white font-medium shadow-md ';
     } else if (dayType === 'remaining') {
-      classes += 'bg-teal-500 text-white font-medium cursor-pointer hover:bg-teal-600 ';
+      classes += 'bg-teal-500 text-white font-medium cursor-pointer hover:bg-teal-600 active:bg-teal-700 shadow-md ';
     } else if (selectable && isCurrentMonth) {
-      classes += 'hover:bg-slate-100 hover:shadow-sm cursor-pointer text-slate-900 active:scale-95 ';
+      classes += 'hover:bg-slate-100 hover:shadow-sm cursor-pointer text-slate-900 active:scale-95 active:bg-slate-200 ';
     } else {
       classes += 'text-slate-300 ';
     }
@@ -153,63 +153,60 @@ export function Calendar({
   const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/50 p-10 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
+    <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/50 p-4 sm:p-6 md:p-10 shadow-xl hover:shadow-2xl transition-apple-smooth card-hover-3d">
       {!birthDate && (
-        <div className="mb-6 p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
-          <p className="text-sm text-teal-900 text-center font-semibold">
+        <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
+          <p className="text-xs sm:text-sm text-teal-900 text-center font-semibold">
             👶 Cliquez sur un jour du calendrier pour sélectionner la date de naissance
           </p>
         </div>
       )}
 
       {birthDate && remainingBlocks.length === 0 && mandatoryPeriod && (
-        <div className="mb-6 p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
-          <p className="text-sm text-teal-900 text-center font-semibold mb-2">
-            ✨ Planifiez vos 21 jours restants
-          </p>
-          <p className="text-xs text-teal-700 text-center">
-            Cliquez sur un jour dans le calendrier pour placer automatiquement les 21 jours à partir de cette date
+        <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl border border-teal-200/60 backdrop-blur-sm animate-spring-in shadow-md">
+          <p className="text-xs sm:text-sm text-teal-900 text-center font-semibold mb-2">
+            ✨ Choisissez votre mode de planification ci-dessous
           </p>
         </div>
       )}
 
       {birthDate && remainingBlocks.length > 0 && (
-        <div className="mb-6 p-5 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200/60 backdrop-blur-sm animate-spring-in shadow-md">
-          <p className="text-sm text-emerald-900 text-center font-semibold">
-            ✓ Vous pouvez cliquer sur les blocs verts pour les supprimer ou ajouter d'autres périodes
+        <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200/60 backdrop-blur-sm animate-spring-in shadow-md">
+          <p className="text-xs sm:text-sm text-emerald-900 text-center font-semibold">
+            ✓ Cliquez sur les blocs verts pour les supprimer
           </p>
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <button
           onClick={previousMonth}
-          className="p-3 hover:bg-slate-100/80 rounded-xl transition-apple-smooth active:scale-95 hover:shadow-lg hover:scale-105 border border-transparent hover:border-slate-200"
+          className="p-2 sm:p-3 hover:bg-slate-100/80 rounded-xl transition-apple-smooth active:scale-95 hover:shadow-lg hover:scale-105 border border-transparent hover:border-slate-200 touch-manipulation"
         >
-          <ChevronLeft className="w-6 h-6 text-slate-600" />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
         </button>
 
-        <h2 className="text-xl font-bold text-slate-900 capitalize tracking-tight">
+        <h2 className="text-base sm:text-xl font-bold text-slate-900 capitalize tracking-tight">
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
 
         <button
           onClick={nextMonth}
-          className="p-3 hover:bg-slate-100/80 rounded-xl transition-apple-smooth active:scale-95 hover:shadow-lg hover:scale-105 border border-transparent hover:border-slate-200"
+          className="p-2 sm:p-3 hover:bg-slate-100/80 rounded-xl transition-apple-smooth active:scale-95 hover:shadow-lg hover:scale-105 border border-transparent hover:border-slate-200 touch-manipulation"
         >
-          <ChevronRight className="w-6 h-6 text-slate-600" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-4 mb-4">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 mb-2 sm:mb-4">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-sm font-semibold text-slate-600 py-2">
+          <div key={day} className="text-center text-xs sm:text-sm font-semibold text-slate-600 py-1 sm:py-2">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-4">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4">
         {days.map((day, index) => {
           const dayType = getDayType(day);
           const selectable = isSelectable(day);
@@ -229,8 +226,8 @@ export function Calendar({
         })}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-slate-200/60">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 border-t border-slate-200/60">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
           <div className="flex items-center gap-3 group">
             <div className="w-6 h-6 bg-slate-900 rounded-lg shadow-sm group-hover:scale-110 transition-apple-smooth"></div>
             <span className="text-slate-700 font-semibold">Naissance</span>

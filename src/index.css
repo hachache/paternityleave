@@ -124,8 +124,23 @@
                 box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
-  .card-hover-3d:hover {
-    transform: translateY(-2px) translateZ(10px);
+  @media (hover: hover) and (pointer: fine) {
+    .card-hover-3d:hover {
+      transform: translateY(-2px) translateZ(10px);
+    }
+  }
+
+  /* Amélioration des interactions tactiles */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Empêcher le zoom sur les inputs sur iOS */
+  @supports (-webkit-touch-callout: none) {
+    input[type="range"] {
+      font-size: 16px;
+    }
   }
 }
 

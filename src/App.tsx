@@ -25,6 +25,11 @@ function App() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [firstBlockDays, setFirstBlockDays] = useState(10);
 
+  // New state for interactive split mode
+  const [splitMode, setSplitMode] = useState<'idle' | 'placing-first' | 'placing-second'>('idle');
+  const [splitConfig, setSplitConfig] = useState<[number, number] | null>(null);
+  const [previewBlock, setPreviewBlock] = useState<LeaveBlock | null>(null);
+
   const handleSelectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
     setBirthDate(normalized);
@@ -47,8 +52,68 @@ function App() {
 
     if (!birthDate || !mandatoryPeriod) return;
 
-    // Calculer combien de jours restent à planifier
-    const totalUsedDays = remainingBlocks.reduce((sum, block) =>
+    // Si on est en mode split interactif
+    if (splitMode === 'placing-first' && splitConfig) {
+      const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, splitConfig[0]);
+
+      if (!firstBlock) {
+        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
+        return;
+      }
+
+      const validation = validateRemainingBlock(
+        firstBlock.start,
+        firstBlock.end,
+        birthDate,
+        employerPeriod,
+        mandatoryPeriod,
+        remainingBlocks,
+        0
+      );
+
+      if (!validation.valid) {
+        setError(validation.error || 'Bloc invalide');
+        return;
+      }
+
+      setRemainingBlocks([firstBlock]);
+      setSplitMode('placing-second');
+      setSuccessMessage(`✅ Premier bloc de ${splitConfig[0]} jours placé ! Cliquez maintenant sur le calendrier pour placer le second bloc de ${splitConfig[1]} jours.`);
+      return;
+    }
+
+    if (splitMode === 'placing-second' && splitConfig) {
+      const secondBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, splitConfig[1]);
+
+      if (!secondBlock) {
+        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
+        return;
+      }
+
+      const validation = validateRemainingBlock(
+        secondBlock.start,
+        secondBlock.end,
+        birthDate,
+        employerPeriod,
+        mandatoryPeriod,
+        remainingBlocks,
+        splitConfig[0]
+      );
+
+      if (!validation.valid) {
+        setError(validation.error || 'Bloc invalide');
+        return;
+      }
+
+      setRemainingBlocks([...remainingBlocks, secondBlock]);
+      setSplitMode('idle');
+      setSplitConfig(null);
+      setSuccessMessage('🎉 Planning complet ! Les 21 jours ont été planifiés en 2 périodes distinctes.');
+      return;
+    }
+
+    // Mode normal (automatique)
+    const totalUsedDays = remainingBlocks.reduce((sum: number, block: LeaveBlock) =>
       sum + (differenceInDays(block.end, block.start) + 1), 0
     );
     const daysLeft = 21 - totalUsedDays;
@@ -58,7 +123,6 @@ function App() {
       return;
     }
 
-    // Créer automatiquement un bloc avec les jours restants
     const autoBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, daysLeft);
 
     if (!autoBlock) {
@@ -66,7 +130,6 @@ function App() {
       return;
     }
 
-    // Vérifier qu'il n'y a pas de chevauchement
     const validation = validateRemainingBlock(
       autoBlock.start,
       autoBlock.end,
@@ -99,6 +162,9 @@ function App() {
     setError(null);
     setSuccessMessage(null);
     setShowResetConfirm(false);
+    setSplitMode('idle');
+    setSplitConfig(null);
+    setPreviewBlock(null);
   };
 
   const handleResetCancel = () => {
@@ -108,7 +174,7 @@ function App() {
   const handleAutomaticPlanning = () => {
     if (!birthDate || !mandatoryPeriod) return;
 
-    const totalUsedDays = remainingBlocks.reduce((sum, block) =>
+    const totalUsedDays = remainingBlocks.reduce((sum: number, block: LeaveBlock) =>
       sum + (differenceInDays(block.end, block.start) + 1), 0
     );
 
@@ -129,46 +195,37 @@ function App() {
 
     setRemainingBlocks([...remainingBlocks, autoBlock]);
     setError(null);
+    setSuccessMessage('✅ Les 21 jours ont été planifiés automatiquement !');
   };
 
-  const handleFractionnedPlanning = (config: number[]) => {
+  const handleStartInteractiveSplit = () => {
     if (!birthDate || !mandatoryPeriod) return;
 
-    const totalUsedDays = remainingBlocks.reduce((sum, block) =>
+    const totalUsedDays = remainingBlocks.reduce((sum: number, block: LeaveBlock) =>
       sum + (differenceInDays(block.end, block.start) + 1), 0
     );
 
     if (totalUsedDays > 0) {
-      setError('Veuillez d\'abord supprimer les blocs existants pour utiliser la planification fractionnée');
+      setError('Veuillez d\'abord effacer tous les blocs pour utiliser le mode fractionnement');
       return;
     }
 
     setError(null);
+    setSuccessMessage(`🎯 Mode fractionnement activé ! Cliquez sur le calendrier pour placer le premier bloc de ${firstBlockDays} jours.`);
+    setSplitMode('placing-first');
+    setSplitConfig([firstBlockDays, 21 - firstBlockDays]);
+  };
+
+  const handleCancelSplitMode = () => {
+    setSplitMode('idle');
+    setSplitConfig(null);
+    setPreviewBlock(null);
+    setError(null);
     setSuccessMessage(null);
-
-    const { blocks, error: fractionError } = calculateFractionnedPeriods(birthDate, mandatoryPeriod.end, config);
-
-    if (blocks.length === 0) {
-      setError(fractionError || 'Impossible de planifier cette répartition');
-      return;
-    }
-
-    setRemainingBlocks(blocks);
-
-    // Show success message explaining what was done and what to do next
-    const totalConfiguredDays = config.reduce((sum, days) => sum + days, 0);
-    const plannedDays = blocks.reduce((sum, block) => sum + block.days, 0);
-    const remainingDays = totalConfiguredDays - plannedDays;
-
-    if (remainingDays > 0) {
-      setSuccessMessage(`✅ Premier bloc de ${blocks[0].days} jours placé ! Cliquez sur le calendrier pour placer les ${remainingDays} jours restants.`);
-    } else {
-      setSuccessMessage('✅ Répartition fractionnée appliquée automatiquement !');
-    }
   };
 
   const handleRemoveBlock = (index: number) => {
-    const newBlocks = remainingBlocks.filter((_, i) => i !== index);
+    const newBlocks = remainingBlocks.filter((_: LeaveBlock, i: number) => i !== index);
     setRemainingBlocks(newBlocks);
   };
 
@@ -176,32 +233,35 @@ function App() {
     setRemainingBlocks([]);
     setError(null);
     setSuccessMessage(null);
+    setSplitMode('idle');
+    setSplitConfig(null);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      <div className="container mx-auto px-6 py-12 max-w-5xl">
-        <header className="mb-12 text-center animate-fade-in relative">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl">
+        <header className="mb-8 sm:mb-12 text-center animate-fade-in relative">
           <button
             onClick={handleResetRequest}
-            className={`absolute top-0 right-4 px-4 py-2.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-xl hover:bg-white hover:shadow-lg transition-apple-smooth text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-2 ${!birthDate ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-fade-in'}`}
+            className={`absolute top-0 right-2 sm:right-4 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-xl hover:bg-white hover:shadow-lg transition-apple-smooth text-xs sm:text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-1 sm:gap-2 ${!birthDate ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-fade-in'}`}
           >
-            <RotateCcw className="w-4 h-4" />
-            Réinitialiser
+            <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Réinitialiser</span>
+            <span className="sm:hidden">Reset</span>
           </button>
 
           <button
             onClick={handleResetRequest}
-            className={`inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-teal-500 to-teal-600 rounded-3xl mb-6 shadow-lg shadow-teal-200/50 transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 ${birthDate ? 'cursor-pointer' : 'cursor-default'}`}
+            className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 shadow-lg shadow-teal-200/50 transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 ${birthDate ? 'cursor-pointer' : 'cursor-default'}`}
             title={birthDate ? "Cliquer pour réinitialiser" : "Calendrier"}
           >
-            <CalendarIcon className="w-10 h-10 text-white" />
+            <CalendarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </button>
 
-          <h1 className="text-6xl font-bold text-slate-900 mb-4 tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
             Congé Paternité
           </h1>
-          <p className="text-slate-600 text-lg font-medium mb-4">
+          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4">
             Planifiez votre congé selon la législation française
           </p>
 
@@ -274,7 +334,7 @@ function App() {
           </div>
         )}
 
-        <div className="mb-8 max-w-2xl mx-auto">
+        <div className="mb-6 sm:mb-8 max-w-2xl mx-auto">
           <Calendar
             birthDate={birthDate}
             onSelectBirthDate={handleSelectBirthDate}
@@ -286,92 +346,151 @@ function App() {
           />
         </div>
 
-        {birthDate && mandatoryPeriod && (
-          <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-apple-smooth">
-              <h3 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 bg-teal-500 rounded-full animate-pulse-subtle"></span>
-                Planification automatique
-              </h3>
-
-              <div className="space-y-3">
-                <button
-                  onClick={handleAutomaticPlanning}
-                  className="w-full px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium transition-apple-smooth hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                  <span>Planifier les jours restants en un bloc</span>
-                </button>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="px-2 bg-gradient-to-br from-slate-50 to-slate-100 text-slate-500">ou</span>
-                  </div>
+        {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && splitMode === 'idle' && (
+          <div className="max-w-3xl mx-auto mb-8 animate-fade-in">
+            <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl border-2 border-slate-200/80 p-8 shadow-xl hover:shadow-2xl transition-apple-smooth">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl mb-4 shadow-lg">
+                  <span className="text-3xl">📅</span>
                 </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                  Planifiez vos 21 jours restants
+                </h3>
+                <p className="text-slate-600 text-sm">
+                  Choisissez comment organiser vos congés paternité
+                </p>
+              </div>
 
-                <div className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-slate-700">Planifier en 2 blocs fractionnés</p>
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">21 jours total</span>
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Option 1: Tout d'un coup */}
+                <div className="group bg-white rounded-2xl border-2 border-slate-200 p-6 hover:border-teal-400 hover:shadow-xl transition-all cursor-pointer">
+                  <div className="text-center mb-4">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-teal-400 to-teal-500 rounded-2xl mb-3 shadow-lg group-hover:scale-110 transition-all">
+                      <span className="text-4xl font-bold text-white">21</span>
                     </div>
-
-                    <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-4">
-                      {/* Visual blocks preview */}
-                      <div className="flex gap-2 items-center">
-                        <div
-                          className="h-12 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                          style={{ width: `${(firstBlockDays / 21) * 100}%` }}
-                        >
-                          {firstBlockDays}j
-                        </div>
-                        <div
-                          className="h-12 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                          style={{ width: `${((21 - firstBlockDays) / 21) * 100}%` }}
-                        >
-                          {21 - firstBlockDays}j
-                        </div>
-                      </div>
-
-                      {/* Slider */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-medium text-slate-600 flex items-center justify-between">
-                          <span>Répartition des jours</span>
-                          <span className="text-teal-600">Bloc 1: {firstBlockDays}j • Bloc 2: {21 - firstBlockDays}j</span>
-                        </label>
-                        <input
-                          type="range"
-                          min="5"
-                          max="16"
-                          value={firstBlockDays}
-                          onChange={(e) => setFirstBlockDays(Number(e.target.value))}
-                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-thumb"
-                        />
-                        <p className="text-xs text-slate-500 text-center">Minimum 5 jours par bloc</p>
-                      </div>
-
-                      <button
-                        onClick={() => handleFractionnedPlanning([firstBlockDays, 21 - firstBlockDays])}
-                        className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-lg font-semibold transition-apple-smooth hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-                      >
-                        <span>Appliquer cette répartition</span>
-                      </button>
-                    </div>
+                    <h4 className="text-lg font-bold text-slate-900 mb-2">Tout d'un coup</h4>
+                    <p className="text-sm text-slate-600 mb-4">
+                      21 jours consécutifs<br />après la période obligatoire
+                    </p>
                   </div>
-                </div>
-
-                {remainingBlocks.length > 0 && (
                   <button
-                    onClick={handleClearAllBlocks}
-                    className="w-full px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 border border-red-200 hover:border-red-300 rounded-lg text-sm font-medium transition-apple-smooth hover:shadow-md hover:scale-[1.01] active:scale-[0.99]"
+                    onClick={handleAutomaticPlanning}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    Effacer tous les blocs verts
+                    Planifier
                   </button>
-                )}
+                </div>
+
+                {/* Option 2: En 2 périodes */}
+                <div className="group bg-white rounded-2xl border-2 border-slate-200 p-6 hover:border-emerald-400 hover:shadow-xl transition-all">
+                  <div className="text-center mb-4">
+                    <div className="flex gap-2 justify-center mb-3">
+                      <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-500 rounded-xl shadow-md group-hover:scale-110 transition-all">
+                        <span className="text-2xl font-bold text-white">{firstBlockDays}</span>
+                      </div>
+                      <div className="flex items-center justify-center w-4 h-16 text-slate-400 font-bold">
+                        +
+                      </div>
+                      <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl shadow-md group-hover:scale-110 transition-all">
+                        <span className="text-2xl font-bold text-white">{21 - firstBlockDays}</span>
+                      </div>
+                    </div>
+                    <h4 className="text-lg font-bold text-slate-900 mb-2">En 2 périodes</h4>
+                    <p className="text-sm text-slate-600 mb-4">
+                      Fractionnez selon vos besoins<br />
+                      <span className="text-xs text-slate-500">(minimum 5j par bloc)</span>
+                    </p>
+                  </div>
+
+                  {/* Slider interactif */}
+                  <div className="mb-4 bg-slate-50 rounded-xl p-4">
+                    <div className="flex gap-2 mb-3">
+                      <div
+                        className="h-10 bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                        style={{ width: `${(firstBlockDays / 21) * 100}%` }}
+                      >
+                        {firstBlockDays}j
+                      </div>
+                      <div
+                        className="h-10 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
+                        style={{ width: `${((21 - firstBlockDays) / 21) * 100}%` }}
+                      >
+                        {21 - firstBlockDays}j
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min="5"
+                      max="16"
+                      value={firstBlockDays}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstBlockDays(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb"
+                      disabled={splitMode !== 'idle'}
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleStartInteractiveSplit}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Commencer le placement
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Mode split actif - Instructions */}
+        {splitMode !== 'idle' && splitConfig && (
+          <div className="max-w-3xl mx-auto mb-8 animate-spring-in">
+            <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl border-2 border-teal-300 p-8 shadow-xl">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg animate-pulse-subtle">
+                    {splitMode === 'placing-first' ? '1' : '2'}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-teal-900 mb-2">
+                    {splitMode === 'placing-first'
+                      ? `Placez le premier bloc de ${splitConfig[0]} jours`
+                      : `Placez le second bloc de ${splitConfig[1]} jours`}
+                  </h3>
+                  <p className="text-teal-800 mb-4">
+                    👆 Cliquez sur une date dans le calendrier ci-dessus pour placer le {splitMode === 'placing-first' ? 'premier' : 'second'} bloc
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCancelSplitMode}
+                      className="px-6 py-2.5 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-slate-200 hover:border-slate-300"
+                    >
+                      Annuler
+                    </button>
+                    {splitMode === 'placing-second' && (
+                      <button
+                        onClick={handleClearAllBlocks}
+                        className="px-6 py-2.5 bg-white hover:bg-red-50 text-red-600 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-red-200 hover:border-red-300"
+                      >
+                        Recommencer
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bouton pour effacer les blocs */}
+        {remainingBlocks.length > 0 && splitMode === 'idle' && (
+          <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
+            <button
+              onClick={handleClearAllBlocks}
+              className="w-full px-4 py-3 bg-gradient-to-r from-red-50 to-rose-50 hover:from-red-100 hover:to-rose-100 text-red-700 hover:text-red-800 border-2 border-red-200 hover:border-red-300 rounded-2xl text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+            >
+              🗑️ Effacer tous les blocs et recommencer
+            </button>
           </div>
         )}
 
