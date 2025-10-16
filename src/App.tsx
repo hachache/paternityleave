@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
@@ -11,12 +11,9 @@ import { ProgressStepper } from './components/ProgressStepper';
 import { CalendarLegend } from './components/CalendarLegend';
 import { SectionCard } from './components/SectionCard';
 import { NextStepsCard } from './components/NextStepsCard';
-import { WelcomeScreen } from './components/WelcomeScreen';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
-  // State for welcome screen
-  const [showWelcome, setShowWelcome] = useState(true);
   const {
     birthDate,
     employerPeriod,
@@ -134,10 +131,10 @@ function App() {
     previousPlannedDays.current = totalPlannedDays;
   }, [scrollIntoViewIfNeeded, totalPlannedDays]);
 
-  // Show welcome screen first
-  if (showWelcome) {
-    return <WelcomeScreen onStart={() => setShowWelcome(false)} />;
-  }
+  // Scroll to top on initial page load
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50">
