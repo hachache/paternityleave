@@ -70,13 +70,11 @@ function App() {
   // Schedule scroll after RAF to avoid race conditions - STABLE
   const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>, offset: number = -20) => {
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const node = ref.current;
-        if (!node) return;
-        const elementPosition = node.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset + offset;
-        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-      });
+      const node = ref.current;
+      if (!node) return;
+      const elementPosition = node.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset + offset;
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     });
   }, []); // Pas de dépendances = fonction stable, pas de re-création
 

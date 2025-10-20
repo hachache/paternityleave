@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* scroll-behavior removed to avoid conflicts with JS scrollTo behavior: 'smooth' */
     /* Provide top padding for sticky UI so scrollIntoView aligns correctly */
     scroll-padding-top: 80px;
   }
