@@ -13,6 +13,7 @@ import { SectionCard } from './components/SectionCard';
 import { NextStepsCard } from './components/NextStepsCard';
 import { NavigationAnchor } from './components/NavigationAnchor';
 import { ScenarioSelector } from './components/ScenarioSelector';
+import { Button } from './components/Button';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
@@ -164,10 +165,10 @@ function App() {
             <CalendarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </button>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
             Congé Paternité
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-2xl mx-auto">
+          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-2xl mx-auto leading-relaxed">
             Planifiez votre congé selon la législation française
           </p>
 
@@ -237,27 +238,31 @@ function App() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500 text-white mb-4 shadow-md">
                   <RotateCcw className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Réinitialiser ?
                 </h3>
-                <p className="text-slate-600 text-sm">
+                <p className="text-slate-600 text-base leading-relaxed">
                   Êtes-vous sûr de vouloir réinitialiser toute la planification ? Cette action ne peut pas être annulée.
                 </p>
               </div>
 
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={handleResetCancel}
-                  className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition-apple-smooth hover:shadow-md active:scale-[0.98] hover:scale-[1.02]"
+                  variant="secondary"
+                  size="lg"
+                  className="flex-1"
                 >
                   Annuler
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleResetConfirm}
-                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-apple-smooth hover:shadow-lg active:scale-[0.98] hover:scale-[1.02]"
+                  variant="danger"
+                  size="lg"
+                  className="flex-1"
                 >
                   Réinitialiser
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -346,10 +351,10 @@ function App() {
                     📅
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Planifiez vos {totalFractionableDays} jours restants
                 </h3>
-                <p className="text-slate-600 text-sm px-4">
+                <p className="text-slate-600 text-base px-4 leading-relaxed">
                   Cliquez sur une date dans le calendrier pour placer vos {totalFractionableDays} jours automatiquement
                 </p>
               </div>
@@ -358,22 +363,24 @@ function App() {
               <div className="bg-white border border-teal-200 rounded-2xl p-5 sm:p-6 mb-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex-1">
-                    <h4 className="text-base sm:text-lg font-bold text-teal-900 mb-1">
+                    <h4 className="text-base font-bold text-teal-900 mb-1">
                       Mode personnalisé
                     </h4>
-                    <p className="text-sm sm:text-base text-teal-700">
+                    <p className="text-base text-teal-700 leading-relaxed">
                       Choisissez vous-même où placer vos 2 périodes (min. 5j chacune)
                     </p>
                   </div>
-                  <button
+                  <Button
                     onClick={() => {
                       setCustomMode(true);
                       setTimeout(() => smoothScrollTo(customModeRef, -100), 300);
                     }}
-                    className="flex-shrink-0 ml-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-semibold transition-apple-smooth hover:shadow-lg hover:scale-[1.03] active:scale-[0.97] text-sm sm:text-base"
+                    variant="primary"
+                    size="md"
+                    className="flex-shrink-0 ml-4"
                   >
                     Activer
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Prévisualisation */}
@@ -413,17 +420,17 @@ function App() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl sm:text-2xl font-bold text-teal-900 mb-2">
+                  <h3 className="text-xl font-bold text-teal-900 mb-2">
                     Mode personnalisé
                   </h3>
-                  <p className="text-sm sm:text-base text-teal-800 mb-4">
+                  <p className="text-base text-teal-800 mb-4 leading-relaxed">
                     Choisissez votre méthode de sélection
                   </p>
                 </div>
               </div>
 
               {/* Deux options : Slider ou Sélection visuelle */}
-              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                 {/* Option 1 : Avec Slider */}
                 <div className="bg-white rounded-2xl p-5 border border-teal-200 hover:border-teal-400 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
@@ -454,12 +461,15 @@ function App() {
                   <p className="text-sm text-slate-600 mb-3 leading-relaxed">
                     Cliquez sur la date de début, puis sur la date de fin de votre 1ère période
                   </p>
-                  <button
+                  <Button
                     onClick={handleStartVisualSelection}
-                    className="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-apple-smooth hover:shadow-lg hover:scale-[1.02] active:scale-[0.97]"
+                    variant="primary"
+                    size="sm"
+                    fullWidth
+                    className="bg-emerald-600 hover:bg-emerald-700"
                   >
                     Utiliser ce mode
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -536,12 +546,14 @@ function App() {
                 </div>
               </div>
 
-              <button
+              <Button
                 onClick={() => setCustomMode(false)}
-                className="w-full px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-all hover:shadow-md border-2 border-slate-200 hover:border-slate-300"
+                variant="outline"
+                size="lg"
+                fullWidth
               >
                 Annuler et revenir au mode simple
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -571,12 +583,15 @@ function App() {
         {/* Bouton Effacer tous les blocs */}
         {remainingBlocks.length > 0 && (
           <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
-            <button
+            <Button
               onClick={handleClearAllBlocks}
-              className="w-full px-4 py-3 bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 border border-red-200 hover:border-red-300 rounded-2xl text-sm font-semibold transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+              variant="outline"
+              size="md"
+              fullWidth
+              className="bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 border-red-200 hover:border-red-300"
             >
               🗑️ Effacer tous les blocs et recommencer
-            </button>
+            </Button>
           </div>
         )}
 
@@ -609,13 +624,16 @@ function App() {
 
         {birthDate && (
           <div className="text-center mt-8 max-w-2xl mx-auto animate-fade-in-delay">
-            <button
+            <Button
               onClick={handleResetRequest}
-              className="px-8 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl hover:shadow-lg transition-apple-smooth text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-2 mx-auto"
+              variant="secondary"
+              size="md"
+              icon={RotateCcw}
+              iconPosition="left"
+              className="mx-auto"
             >
-              <RotateCcw className="w-4 h-4" />
               Réinitialiser
-            </button>
+            </Button>
           </div>
         )}
 

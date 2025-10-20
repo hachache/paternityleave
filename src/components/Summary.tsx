@@ -34,7 +34,7 @@ export function Summary({
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg transition-apple-smooth">
-      <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+      <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
         <div className="p-2 rounded-xl bg-teal-100 text-teal-700">
           <CheckCircle2 className="w-5 h-5" />
         </div>
@@ -44,8 +44,8 @@ export function Summary({
       <div className="space-y-4">
         <div className="rounded-2xl border border-teal-200 bg-teal-50 p-5 transition-apple-smooth hover:shadow-md">
           <p className="text-xs font-semibold uppercase tracking-wide text-teal-700 mb-1">Situation</p>
-          <p className="text-sm font-semibold text-teal-900">{scenario.label}</p>
-          <p className="text-xs text-teal-700 mt-1">
+          <p className="text-base font-semibold text-teal-900 leading-relaxed">{scenario.label}</p>
+          <p className="text-sm text-teal-700 mt-1 leading-relaxed">
             {totalFractionableDays} jours fractionnables • Jusqu&apos;à {scenario.limitMonthsAfterBirth} mois après la naissance
           </p>
         </div>
@@ -54,7 +54,7 @@ export function Summary({
           <Calendar className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-xs font-medium text-slate-500 mb-1">Date de naissance</p>
-            <p className="text-slate-900 font-medium text-sm capitalize">
+            <p className="text-slate-900 font-medium text-base capitalize leading-relaxed">
               {format(birthDate, 'EEEE d MMMM yyyy', { locale: fr })}
             </p>
           </div>
@@ -98,15 +98,15 @@ export function Summary({
               {remainingBlocks.map((block, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl p-4 group hover:bg-red-50 transition-apple-smooth hover:shadow-md cursor-pointer border border-teal-200/40 hover:border-red-300"
+                  className="bg-white rounded-xl p-4 group hover:bg-red-50 transition-apple-smooth hover:shadow-md cursor-pointer border border-teal-200/40 hover:border-red-300 space-y-1.5"
                   onClick={() => onRemoveBlock(index)}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="text-sm text-teal-700 font-semibold mb-2 group-hover:text-red-700 transition-colors">
+                    <div className="flex-1 space-y-1.5">
+                      <p className="text-sm text-teal-700 font-semibold group-hover:text-red-700 transition-colors">
                         Bloc {index + 1}
                       </p>
-                      <p className="text-sm text-slate-900 mb-1 group-hover:text-red-900 transition-colors font-medium">
+                      <p className="text-base text-slate-900 group-hover:text-red-900 transition-colors font-medium leading-relaxed">
                         Du {format(block.start, 'd MMM', { locale: fr })} au{' '}
                         {format(block.end, 'd MMM yyyy', { locale: fr })}
                       </p>

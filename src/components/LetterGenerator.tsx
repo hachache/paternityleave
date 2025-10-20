@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { Mail, Copy, Check } from 'lucide-react';
 import { LeaveBlock } from '../utils/paternityLeave';
+import { Button } from './Button';
 
 interface LetterGeneratorProps {
   birthDate: Date;
@@ -84,7 +85,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg transition-apple-smooth">
-      <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+      <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
         <div className="p-2 rounded-xl bg-slate-900 text-white">
           <Mail className="w-5 h-5" />
         </div>
@@ -92,8 +93,8 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
       </h2>
 
       <div className="space-y-4 mb-6">
-        <p className="text-xs text-slate-500">* Champs obligatoires avant génération du courrier</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <p className="text-sm text-slate-500 leading-relaxed">* Champs obligatoires avant génération du courrier</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Lieu <span className="text-red-500" aria-hidden="true">*</span>
@@ -124,7 +125,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Prénom <span className="text-red-500" aria-hidden="true">*</span>
@@ -189,26 +190,24 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
       <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 mb-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
           <p className="text-sm font-semibold text-slate-700">Lettre personnalisable</p>
-          <button
+          <Button
             type="button"
             onClick={handleResetLetter}
             disabled={!isDirty}
-            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
-              isDirty
-                ? 'border-teal-200 bg-white text-teal-700 hover:border-teal-300 hover:bg-teal-50'
-                : 'cursor-not-allowed border-slate-200 bg-white text-slate-400'
-            }`}
+            variant="outline"
+            size="sm"
+            className={isDirty ? 'border-teal-200 text-teal-700 hover:border-teal-300 hover:bg-teal-50' : ''}
           >
             Réinitialiser le texte
-          </button>
+          </Button>
         </div>
         <textarea
           value={customLetter}
           onChange={(e) => handleLetterChange(e.target.value)}
-          className="w-full h-64 resize-vertical rounded-xl border-2 border-slate-300 bg-white px-4 py-3 font-mono text-sm text-slate-800 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full h-64 resize-vertical rounded-xl border-2 border-slate-300 bg-white px-4 py-3 font-mono text-base text-slate-800 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 leading-relaxed"
           aria-label="Lettre à envoyer"
         />
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-sm text-slate-500 leading-relaxed">
           Vous pouvez modifier librement le contenu avant de le copier.
         </p>
         {isDirty && (
@@ -216,22 +215,17 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
         )}
       </div>
 
-      <button
+      <Button
         onClick={handleCopy}
-        className="w-full px-6 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl hover:shadow-xl transition-apple-smooth font-semibold flex items-center justify-center gap-3 active:scale-[0.98] hover:scale-[1.02]"
+        variant="primary"
+        size="lg"
+        fullWidth
+        icon={copied ? Check : Copy}
+        iconPosition="left"
+        className="bg-slate-900 hover:bg-slate-800"
       >
-        {copied ? (
-          <>
-            <Check className="w-5 h-5" />
-            Copié !
-          </>
-        ) : (
-          <>
-            <Copy className="w-5 h-5" />
-            Copier le courrier
-          </>
-        )}
-      </button>
+        {copied ? 'Copié !' : 'Copier le courrier'}
+      </Button>
     </div>
   );
 }

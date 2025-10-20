@@ -20,7 +20,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
   const scenarios = Object.values(LEAVE_SCENARIOS);
 
   return (
-    <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-3 sm:grid-cols-2">
+    <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-3 sm:gap-4 sm:grid-cols-2">
       {scenarios.map(config => {
         const isSelected = config.id === selectedScenario;
         const details = formatScenarioDetails(config);
@@ -43,7 +43,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                 <p className="text-sm font-semibold uppercase tracking-wide text-teal-600">
                   {config.label}
                 </p>
-                <p className="mt-1 text-sm text-slate-600">{config.description}</p>
+                <p className="mt-1 text-base text-slate-600 leading-relaxed">{config.description}</p>
               </div>
               <span
                 className={`mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
@@ -55,16 +55,16 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
               </span>
             </div>
 
-            <div className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-              <div className="rounded-xl bg-white/80 p-3">
-                <p className="font-semibold text-slate-900">{details.totalText}</p>
+            <div className="mt-4 grid gap-2 sm:gap-3 text-slate-700 sm:grid-cols-2">
+              <div className="rounded-xl bg-white/80 p-3 space-y-1">
+                <p className="font-semibold text-slate-900 text-base leading-relaxed">{details.totalText}</p>
                 {details.bonusText && (
-                  <p className="text-xs font-semibold text-emerald-600">{details.bonusText}</p>
+                  <p className="text-sm font-semibold text-emerald-600">{details.bonusText}</p>
                 )}
               </div>
-              <div className="rounded-xl bg-white/80 p-3">
-                <p className="font-semibold text-slate-900">{details.limitText}</p>
-                <p className="text-xs text-slate-500">Possibilité de fractionnement en 2 périodes minimum</p>
+              <div className="rounded-xl bg-white/80 p-3 space-y-1">
+                <p className="font-semibold text-slate-900 text-base leading-relaxed">{details.limitText}</p>
+                <p className="text-sm text-slate-500 leading-relaxed">Fractionnement en 2 périodes minimum</p>
               </div>
             </div>
           </button>

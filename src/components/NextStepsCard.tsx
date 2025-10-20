@@ -11,19 +11,19 @@ export function NextStepsCard({ planningStep, totalPlannedDays, hasBirthDate, ha
   const checklist = buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks, fractionableDays });
 
   return (
-    <ol className="space-y-3 text-sm text-slate-700">
+    <ol className="space-y-4 text-base text-slate-700">
       {checklist.map(item => (
-        <li key={item.label} className="flex items-start gap-2">
+        <li key={item.label} className="flex items-start gap-3 pb-3 border-b border-slate-100 last:border-0 last:pb-0">
           <span
-            className={`mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+            className={`mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
               item.status === 'done' ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
             }`}
           >
             {item.status === 'done' ? '✓' : item.index}
           </span>
-          <div>
-            <p className="font-medium text-slate-900">{item.label}</p>
-            {item.hint && <p className="text-xs text-slate-500 mt-0.5">{item.hint}</p>}
+          <div className="space-y-1.5 flex-1">
+            <p className="font-semibold text-slate-900 leading-relaxed">{item.label}</p>
+            {item.hint && <p className="text-sm text-slate-500 leading-relaxed">{item.hint}</p>}
           </div>
         </li>
       ))}
