@@ -124,17 +124,28 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
       >
         {/* Confetti effect avec CSS */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(16)].map((_, i) => (
-            <div
-              key={i}
-              className="confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 0.4}s`,
-                backgroundColor: ['#0f766e', '#14b8a6', '#f59e0b'][Math.floor(Math.random() * 3)]
-              }}
-            />
-          ))}
+          {[...Array(50)].map((_, i) => {
+            const colors = ['#0f766e', '#14b8a6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomLeft = Math.random() * 100;
+            const randomDelay = Math.random() * 0.8;
+            const randomDuration = 2 + Math.random() * 1.5;
+
+            return (
+              <div
+                key={i}
+                className="confetti"
+                style={{
+                  left: `${randomLeft}%`,
+                  animationDelay: `${randomDelay}s`,
+                  animationDuration: `${randomDuration}s`,
+                  backgroundColor: randomColor,
+                  width: `${6 + Math.random() * 6}px`,
+                  height: `${6 + Math.random() * 6}px`,
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Contenu */}

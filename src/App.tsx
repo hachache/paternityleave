@@ -235,7 +235,10 @@ function App() {
         {/* Celebration Modal */}
         <CelebrationModal
           show={showCelebration}
-          onClose={hideCelebration}
+          onClose={() => {
+            hideCelebration();
+            setTimeout(() => smoothScrollTo(letterRef, -100), 400);
+          }}
           totalFractionableDays={totalFractionableDays}
         />
 
