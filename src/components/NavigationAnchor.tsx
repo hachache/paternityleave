@@ -37,7 +37,7 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
 
   // IntersectionObserver for active section tracking
   useEffect(() => {
-    if (!show) return;
+    if (!show || isMobile) return; // Skip observer on mobile for performance
     if ('IntersectionObserver' in window) {
       const targets = sections
         .map(s => document.getElementById(s.id))
@@ -54,7 +54,7 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
             ratios.set(id, entry.intersectionRatio);
           });
 
-          // Debounce pour éviter le clignotement (80ms optimisé pour le scroll tactile mobile)
+          // Debounce pour éviter le clignotement
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
             // Pick the section with the highest ratio
@@ -70,12 +70,12 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
               setActiveSection(prev => prev !== bestId ? bestId : prev);
             }
             debounceTimerRef.current = null;
-          }, 80); // Debounce de 80ms - réponse plus rapide pour mobile
+          }, 150); // Debounce de 150ms pour plus de stabilité
         },
         {
           root: null,
           rootMargin: '-80px 0px -30% 0px', // Aligné avec scroll-mt-20 (80px) pour cohérence
-          threshold: [0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] // Granularité augmentée
+          threshold: [0, 0.25, 0.5, 0.75, 1] // Optimized: 5 thresholds instead of 13 for better performance
         }
       );
       targets.forEach(el => io.observe(el));
@@ -89,7 +89,7 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
       // Fallback: measure once
       detectActiveSection();
     }
-  }, [show, sections, detectActiveSection]); // Retiré activeSection pour éviter boucle
+  }, [show, isMobile, sections, detectActiveSection]); // Retiré activeSection pour éviter boucle
 
   useEffect(() => {
     if (!show) return;
