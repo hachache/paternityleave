@@ -18,7 +18,6 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
   const [adresse, setAdresse] = useState('');
   const [fonction, setFonction] = useState('');
   const [copied, setCopied] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
 
   const baseLetter = useMemo(() => {
     const birthDateFormatted = format(birthDate, 'dd/MM/yyyy');
@@ -50,33 +49,15 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
     return letter;
   }, [adresse, birthDate, dateRedaction, fonction, lieu, mandatoryPeriod, nom, prenom, remainingBlocks]);
 
-  const [customLetter, setCustomLetter] = useState(baseLetter);
-
-  useEffect(() => {
-    if (!isDirty) {
-      setCustomLetter(baseLetter);
-    }
-  }, [baseLetter, isDirty]);
-
   useEffect(() => {
     if (!copied) return;
     const timeout = setTimeout(() => setCopied(false), 2000);
     return () => clearTimeout(timeout);
   }, [copied]);
 
-  const handleLetterChange = (value: string) => {
-    setCustomLetter(value);
-    setIsDirty(true);
-  };
-
-  const handleResetLetter = () => {
-    setCustomLetter(baseLetter);
-    setIsDirty(false);
-  };
-
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(customLetter);
+      await navigator.clipboard.writeText(baseLetter);
       setCopied(true);
     } catch (err) {
       console.error('Erreur lors de la copie:', err);
@@ -188,31 +169,18 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 mb-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
-          <p className="text-sm font-semibold text-slate-700">Lettre personnalisable</p>
-          <Button
-            type="button"
-            onClick={handleResetLetter}
-            disabled={!isDirty}
-            variant="outline"
-            size="sm"
-            className={isDirty ? 'border-teal-200 text-teal-700 hover:border-teal-300 hover:bg-teal-50' : ''}
-          >
-            Réinitialiser le texte
-          </Button>
+        <div className="mb-3">
+          <p className="text-sm font-semibold text-slate-700">Lettre générée</p>
         </div>
         <textarea
-          value={customLetter}
-          onChange={(e) => handleLetterChange(e.target.value)}
-          className="w-full h-64 resize-vertical rounded-xl border-2 border-slate-300 bg-white px-4 py-3 font-mono text-base text-slate-800 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 leading-relaxed"
+          value={baseLetter}
+          readOnly
+          className="w-full h-64 resize-vertical rounded-xl border-2 border-slate-300 bg-slate-50 px-4 py-3 font-mono text-base text-slate-800 leading-relaxed cursor-default"
           aria-label="Lettre à envoyer"
         />
         <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-          Vous pouvez modifier librement le contenu avant de le copier.
+          Lettre générée automatiquement. Cliquez sur "Copier le courrier" puis collez-la dans votre éditeur pour la modifier si besoin.
         </p>
-        {isDirty && (
-          <p className="mt-1 text-xs font-semibold text-emerald-600">Modèle personnalisé</p>
-        )}
       </div>
 
       <Button
