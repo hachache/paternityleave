@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { CheckCircle } from 'lucide-react';
 import Confetti from 'react-confetti';
 import { useMediaQuery } from '../hooks/useMediaQuery';
@@ -17,6 +17,7 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const totalDays = 7 + totalFractionableDays;
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const isCoarsePointer = useMediaQuery('(pointer: coarse)');
 
   useEffect(() => {
     let resizeTimer: NodeJS.Timeout;
@@ -37,18 +38,23 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
   useEffect(() => {
     if (show) {
       setIsVisible(true);
-      setShowConfetti(!prefersReducedMotion);
-      // Arrêter les confettis après 5 secondes
-      const timer = setTimeout(() => setShowConfetti(false), 5000);
+      // Désactiver les confettis sur mobile et quand motion réduit
+      setShowConfetti(!prefersReducedMotion && !isCoarsePointer);
+      const timer = setTimeout(() => setShowConfetti(false), isCoarsePointer ? 1500 : 4000);
       return () => clearTimeout(timer);
     } else {
       setIsVisible(false);
       setShowConfetti(false);
     }
-  }, [show, prefersReducedMotion]);
+  }, [show, prefersReducedMotion, isCoarsePointer]);
 
   useEffect(() => {
     if (!show) {
+      return undefined;
+    }
+
+    // Sur mobile, éviter le focus programmatique et le piège du focus pour réduire le jank
+    if (isCoarsePointer) {
       return undefined;
     }
 
@@ -112,14 +118,14 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
       cancelAnimationFrame(frame);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose, show]);
+  }, [onClose, show, isCoarsePointer]);
 
   useEffect(() => {
-    if (!show && previouslyFocusedRef.current) {
+    if (!show && previouslyFocusedRef.current && !isCoarsePointer) {
       previouslyFocusedRef.current.focus();
       previouslyFocusedRef.current = null;
     }
-  }, [show]);
+  }, [show, isCoarsePointer]);
 
   if (!show && !isVisible) return null;
 
@@ -131,11 +137,11 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
           width={windowSize.width}
           height={windowSize.height}
           numberOfPieces={Math.min(
-            200,
-            Math.max(80, Math.floor((windowSize.width * windowSize.height) / 60000))
+            160,
+            Math.max(40, Math.floor((windowSize.width * windowSize.height) / (isCoarsePointer ? 120000 : 80000)))
           )}
           recycle={false}
-          gravity={0.3}
+          gravity={isCoarsePointer ? 0.2 : 0.3}
           colors={['#0f766e', '#14b8a6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#f43f5e']}
           style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
         />
@@ -147,22 +153,24 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
           ${isVisible ? 'opacity-100' : 'opacity-0'}
         `}
         style={{
-          transition: 'opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          backdropFilter: isVisible ? 'blur(4px)' : 'blur(0px)',
-          WebkitBackdropFilter: isVisible ? 'blur(4px)' : 'blur(0px)'
+          transition: `opacity ${isCoarsePointer ? 200 : 400}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
+          backdropFilter: isCoarsePointer ? 'none' : (isVisible ? 'blur(4px)' : 'blur(0px)'),
+          WebkitBackdropFilter: isCoarsePointer ? 'none' : (isVisible ? 'blur(4px)' : 'blur(0px)')
         }}
         onClick={() => {
           setIsVisible(false);
           setShowConfetti(false);
-          setTimeout(onClose, 400);
+          setTimeout(onClose, isCoarsePointer ? 200 : 400);
         }}
       >
         <div
           className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden"
           style={{
-            transform: isVisible ? 'scale(1)' : 'scale(0.95)',
+            transform: isCoarsePointer ? 'none' : (isVisible ? 'scale(1)' : 'scale(0.95)'),
             opacity: isVisible ? 1 : 0,
-            transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            transition: isCoarsePointer
+              ? 'opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+              : 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
           }}
           ref={dialogRef}
           role="dialog"
@@ -206,7 +214,7 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
             onClick={() => {
               setIsVisible(false);
               setShowConfetti(false);
-              setTimeout(onClose, 400);
+              setTimeout(onClose, isCoarsePointer ? 200 : 400);
             }}
             className="mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold w-full"
             style={{
