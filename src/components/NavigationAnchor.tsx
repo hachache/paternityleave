@@ -141,20 +141,9 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
     </>
   );
 
-  // Bottom nav pour mobile
+  // Masquer la barre de navigation sur mobile
   if (isMobile) {
-    return (
-      <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
-        <nav
-          className="pointer-events-auto flex justify-around gap-1 px-2 py-2 bg-white/95 dark:bg-slate-800/90 backdrop-blur-lg border-t border-slate-200/80 dark:border-slate-600 shadow-lg"
-          style={{
-            transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-          }}
-        >
-          {navContent}
-        </nav>
-      </div>
-    );
+    return null;
   }
 
   // Top nav pour desktop

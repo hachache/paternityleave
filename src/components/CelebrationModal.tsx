@@ -19,11 +19,19 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   useEffect(() => {
+    let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      // Debounce pour éviter les re-renders pendant le resize
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      }, 100);
     };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -135,22 +143,27 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
 
       <div
         className={`
-          fixed inset-0 bg-slate-900/30 backdrop-blur-sm flex items-center justify-center z-50 px-4
-          transition-opacity duration-300
+          fixed inset-0 bg-slate-900/30 flex items-center justify-center z-50 px-4
           ${isVisible ? 'opacity-100' : 'opacity-0'}
         `}
+        style={{
+          transition: 'opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          backdropFilter: isVisible ? 'blur(4px)' : 'blur(0px)',
+          WebkitBackdropFilter: isVisible ? 'blur(4px)' : 'blur(0px)'
+        }}
         onClick={() => {
           setIsVisible(false);
           setShowConfetti(false);
-          setTimeout(onClose, 300);
+          setTimeout(onClose, 400);
         }}
       >
         <div
-          className={`
-            bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden
-            transition-all duration-500
-            ${isVisible ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}
-          `}
+          className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden"
+          style={{
+            transform: isVisible ? 'scale(1)' : 'scale(0.95)',
+            opacity: isVisible ? 1 : 0,
+            transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }}
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
@@ -193,9 +206,26 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
             onClick={() => {
               setIsVisible(false);
               setShowConfetti(false);
-              setTimeout(onClose, 300);
+              setTimeout(onClose, 400);
             }}
-            className="mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-105 active:scale-95 w-full"
+            className="mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold w-full"
+            style={{
+              transition: 'background-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.02)';
+              e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '';
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'scale(0.98)';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'scale(1.02)';
+            }}
             data-autofocus
           >
             Super ! 👍
