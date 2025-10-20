@@ -352,7 +352,7 @@ function App() {
         </div>
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
-          <div ref={planningRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
+          <div ref={planningRef} className="max-w-2xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg transition-apple-smooth">
               <div className="text-center mb-6 sm:mb-8">
                 <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-700 mb-3 sm:mb-4 shadow-sm">
@@ -420,7 +420,7 @@ function App() {
 
         {/* Mode personnalisé actif */}
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && !visualSelectionMode && (
-          <div ref={customModeRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
+          <div ref={customModeRef} className="max-w-2xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-teal-200 p-6 sm:p-8 shadow-lg">
               <div className="flex items-start gap-4 mb-6">
                 <div className="flex-shrink-0">
@@ -570,7 +570,7 @@ function App() {
 
         {/* Message pendant le placement personnalisé */}
         {customMode && remainingBlocks.length === 1 && !visualSelectionMode && (
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-slide-up">
+          <div className="max-w-2xl mx-auto mb-6 sm:mb-8 animate-slide-up">
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-lg">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-md flex-shrink-0">
