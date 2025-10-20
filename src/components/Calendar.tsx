@@ -78,6 +78,17 @@ export function Calendar({
     return result;
   }, [calendarStart, endTimestamp]);
 
+  // Precompute normalized timestamps for event delegation and lookups
+  const dayKeyMap = useMemo(() => {
+    const m = new Map<number, Date>();
+    for (const d of days) {
+      const key = startOfDay(d).getTime();
+      // store normalized date to avoid recomputing startOfDay
+      m.set(key, startOfDay(d));
+    }
+    return m;
+  }, [days]);
+
   const holidays = useMemo(() => {
     const years = Array.from(new Set(days.map(date => date.getFullYear())));
     return years.flatMap(year => getFrenchHolidays(year));
@@ -112,7 +123,7 @@ export function Calendar({
   useEffect(() => {
     const key = startOfDay(focusedDate).getTime();
     const target = dayRefs.current[key];
-    if (target) {
+    if (target && document.activeElement !== target) {
       target.focus();
     }
   }, [focusedDate, currentMonth]);
@@ -293,6 +304,33 @@ export function Calendar({
     ]
   );
 
+  // Precompute per-day metadata to reuse in delegated handlers and rendering
+  const metadataByKey = useMemo(() => {
+    const m = new Map<number, DayMetadata>();
+    for (const d of days) {
+      const key = startOfDay(d).getTime();
+      m.set(key, describeDay(d));
+    }
+    return m;
+  }, [days, describeDay]);
+
+  // Delegate clicks at the grid level to reduce per-cell handlers and closures
+  const handleGridClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      const target = (event.target as HTMLElement).closest('button[data-date]') as
+        | HTMLButtonElement
+        | null;
+      if (!target) return;
+      const ts = Number(target.getAttribute('data-date'));
+      if (!ts || Number.isNaN(ts)) return;
+      const date = dayKeyMap.get(ts);
+      if (!date) return;
+      const meta = metadataByKey.get(ts);
+      handleDayInteraction(date, meta);
+    },
+    [dayKeyMap, metadataByKey, handleDayInteraction]
+  );
+
   const handleGridKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (!focusedDate) return;
@@ -464,11 +502,13 @@ export function Calendar({
         aria-label="Calendrier des congés paternité"
         className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4"
         onKeyDown={handleGridKeyDown}
+        onClick={handleGridClick}
       >
         {days.map(day => {
-          const metadata = describeDay(day);
-          const dayKey = startOfDay(day).getTime();
-          const isFocused = startOfDay(day).getTime() === startOfDay(focusedDate).getTime();
+          const dayStart = startOfDay(day);
+          const dayKey = dayStart.getTime();
+          const metadata = metadataByKey.get(dayKey) ?? { type: null, selectable: true, action: 'select' };
+          const isFocused = dayKey === startOfDay(focusedDate).getTime();
           const ariaDisabled = !metadata.selectable && metadata.action !== 'remove';
 
           return (
@@ -477,17 +517,16 @@ export function Calendar({
               ref={registerDayRef(dayKey)}
               type="button"
               data-date={dayKey}
-              className={getDayClasses(day, metadata)}
+              className={getDayClasses(dayStart, metadata)}
               tabIndex={isFocused ? 0 : -1}
-              aria-label={buildAriaLabel(day, metadata)}
+              aria-label={buildAriaLabel(dayStart, metadata)}
               aria-disabled={ariaDisabled}
               aria-selected={metadata.type === 'remaining'}
               aria-current={metadata.type === 'birth' ? 'date' : undefined}
               title={metadata.reason}
-              onFocus={() => setFocusedDate(startOfDay(day))}
-              onClick={() => handleDayInteraction(day, metadata)}
+              onFocus={() => setFocusedDate(dayStart)}
             >
-              {format(day, 'd')}
+              {dayStart.getDate()}
             </button>
           );
         })}
