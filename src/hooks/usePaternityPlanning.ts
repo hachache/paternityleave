@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { differenceInDays, startOfDay } from 'date-fns';
 import {
   calculateAutomaticRemainingPeriod,
@@ -6,7 +6,11 @@ import {
   calculateMandatoryPeriod,
   calculateTotalUsedDays,
   validateRemainingBlock,
-  LeaveBlock
+  LeaveBlock,
+  LeaveScenarioConfig,
+  LeaveScenarioId,
+  DEFAULT_LEAVE_SCENARIO_ID,
+  getLeaveScenarioConfig
 } from '../utils/paternityLeave';
 
 export type SelectionStep = 'idle' | 'selecting-start' | 'selecting-end';
@@ -20,13 +24,31 @@ export function usePaternityPlanning() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [customMode, setCustomMode] = useState(false);
-  const [customFirstBlockDays, setCustomFirstBlockDays] = useState(10);
+  const [scenarioId, setScenarioId] = useState<LeaveScenarioId>(DEFAULT_LEAVE_SCENARIO_ID);
+  const [customFirstBlockDays, setCustomFirstBlockDays] = useState(() => {
+    const config = getLeaveScenarioConfig(DEFAULT_LEAVE_SCENARIO_ID);
+    return Math.max(5, Math.min(10, config.fractionableDays - 5));
+  });
   const [visualSelectionMode, setVisualSelectionMode] = useState(false);
   const [selectionStep, setSelectionStep] = useState<SelectionStep>('idle');
   const [selectionStartDate, setSelectionStartDate] = useState<Date | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
 
+  const computeDefaultFirstBlock = useCallback(
+    (config: LeaveScenarioConfig) =>
+      Math.max(5, Math.min(10, config.fractionableDays - 5)),
+    []
+  );
+  const scenario = useMemo<LeaveScenarioConfig>(
+    () => getLeaveScenarioConfig(scenarioId),
+    [scenarioId]
+  );
+  const totalFractionableDays = scenario.fractionableDays;
+  const minBlockLength = 5;
+  const maxFirstBlockLength = Math.max(minBlockLength, totalFractionableDays - minBlockLength);
+
   const hasShownCelebration = useRef(false);
+  const previousScenarioRef = useRef<LeaveScenarioId>(scenarioId);
 
   const totalPlannedDays = useMemo(
     () => calculateTotalUsedDays(remainingBlocks),
@@ -35,20 +57,47 @@ export function usePaternityPlanning() {
 
   useEffect(() => {
     if (birthDate && mandatoryPeriod && remainingBlocks.length > 0) {
-      if (totalPlannedDays === 21 && !hasShownCelebration.current) {
+      if (totalPlannedDays === totalFractionableDays && !hasShownCelebration.current) {
         hasShownCelebration.current = true;
         const timer = setTimeout(() => setShowCelebration(true), 500);
         return () => clearTimeout(timer);
       }
     }
     return undefined;
-  }, [birthDate, mandatoryPeriod, remainingBlocks, totalPlannedDays]);
+  }, [birthDate, mandatoryPeriod, remainingBlocks, totalFractionableDays, totalPlannedDays]);
+
+  useEffect(() => {
+    if (previousScenarioRef.current !== scenarioId) {
+      previousScenarioRef.current = scenarioId;
+      setCustomMode(false);
+      setVisualSelectionMode(false);
+      setSelectionStep('idle');
+      setSelectionStartDate(null);
+      setCustomFirstBlockDays(computeDefaultFirstBlock(scenario));
+
+      if (totalPlannedDays > totalFractionableDays) {
+        setRemainingBlocks([]);
+        setSuccessMessage(null);
+        setError(
+          `Le scénario sélectionné prévoit ${totalFractionableDays} jours fractionnables. Votre planning a été réinitialisé.`
+        );
+      }
+
+      hasShownCelebration.current = false;
+    }
+  }, [
+    computeDefaultFirstBlock,
+    scenario,
+    scenarioId,
+    totalFractionableDays,
+    totalPlannedDays
+  ]);
 
   const planningStep = useMemo(() => {
     if (!birthDate) return 1;
-    if (totalPlannedDays === 21) return 3;
+    if (totalPlannedDays >= totalFractionableDays) return 3;
     return 2;
-  }, [birthDate, totalPlannedDays]);
+  }, [birthDate, totalFractionableDays, totalPlannedDays]);
 
   const selectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
@@ -87,7 +136,9 @@ export function usePaternityPlanning() {
       setSelectionStartDate(normalized);
       setSelectionStep('selecting-end');
       setSuccessMessage(
-        `✅ Date de début sélectionnée : ${normalized.toLocaleDateString('fr-FR')}. Cliquez maintenant sur la date de FIN de votre première période.`
+        `✅ Date de début sélectionnée : ${normalized.toLocaleDateString(
+          'fr-FR'
+        )}. Cliquez maintenant sur la date de FIN de votre première période.`
       );
       return;
     }
@@ -95,13 +146,15 @@ export function usePaternityPlanning() {
     if (visualSelectionMode && selectionStep === 'selecting-end' && selectionStartDate) {
       const daysDiff = differenceInDays(normalized, selectionStartDate) + 1;
 
-      if (daysDiff < 5) {
+      if (daysDiff < minBlockLength) {
         setError('La première période doit contenir au minimum 5 jours');
         return;
       }
 
-      if (daysDiff > 16) {
-        setError('La première période ne peut pas dépasser 16 jours (il doit rester au moins 5 jours pour la 2ème période)');
+      if (daysDiff > maxFirstBlockLength) {
+        setError(
+          `La première période ne peut pas dépasser ${maxFirstBlockLength} jours (il doit rester au moins ${minBlockLength} jours pour la 2ème période)`
+        );
         return;
       }
 
@@ -124,7 +177,8 @@ export function usePaternityPlanning() {
         employerPeriod,
         mandatoryPeriod,
         [],
-        0
+        0,
+        scenario
       );
 
       if (!validation.valid) {
@@ -132,14 +186,14 @@ export function usePaternityPlanning() {
         return;
       }
 
-      const newBlocks = [firstBlock];
-      setRemainingBlocks(newBlocks);
+      const remainingAfterFirst = totalFractionableDays - daysDiff;
+      setRemainingBlocks([firstBlock]);
       setVisualSelectionMode(false);
       setSelectionStep('idle');
       setSelectionStartDate(null);
       setCustomMode(false);
       setSuccessMessage(
-        `✅ Premier bloc de ${daysDiff} jours placé ! Cliquez sur le calendrier pour placer les ${21 - daysDiff} jours restants.`
+        `✅ Premier bloc de ${daysDiff} jours placé ! Cliquez sur le calendrier pour placer les ${remainingAfterFirst} jours restants.`
       );
       return;
     }
@@ -150,10 +204,17 @@ export function usePaternityPlanning() {
         return;
       }
 
-      const firstBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, customFirstBlockDays);
+      const firstBlock = calculateAutomaticRemainingPeriod(
+        birthDate,
+        normalized,
+        customFirstBlockDays,
+        scenario
+      );
 
       if (!firstBlock) {
-        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
+        setError(
+          `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+        );
         return;
       }
 
@@ -164,7 +225,8 @@ export function usePaternityPlanning() {
         employerPeriod,
         mandatoryPeriod,
         remainingBlocks,
-        0
+        0,
+        scenario
       );
 
       if (!validation.valid) {
@@ -172,19 +234,27 @@ export function usePaternityPlanning() {
         return;
       }
 
+      const remainingAfterFirst = totalFractionableDays - customFirstBlockDays;
       setRemainingBlocks([firstBlock]);
       setSuccessMessage(
-        `✅ Premier bloc de ${customFirstBlockDays} jours placé ! Cliquez sur une autre date pour placer les ${21 - customFirstBlockDays} jours restants.`
+        `✅ Premier bloc de ${customFirstBlockDays} jours placé ! Cliquez sur une autre date pour placer les ${remainingAfterFirst} jours restants.`
       );
       return;
     }
 
     if (customMode && remainingBlocks.length === 1) {
-      const remainingDays = 21 - customFirstBlockDays;
-      const secondBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, remainingDays);
+      const remainingDays = totalFractionableDays - customFirstBlockDays;
+      const secondBlock = calculateAutomaticRemainingPeriod(
+        birthDate,
+        normalized,
+        remainingDays,
+        scenario
+      );
 
       if (!secondBlock) {
-        setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
+        setError(
+          `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+        );
         return;
       }
 
@@ -195,7 +265,8 @@ export function usePaternityPlanning() {
         employerPeriod,
         mandatoryPeriod,
         remainingBlocks,
-        customFirstBlockDays
+        customFirstBlockDays,
+        scenario
       );
 
       if (!validation.valid) {
@@ -205,22 +276,33 @@ export function usePaternityPlanning() {
 
       setRemainingBlocks(prev => [...prev, secondBlock]);
       setCustomMode(false);
-      setSuccessMessage('🎉 Planning complet ! Les 21 jours ont été planifiés en 2 périodes personnalisées.');
+      setSuccessMessage(
+        `🎉 Planning complet ! Les ${totalFractionableDays} jours ont été planifiés en 2 périodes personnalisées.`
+      );
       return;
     }
 
     const totalUsedDays = calculateTotalUsedDays(remainingBlocks);
-    const daysLeft = 21 - totalUsedDays;
+    const daysLeft = totalFractionableDays - totalUsedDays;
 
     if (daysLeft === 0) {
-      setSuccessMessage('🎉 Planning complet ! Vous avez planifié les 28 jours de congé paternité (3j + 4j + 21j)');
+      setSuccessMessage(
+        `🎉 Planning complet ! Vous avez planifié les ${7 + totalFractionableDays} jours de congé paternité (3j + 4j + ${totalFractionableDays}j)`
+      );
       return;
     }
 
-    const autoBlock = calculateAutomaticRemainingPeriod(birthDate, normalized, daysLeft);
+    const autoBlock = calculateAutomaticRemainingPeriod(
+      birthDate,
+      normalized,
+      daysLeft,
+      scenario
+    );
 
     if (!autoBlock) {
-      setError('Impossible de planifier à partir de cette date : la période dépasse les 6 mois après la naissance');
+      setError(
+        `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+      );
       return;
     }
 
@@ -231,7 +313,8 @@ export function usePaternityPlanning() {
       employerPeriod,
       mandatoryPeriod,
       remainingBlocks,
-      totalUsedDays
+      totalUsedDays,
+      scenario
     );
 
     if (!validation.valid) {
@@ -242,7 +325,7 @@ export function usePaternityPlanning() {
     setRemainingBlocks(prev => [...prev, autoBlock]);
     setError(null);
     if (!customMode) {
-      setSuccessMessage('✅ Les 21 jours ont été planifiés automatiquement !');
+      setSuccessMessage(`✅ Les ${totalFractionableDays} jours ont été planifiés automatiquement !`);
     }
   };
 
@@ -331,6 +414,10 @@ export function usePaternityPlanning() {
     hideCelebration,
     planningStep,
     totalPlannedDays,
+    totalFractionableDays,
+    scenario,
+    scenarioId,
+    setScenarioId,
     setCustomMode,
     setCustomFirstBlockDays
   };

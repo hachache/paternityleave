@@ -1,20 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { Mail, Copy, Check } from 'lucide-react';
 import { LeaveBlock } from '../utils/paternityLeave';
 
 interface LetterGeneratorProps {
   birthDate: Date;
-  employerPeriod: LeaveBlock | null;
   mandatoryPeriod: LeaveBlock | null;
   remainingBlocks: LeaveBlock[];
 }
 
-export function LetterGenerator({
-  birthDate,
-  mandatoryPeriod,
-  remainingBlocks
-}: LetterGeneratorProps) {
+export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }: LetterGeneratorProps) {
   const [lieu, setLieu] = useState('');
   const [dateRedaction, setDateRedaction] = useState(format(new Date(), 'dd/MM/yyyy'));
   const [nom, setNom] = useState('');
@@ -22,8 +17,9 @@ export function LetterGenerator({
   const [adresse, setAdresse] = useState('');
   const [fonction, setFonction] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
-  const generateLetter = () => {
+  const baseLetter = useMemo(() => {
     const birthDateFormatted = format(birthDate, 'dd/MM/yyyy');
 
     let letter = `${lieu}, le ${dateRedaction}\n${prenom} ${nom}\n${adresse}\n${fonction}\n\n\nMadame, Monsieur,\n\nJ'ai le plaisir de vous informer que mon enfant doit naître le ${birthDateFormatted}.\nPour cette occasion, je souhaite bénéficier du congé de paternité et d'accueil de l'enfant`;
@@ -51,14 +47,36 @@ export function LetterGenerator({
     letter += '\n\nVous trouverez ci-joint le certificat médical attestant la date prévue de la naissance.\n\nJe vous prie d\'agréer, Madame, Monsieur, l\'expression de ma considération distinguée.';
 
     return letter;
+  }, [adresse, birthDate, dateRedaction, fonction, lieu, mandatoryPeriod, nom, prenom, remainingBlocks]);
+
+  const [customLetter, setCustomLetter] = useState(baseLetter);
+
+  useEffect(() => {
+    if (!isDirty) {
+      setCustomLetter(baseLetter);
+    }
+  }, [baseLetter, isDirty]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timeout = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
+  const handleLetterChange = (value: string) => {
+    setCustomLetter(value);
+    setIsDirty(true);
+  };
+
+  const handleResetLetter = () => {
+    setCustomLetter(baseLetter);
+    setIsDirty(false);
   };
 
   const handleCopy = async () => {
-    const letter = generateLetter();
     try {
-      await navigator.clipboard.writeText(letter);
+      await navigator.clipboard.writeText(customLetter);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Erreur lors de la copie:', err);
     }
@@ -74,10 +92,11 @@ export function LetterGenerator({
       </h2>
 
       <div className="space-y-4 mb-6">
+        <p className="text-xs text-slate-500">* Champs obligatoires avant génération du courrier</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Lieu
+              Lieu <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
               type="text"
@@ -85,11 +104,13 @@ export function LetterGenerator({
               onChange={(e) => setLieu(e.target.value)}
               placeholder="Paris"
               className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
+              aria-required="true"
+              required
             />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Date de rédaction
+              Date de rédaction <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
               type="text"
@@ -97,6 +118,8 @@ export function LetterGenerator({
               onChange={(e) => setDateRedaction(e.target.value)}
               placeholder="01/01/2024"
               className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
+              aria-required="true"
+              required
             />
           </div>
         </div>
@@ -104,7 +127,7 @@ export function LetterGenerator({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Prénom
+              Prénom <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
               type="text"
@@ -112,11 +135,13 @@ export function LetterGenerator({
               onChange={(e) => setPrenom(e.target.value)}
               placeholder="Jean"
               className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
+              aria-required="true"
+              required
             />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Nom
+              Nom <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
               type="text"
@@ -124,13 +149,15 @@ export function LetterGenerator({
               onChange={(e) => setNom(e.target.value)}
               placeholder="Dupont"
               className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
+              aria-required="true"
+              required
             />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
-            Adresse
+            Adresse <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
             type="text"
@@ -138,12 +165,14 @@ export function LetterGenerator({
             onChange={(e) => setAdresse(e.target.value)}
             placeholder="123 Rue de la République, 75001 Paris"
             className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
+            aria-required="true"
+            required
           />
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
-            Fonction
+            Fonction <span className="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
             type="text"
@@ -151,14 +180,40 @@ export function LetterGenerator({
             onChange={(e) => setFonction(e.target.value)}
             placeholder="Développeur"
             className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
+            aria-required="true"
+            required
           />
         </div>
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 mb-6">
-        <pre className="whitespace-pre-wrap text-sm text-slate-800 font-mono leading-relaxed">
-          {generateLetter()}
-        </pre>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
+          <p className="text-sm font-semibold text-slate-700">Lettre personnalisable</p>
+          <button
+            type="button"
+            onClick={handleResetLetter}
+            disabled={!isDirty}
+            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
+              isDirty
+                ? 'border-teal-200 bg-white text-teal-700 hover:border-teal-300 hover:bg-teal-50'
+                : 'cursor-not-allowed border-slate-200 bg-white text-slate-400'
+            }`}
+          >
+            Réinitialiser le texte
+          </button>
+        </div>
+        <textarea
+          value={customLetter}
+          onChange={(e) => handleLetterChange(e.target.value)}
+          className="w-full h-64 resize-vertical rounded-xl border-2 border-slate-300 bg-white px-4 py-3 font-mono text-sm text-slate-800 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+          aria-label="Lettre à envoyer"
+        />
+        <p className="mt-2 text-xs text-slate-500">
+          Vous pouvez modifier librement le contenu avant de le copier.
+        </p>
+        {isDirty && (
+          <p className="mt-1 text-xs font-semibold text-emerald-600">Modèle personnalisé</p>
+        )}
       </div>
 
       <button

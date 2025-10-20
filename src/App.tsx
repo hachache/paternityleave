@@ -12,6 +12,7 @@ import { CalendarLegend } from './components/CalendarLegend';
 import { SectionCard } from './components/SectionCard';
 import { NextStepsCard } from './components/NextStepsCard';
 import { NavigationAnchor } from './components/NavigationAnchor';
+import { ScenarioSelector } from './components/ScenarioSelector';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
@@ -31,6 +32,9 @@ function App() {
     showCelebration,
     planningStep,
     totalPlannedDays,
+    totalFractionableDays,
+    scenario,
+    scenarioId,
     selectBirthDate,
     selectRemainingDay,
     requestReset,
@@ -41,9 +45,13 @@ function App() {
     startVisualSelection,
     cancelVisualSelection,
     hideCelebration,
+    setScenarioId,
     setCustomMode,
     setCustomFirstBlockDays
   } = usePaternityPlanning();
+
+  const secondBlockDays = Math.max(totalFractionableDays - customFirstBlockDays, 0);
+  const sliderMax = Math.max(5, totalFractionableDays - 5);
 
   // Refs for smooth scrolling
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -126,20 +134,18 @@ function App() {
 
   const previousPlannedDays = useRef(totalPlannedDays);
   useEffect(() => {
-    if (previousPlannedDays.current < 21 && totalPlannedDays === 21) {
+    if (
+      previousPlannedDays.current < totalFractionableDays &&
+      totalPlannedDays === totalFractionableDays
+    ) {
       scrollIntoViewIfNeeded(letterRef, -120);
     }
     previousPlannedDays.current = totalPlannedDays;
-  }, [scrollIntoViewIfNeeded, totalPlannedDays]);
-
-  // Scroll to top on initial page load
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, []);
+  }, [scrollIntoViewIfNeeded, totalFractionableDays, totalPlannedDays]);
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-20">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-16 sm:pt-20 md:pt-20 pb-16 md:pb-6">
         <header className="mb-8 sm:mb-12 text-center animate-fade-in relative">
           <button
             onClick={handleResetRequest}
@@ -181,10 +187,20 @@ function App() {
         <NavigationAnchor show={birthDate !== null} />
 
         <div className="max-w-2xl mx-auto mb-8">
-          <ProgressStepper currentStep={planningStep} />
+          <SectionCard
+            title="Votre situation"
+            description="Adaptez le nombre de jours fractionnables selon votre cas"
+            accent="teal"
+          >
+            <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
+          </SectionCard>
+        </div>
+
+        <div className="max-w-2xl mx-auto mb-8">
+          <ProgressStepper currentStep={planningStep} fractionableDays={totalFractionableDays} />
           {birthDate && (
             <p className="mt-3 text-center text-sm text-slate-600">
-              {totalPlannedDays} / 21 jours planifiés
+              {totalPlannedDays} / {totalFractionableDays} jours planifiés
             </p>
           )}
         </div>
@@ -201,6 +217,7 @@ function App() {
               hasBirthDate={Boolean(birthDate)}
               hasMandatory={Boolean(mandatoryPeriod)}
               remainingBlocks={remainingBlocks.length}
+              fractionableDays={totalFractionableDays}
             />
           </SectionCard>
         </div>
@@ -209,6 +226,7 @@ function App() {
         <CelebrationModal
           show={showCelebration}
           onClose={hideCelebration}
+          totalFractionableDays={totalFractionableDays}
         />
 
         {/* Modal de confirmation de réinitialisation */}
@@ -314,6 +332,7 @@ function App() {
             remainingBlocks={remainingBlocks}
             onSelectRemainingDay={handleSelectRemainingDay}
             onRemoveBlock={handleRemoveBlock}
+            scenario={scenario}
           />
           <CalendarLegend />
         </div>
@@ -328,10 +347,10 @@ function App() {
                   </span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
-                  Planifiez vos 21 jours restants
+                  Planifiez vos {totalFractionableDays} jours restants
                 </h3>
                 <p className="text-slate-600 text-sm px-4">
-                  Cliquez sur une date dans le calendrier pour placer vos 21 jours automatiquement
+                  Cliquez sur une date dans le calendrier pour placer vos {totalFractionableDays} jours automatiquement
                 </p>
               </div>
 
@@ -359,13 +378,15 @@ function App() {
 
                 {/* Prévisualisation */}
                 <div className="bg-white/90 rounded-xl p-3 sm:p-4">
-                  <p className="text-sm text-slate-600 mb-2 text-center">Répartition par défaut : 10j + 11j</p>
+                  <p className="text-sm text-slate-600 mb-2 text-center">
+                    Répartition par défaut : {customFirstBlockDays}j + {secondBlockDays}j
+                  </p>
                   <div className="flex gap-2">
                     <div className="flex-1 h-8 sm:h-10 bg-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
-                      10 jours
+                      {customFirstBlockDays} jours
                     </div>
                     <div className="flex-1 h-8 sm:h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
-                      11 jours
+                      {secondBlockDays} jours
                     </div>
                   </div>
                 </div>
@@ -374,7 +395,7 @@ function App() {
               {/* Instructions simples */}
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
                 <p className="text-sm text-slate-700 font-medium">
-                  💡 <span className="font-semibold">Mode simple</span> : 1 clic sur le calendrier = 21 jours placés d'un coup
+                  💡 <span className="font-semibold">Mode simple</span> : 1 clic sur le calendrier = {totalFractionableDays} jours placés d'un coup
                 </p>
               </div>
             </div>
@@ -446,7 +467,7 @@ function App() {
               <div className="bg-white rounded-2xl p-5 sm:p-6 mb-4 shadow-md">
                 <div className="text-center mb-4">
                   <p className="text-sm font-semibold text-slate-700 mb-3">
-                    Choisissez la répartition de vos 21 jours
+                    Choisissez la répartition de vos {totalFractionableDays} jours
                   </p>
                   <div className="flex gap-2 justify-center items-center mb-3">
                     <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-teal-600 text-white shadow-md">
@@ -458,7 +479,7 @@ function App() {
                     <div className="text-2xl text-slate-400 font-bold">+</div>
                     <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-emerald-600 text-white shadow-md">
                       <div className="text-center">
-                        <div className="text-2xl sm:text-3xl font-bold">{21 - customFirstBlockDays}</div>
+                        <div className="text-2xl sm:text-3xl font-bold">{secondBlockDays}</div>
                         <div className="text-[10px] text-white/90">jours</div>
                       </div>
                     </div>
@@ -469,13 +490,17 @@ function App() {
                 <div className="flex gap-2 mb-4">
                   <div
                     className="h-12 rounded-lg bg-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                    style={{ width: `${(customFirstBlockDays / 21) * 100}%` }}
+                    style={{
+                      width: `${(customFirstBlockDays / totalFractionableDays) * 100}%`
+                    }}
                   >
                     Période 1
                   </div>
                   <div
                     className="h-12 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                    style={{ width: `${((21 - customFirstBlockDays) / 21) * 100}%` }}
+                    style={{
+                      width: `${(secondBlockDays / totalFractionableDays) * 100}%`
+                    }}
                   >
                     Période 2
                   </div>
@@ -485,7 +510,7 @@ function App() {
                 <input
                   type="range"
                   min="5"
-                  max="16"
+                  max={sliderMax}
                   value={customFirstBlockDays}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomFirstBlockDays(Number(e.target.value))}
                   className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb mb-2"
@@ -506,7 +531,7 @@ function App() {
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
                   <p className="text-sm text-emerald-900 font-medium">
-                    Puis cliquez à nouveau pour placer le 2ème bloc de <span className="font-bold">{21 - customFirstBlockDays} jours</span>
+                    Puis cliquez à nouveau pour placer le 2ème bloc de <span className="font-bold">{secondBlockDays} jours</span>
                   </p>
                 </div>
               </div>
@@ -535,7 +560,7 @@ function App() {
                     Placez maintenant le second bloc
                   </h4>
                   <p className="text-sm text-emerald-800">
-                    Cliquez sur une date dans le calendrier pour placer les {21 - customFirstBlockDays} jours restants
+                    Cliquez sur une date dans le calendrier pour placer les {secondBlockDays} jours restants
                   </p>
                 </div>
               </div>
@@ -564,6 +589,8 @@ function App() {
                 mandatoryPeriod={mandatoryPeriod}
                 remainingBlocks={remainingBlocks}
                 onRemoveBlock={handleRemoveBlock}
+                totalFractionableDays={totalFractionableDays}
+                scenario={scenario}
               />
             </div>
 
@@ -571,7 +598,6 @@ function App() {
               <div ref={letterRef} className="max-w-2xl mx-auto mb-8 animate-fade-in-delay" id="letter">
                 <LetterGenerator
                   birthDate={birthDate}
-                  employerPeriod={employerPeriod}
                   mandatoryPeriod={mandatoryPeriod}
                   remainingBlocks={remainingBlocks}
                 />

@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar, CheckCircle2, Clock } from 'lucide-react';
-import { LeaveBlock, countCalendarDays } from '../utils/paternityLeave';
+import { LeaveBlock, LeaveScenarioConfig, countCalendarDays } from '../utils/paternityLeave';
 
 interface SummaryProps {
   birthDate: Date | null;
@@ -9,6 +9,8 @@ interface SummaryProps {
   mandatoryPeriod: LeaveBlock | null;
   remainingBlocks: LeaveBlock[];
   onRemoveBlock: (index: number) => void;
+  totalFractionableDays: number;
+  scenario: LeaveScenarioConfig;
 }
 
 export function Summary({
@@ -16,16 +18,19 @@ export function Summary({
   employerPeriod,
   mandatoryPeriod,
   remainingBlocks,
-  onRemoveBlock
+  onRemoveBlock,
+  totalFractionableDays,
+  scenario
 }: SummaryProps) {
   if (!birthDate) {
     return null;
   }
 
-  const totalRemainingDays = remainingBlocks.reduce((sum, block) =>
-    sum + countCalendarDays(block.start, block.end), 0
+  const totalRemainingDays = remainingBlocks.reduce(
+    (sum, block) => sum + countCalendarDays(block.start, block.end),
+    0
   );
-  const remainingDaysLeft = 21 - totalRemainingDays;
+  const remainingDaysLeft = totalFractionableDays - totalRemainingDays;
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg transition-apple-smooth">
@@ -37,6 +42,14 @@ export function Summary({
       </h2>
 
       <div className="space-y-4">
+        <div className="rounded-2xl border border-teal-200 bg-teal-50 p-5 transition-apple-smooth hover:shadow-md">
+          <p className="text-xs font-semibold uppercase tracking-wide text-teal-700 mb-1">Situation</p>
+          <p className="text-sm font-semibold text-teal-900">{scenario.label}</p>
+          <p className="text-xs text-teal-700 mt-1">
+            {totalFractionableDays} jours fractionnables • Jusqu&apos;à {scenario.limitMonthsAfterBirth} mois après la naissance
+          </p>
+        </div>
+
         <div className="flex items-start gap-3 pb-4 border-b border-slate-200 mb-4">
           <Calendar className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
@@ -124,7 +137,7 @@ export function Summary({
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-slate-500">sur 21 jours</p>
+            <p className="text-xs text-slate-500">sur {totalFractionableDays} jours</p>
           </div>
         </div>
       </div>

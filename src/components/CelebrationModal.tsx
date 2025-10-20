@@ -1,19 +1,97 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 
 interface CelebrationModalProps {
   show: boolean;
   onClose: () => void;
+  totalFractionableDays: number;
 }
 
-export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
+export function CelebrationModal({ show, onClose, totalFractionableDays }: CelebrationModalProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const totalDays = 7 + totalFractionableDays;
 
   useEffect(() => {
     if (show) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
+    }
+  }, [show]);
+
+  useEffect(() => {
+    if (!show) {
+      return undefined;
+    }
+
+    previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+
+    const focusDialog = () => {
+      if (!dialogRef.current) return;
+      const focusable =
+        dialogRef.current.querySelector<HTMLElement>('[data-autofocus]') ??
+        dialogRef.current.querySelector<HTMLElement>(
+          'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'
+        );
+      focusable?.focus();
+    };
+
+    const frame = requestAnimationFrame(focusDialog);
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables || focusables.length === 0) {
+        return;
+      }
+
+      const focusableElements = Array.from(focusables).filter(
+        element => !element.hasAttribute('disabled') && element.tabIndex !== -1
+      );
+
+      if (focusableElements.length === 0) {
+        return;
+      }
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey) {
+        if (document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else if (document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose, show]);
+
+  useEffect(() => {
+    if (!show && previouslyFocusedRef.current) {
+      previouslyFocusedRef.current.focus();
+      previouslyFocusedRef.current = null;
     }
   }, [show]);
 
@@ -26,6 +104,10 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
         transition-opacity duration-300
         ${isVisible ? 'opacity-100' : 'opacity-0'}
       `}
+      onClick={() => {
+        setIsVisible(false);
+        setTimeout(onClose, 300);
+      }}
     >
       <div
         className={`
@@ -33,6 +115,11 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
           transition-all duration-500
           ${isVisible ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}
         `}
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Planification complète"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Confetti effect avec CSS */}
@@ -69,10 +156,10 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
             style={{ animationDelay: '0.2s' }}
           >
             <p className="text-sm font-semibold text-emerald-900">
-              ✓ 28 jours planifiés avec succès
+              ✓ {totalDays} jours planifiés avec succès
             </p>
             <p className="text-xs text-emerald-700 mt-1">
-              3 jours employeur + 4 jours obligatoires + 21 jours fractionnés
+              3 jours employeur + 4 jours obligatoires + {totalFractionableDays} jours fractionnés
             </p>
           </div>
 
@@ -86,6 +173,7 @@ export function CelebrationModal({ show, onClose }: CelebrationModalProps) {
               setTimeout(onClose, 300);
             }}
             className="mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-all hover:shadow-lg hover:scale-105 active:scale-95 w-full"
+            data-autofocus
           >
             Super ! 👍
           </button>

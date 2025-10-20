@@ -4,10 +4,11 @@ interface NextStepsCardProps {
   hasBirthDate: boolean;
   hasMandatory: boolean;
   remainingBlocks: number;
+  fractionableDays: number;
 }
 
-export function NextStepsCard({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks }: NextStepsCardProps) {
-  const checklist = buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks });
+export function NextStepsCard({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks, fractionableDays }: NextStepsCardProps) {
+  const checklist = buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks, fractionableDays });
 
   return (
     <ol className="space-y-3 text-sm text-slate-700">
@@ -30,9 +31,11 @@ export function NextStepsCard({ planningStep, totalPlannedDays, hasBirthDate, ha
   );
 }
 
-type ChecklistArgs = Required<Pick<NextStepsCardProps, 'planningStep' | 'totalPlannedDays' | 'hasBirthDate' | 'hasMandatory' | 'remainingBlocks'>>;
+type ChecklistArgs = Required<
+  Pick<NextStepsCardProps, 'planningStep' | 'totalPlannedDays' | 'hasBirthDate' | 'hasMandatory' | 'remainingBlocks' | 'fractionableDays'>
+>;
 
-function buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks }: ChecklistArgs) {
+function buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks, fractionableDays }: ChecklistArgs) {
   const steps: Array<{ label: string; hint?: string; status: 'pending' | 'done'; index: number }> = [];
 
   steps.push({
@@ -49,19 +52,25 @@ function buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasManda
     index: 2
   });
 
-  const hasAllBlocks = totalPlannedDays === 21;
+  const hasAllBlocks = totalPlannedDays >= fractionableDays;
+  const remainingDays = Math.max(fractionableDays - totalPlannedDays, 0);
 
   steps.push({
-    label: 'Planifier vos 21 jours fractionnables',
-    hint: remainingBlocks === 0 ? 'Placez vos blocs en respectant minimum 5 jours' : 'Cliquez sur un bloc vert pour le modifier',
-    status: hasAllBlocks ? 'done' : remainingBlocks > 0 ? 'pending' : 'pending',
+    label: `Planifier vos ${fractionableDays} jours fractionnables`,
+    hint:
+      remainingBlocks === 0
+        ? 'Placez vos blocs en respectant minimum 5 jours'
+        : remainingDays > 0
+          ? `${remainingDays} jours restants à planifier`
+          : 'Cliquez sur un bloc vert pour le modifier',
+    status: hasAllBlocks ? 'done' : 'pending',
     index: 3
   });
 
   steps.push({
     label: 'Générer votre lettre de demande',
     hint: 'Remplissez les champs puis copiez le texte à envoyer à votre employeur',
-    status: hasAllBlocks ? 'pending' : 'pending',
+    status: hasAllBlocks ? 'done' : 'pending',
     index: 4
   });
 

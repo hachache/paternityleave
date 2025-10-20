@@ -2,13 +2,14 @@ import { Check } from 'lucide-react';
 
 interface ProgressStepperProps {
   currentStep: number; // 1, 2, or 3
+  fractionableDays: number;
 }
 
-export function ProgressStepper({ currentStep }: ProgressStepperProps) {
+export function ProgressStepper({ currentStep, fractionableDays }: ProgressStepperProps) {
   const steps = [
     { number: 1, label: 'Date de naissance', shortLabel: 'Naissance' },
     { number: 2, label: 'Périodes obligatoires', shortLabel: 'Obligatoire' },
-    { number: 3, label: 'Planification 21j', shortLabel: 'Planning' }
+    { number: 3, label: `Planification ${fractionableDays}j`, shortLabel: 'Planning' }
   ];
 
   return (

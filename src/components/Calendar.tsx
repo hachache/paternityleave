@@ -16,7 +16,13 @@ import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getFrenchHolidays, isFrenchHoliday, isWeekend } from '../utils/holidays';
-import { LeaveBlock, getSixMonthsLimit, isDateInBlock, isDateInRange } from '../utils/paternityLeave';
+import {
+  LeaveBlock,
+  LeaveScenarioConfig,
+  getLimitDate,
+  isDateInBlock,
+  isDateInRange
+} from '../utils/paternityLeave';
 
 type DayType = 'birth' | 'employer' | 'mandatory' | 'remaining' | null;
 type DayAction = 'select' | 'remove' | 'static';
@@ -36,6 +42,7 @@ interface CalendarProps {
   remainingBlocks: LeaveBlock[];
   onSelectRemainingDay: (date: Date) => void;
   onRemoveBlock: (index: number) => void;
+  scenario: LeaveScenarioConfig;
 }
 
 const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -47,7 +54,8 @@ export function Calendar({
   mandatoryPeriod,
   remainingBlocks,
   onSelectRemainingDay,
-  onRemoveBlock
+  onRemoveBlock,
+  scenario
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState<Date>(() => startOfMonth(new Date()));
   const [focusedDate, setFocusedDate] = useState<Date>(() => startOfDay(new Date()));
@@ -75,9 +83,9 @@ export function Calendar({
     return years.flatMap(year => getFrenchHolidays(year));
   }, [days]);
 
-  const sixMonthsLimit = useMemo(
-    () => (birthDate ? getSixMonthsLimit(birthDate) : null),
-    [birthDate]
+  const usageLimit = useMemo(
+    () => (birthDate ? getLimitDate(birthDate, scenario.limitMonthsAfterBirth) : null),
+    [birthDate, scenario]
   );
 
   const registerDayRef = useCallback(
@@ -190,18 +198,18 @@ export function Calendar({
         };
       }
 
-      if (sixMonthsLimit && isAfter(date, sixMonthsLimit)) {
+      if (usageLimit && isAfter(date, usageLimit)) {
         return {
           type: null,
           selectable: false,
-          reason: 'Au-delà des 6 mois autorisés',
+          reason: `Au-delà des ${scenario.limitMonthsAfterBirth} mois autorisés`,
           action: 'static'
         };
       }
 
       return { type: null, selectable: true, action: 'select' };
     },
-    [birthDate, getDayType, sixMonthsLimit]
+    [birthDate, getDayType, scenario.limitMonthsAfterBirth, usageLimit]
   );
 
   const focusDate = useCallback(
@@ -405,7 +413,7 @@ export function Calendar({
       {birthDate && remainingBlocks.length === 0 && mandatoryPeriod && (
         <div className="mb-4 sm:mb-6 rounded-2xl border border-teal-200 bg-teal-50/60 p-4 sm:p-5">
           <p className="text-sm sm:text-base text-teal-900 text-center font-medium">
-            👇 Choisissez où commencer vos 21 jours ou activez le mode personnalisé
+            👇 Choisissez où commencer vos {scenario.fractionableDays} jours ou activez le mode personnalisé
           </p>
         </div>
       )}

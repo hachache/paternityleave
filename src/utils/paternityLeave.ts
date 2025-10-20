@@ -9,6 +9,59 @@ export interface LeaveBlock {
   workingDatesOnly?: Date[]; // Pour la période employeur : stocke uniquement les jours ouvrés
 }
 
+export type LeaveScenarioId =
+  | 'standard'
+  | 'multiple-births'
+  | 'hospitalized-newborn'
+  | 'adoption';
+
+export interface LeaveScenarioConfig {
+  id: LeaveScenarioId;
+  label: string;
+  description: string;
+  fractionableDays: number;
+  limitMonthsAfterBirth: number;
+}
+
+export const LEAVE_SCENARIOS: Record<LeaveScenarioId, LeaveScenarioConfig> = {
+  standard: {
+    id: 'standard',
+    label: 'Naissance simple',
+    description: '21 jours fractionnables à prendre dans les 6 mois suivant la naissance.',
+    fractionableDays: 21,
+    limitMonthsAfterBirth: 6
+  },
+  'multiple-births': {
+    id: 'multiple-births',
+    label: 'Naissances multiples',
+    description: '28 jours fractionnables (7 jours supplémentaires) à prendre dans les 6 mois.',
+    fractionableDays: 28,
+    limitMonthsAfterBirth: 6
+  },
+  'hospitalized-newborn': {
+    id: 'hospitalized-newborn',
+    label: 'Hospitalisation du nouveau-né',
+    description: '21 jours fractionnables pouvant être reportés jusqu’à 12 mois après la naissance.',
+    fractionableDays: 21,
+    limitMonthsAfterBirth: 12
+  },
+  adoption: {
+    id: 'adoption',
+    label: 'Adoption',
+    description: '21 jours fractionnables à prendre dans les 6 mois suivant l’arrivée de l’enfant.',
+    fractionableDays: 21,
+    limitMonthsAfterBirth: 6
+  }
+};
+
+export const DEFAULT_LEAVE_SCENARIO_ID: LeaveScenarioId = 'standard';
+
+export function getLeaveScenarioConfig(
+  id: LeaveScenarioId = DEFAULT_LEAVE_SCENARIO_ID
+): LeaveScenarioConfig {
+  return LEAVE_SCENARIOS[id] ?? LEAVE_SCENARIOS[DEFAULT_LEAVE_SCENARIO_ID];
+}
+
 export function getNextWorkingDay(date: Date): Date {
   let current = startOfDay(date);
 
@@ -84,8 +137,12 @@ export function calculateMandatoryPeriod(employerEnd: Date): LeaveBlock {
   };
 }
 
+export function getLimitDate(birthDate: Date, monthsAfterBirth: number): Date {
+  return startOfDay(addMonths(birthDate, monthsAfterBirth));
+}
+
 export function getSixMonthsLimit(birthDate: Date): Date {
-  return startOfDay(addMonths(birthDate, 6));
+  return getLimitDate(birthDate, 6);
 }
 
 export function validateRemainingBlock(
@@ -95,17 +152,21 @@ export function validateRemainingBlock(
   employerPeriod: LeaveBlock | null,
   mandatoryPeriod: LeaveBlock | null,
   existingBlocks: LeaveBlock[],
-  totalUsedDays: number
+  totalUsedDays: number,
+  scenario: LeaveScenarioConfig
 ): { valid: boolean; error?: string } {
-  const sixMonthsLimit = getSixMonthsLimit(birthDate);
+  const usageLimit = getLimitDate(birthDate, scenario.limitMonthsAfterBirth);
 
   // Les jours fractionnables ne peuvent pas être posés AVANT la naissance
   if (isBefore(start, birthDate)) {
     return { valid: false, error: 'Les jours fractionnables ne peuvent pas être posés avant la date de naissance' };
   }
 
-  if (isAfter(end, sixMonthsLimit)) {
-    return { valid: false, error: 'Les jours doivent être pris dans les 6 mois suivant la naissance' };
+  if (isAfter(end, usageLimit)) {
+    return {
+      valid: false,
+      error: `Les jours doivent être pris dans les ${scenario.limitMonthsAfterBirth} mois suivant la naissance`
+    };
   }
 
   const calendarDays = differenceInDays(end, start) + 1;
@@ -113,8 +174,12 @@ export function validateRemainingBlock(
     return { valid: false, error: 'Chaque bloc doit contenir au moins 5 jours calendaires consécutifs' };
   }
 
-  if (totalUsedDays + calendarDays > 21) {
-    return { valid: false, error: `Ce bloc dépasse les 21 jours disponibles (${21 - totalUsedDays} jours restants)` };
+  const remaining = scenario.fractionableDays - totalUsedDays;
+  if (calendarDays > remaining) {
+    return {
+      valid: false,
+      error: `Ce bloc dépasse les ${scenario.fractionableDays} jours disponibles (${remaining} jours restants)`
+    };
   }
 
   if (employerPeriod && hasOverlap(start, end, employerPeriod.start, employerPeriod.end)) {
@@ -176,9 +241,10 @@ export function isDateInBlock(date: Date, block: LeaveBlock): boolean {
 export function calculateAutomaticRemainingPeriod(
   birthDate: Date,
   startDateOrMandatoryEnd: Date,
-  daysNeeded: number = 21
+  daysNeeded: number,
+  scenario: LeaveScenarioConfig
 ): LeaveBlock | null {
-  const sixMonthsLimit = getSixMonthsLimit(birthDate);
+  const usageLimit = getLimitDate(birthDate, scenario.limitMonthsAfterBirth);
   // Si la date fournie est déjà une date de début valide, on l'utilise directement
   // Sinon, on considère que c'est la fin de la période obligatoire
   const start = startOfDay(startDateOrMandatoryEnd);
@@ -188,13 +254,13 @@ export function calculateAutomaticRemainingPeriod(
     return null;
   }
 
-  if (isAfter(start, sixMonthsLimit)) {
+  if (isAfter(start, usageLimit)) {
     return null;
   }
 
   const end = addDays(start, daysNeeded - 1);
 
-  if (isAfter(end, sixMonthsLimit)) {
+  if (isAfter(end, usageLimit)) {
     return null;
   }
 
@@ -209,9 +275,10 @@ export function calculateAutomaticRemainingPeriod(
 export function calculateFractionnedPeriods(
   birthDate: Date,
   mandatoryEnd: Date,
-  blocksConfig: number[]
+  blocksConfig: number[],
+  scenario: LeaveScenarioConfig = getLeaveScenarioConfig()
 ): { blocks: LeaveBlock[]; error?: string } {
-  const sixMonthsLimit = getSixMonthsLimit(birthDate);
+  const usageLimit = getLimitDate(birthDate, scenario.limitMonthsAfterBirth);
   const blocks: LeaveBlock[] = [];
 
   if (blocksConfig.length === 0) {
@@ -225,13 +292,19 @@ export function calculateFractionnedPeriods(
 
   const currentStart = addDays(mandatoryEnd, 1);
 
-  if (isAfter(currentStart, sixMonthsLimit)) {
-    return { blocks, error: 'Impossible de planifier : la période dépasse les 6 mois après la naissance' };
+  if (isAfter(currentStart, usageLimit)) {
+    return {
+      blocks,
+      error: `Impossible de planifier : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+    };
   }
 
   const end = addDays(currentStart, firstBlockLength - 1);
-  if (isAfter(end, sixMonthsLimit)) {
-    return { blocks, error: 'Impossible de planifier : la période dépasse les 6 mois après la naissance' };
+  if (isAfter(end, usageLimit)) {
+    return {
+      blocks,
+      error: `Impossible de planifier : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+    };
   }
 
   blocks.push({
