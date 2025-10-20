@@ -32,13 +32,13 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             role="radio"
             aria-checked={isSelected}
             onClick={() => onScenarioChange(config.id)}
-            className={`rounded-2xl border-2 p-4 text-left transition-all h-full ${
+            className={`rounded-2xl border-2 p-4 text-left transition-all h-full flex flex-col ${
               isSelected
                 ? 'border-teal-500 bg-teal-50 shadow-lg'
                 : 'border-slate-200 bg-white hover:border-teal-200 hover:shadow-md'
             }`}
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-3 mb-4">
               <div className="flex-1">
                 <p className="text-sm font-semibold uppercase tracking-wide text-teal-600">
                   {config.label}
@@ -55,7 +55,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
               </span>
             </div>
 
-            <div className="mt-4 grid gap-2 sm:gap-3 text-slate-700 sm:grid-cols-2 items-start">
+            <div className="mt-auto grid gap-2 sm:gap-3 text-slate-700 sm:grid-cols-2 items-start">
               <div className="rounded-xl bg-white/80 p-3 space-y-1 h-full">
                 <p className="font-semibold text-slate-900 text-base leading-relaxed">{details.totalText}</p>
                 {details.bonusText && (
