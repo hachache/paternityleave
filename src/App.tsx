@@ -177,7 +177,7 @@ function App() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
             Congé Paternité
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-3xl mx-auto leading-relaxed">
             Planifiez votre congé selon la législation française
           </p>
 
@@ -196,7 +196,7 @@ function App() {
 
         <NavigationAnchor show={birthDate !== null} />
 
-        <div className="max-w-2xl mx-auto mb-8">
+        <div className="max-w-3xl mx-auto mb-8">
           <SectionCard
             title="1. Choisissez votre situation"
             description="Commencez par sélectionner votre cas pour adapter le nombre de jours"
@@ -206,7 +206,7 @@ function App() {
           </SectionCard>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-8">
+        <div className="max-w-3xl mx-auto mb-8">
           <ProgressStepper currentStep={planningStep} fractionableDays={totalFractionableDays} />
           {birthDate && (
             <p className="mt-3 text-center text-sm text-slate-600">
@@ -215,7 +215,7 @@ function App() {
           )}
         </div>
 
-        <div className="max-w-2xl mx-auto mb-8">
+        <div className="max-w-3xl mx-auto mb-8">
           <SectionCard
             title="Étapes suivantes"
             description="Suivez les actions à réaliser pour finaliser votre demande"
@@ -278,7 +278,7 @@ function App() {
         )}
 
         {(error || (successMessage && !visualSelectionMode)) && (
-          <div className="max-w-2xl mx-auto space-y-3 mb-6 animate-fade-in">
+          <div className="max-w-3xl mx-auto space-y-3 mb-6 animate-fade-in">
             {error && (
               <FeedbackBanner
                 tone="error"
@@ -299,7 +299,7 @@ function App() {
 
         {/* Bannière d'instruction pour le mode sélection visuelle - juste au-dessus du calendrier */}
         {visualSelectionMode && selectionStep !== 'idle' && (
-          <div className="mb-4 max-w-2xl mx-auto animate-slide-up">
+          <div className="mb-4 max-w-3xl mx-auto animate-slide-up">
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5 shadow-lg">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0">
@@ -337,7 +337,7 @@ function App() {
           </div>
         )}
 
-        <div ref={calendarRef} className="mb-6 sm:mb-8 max-w-2xl mx-auto scroll-mt-20" id="calendar">
+        <div ref={calendarRef} className="mb-6 sm:mb-8 max-w-3xl mx-auto scroll-mt-20" id="calendar">
           <Calendar
             birthDate={birthDate}
             onSelectBirthDate={handleSelectBirthDate}
@@ -352,7 +352,7 @@ function App() {
         </div>
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
-          <div ref={planningRef} className="max-w-2xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
+          <div ref={planningRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg transition-apple-smooth">
               <div className="text-center mb-6 sm:mb-8">
                 <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-700 mb-3 sm:mb-4 shadow-sm">
@@ -420,7 +420,7 @@ function App() {
 
         {/* Mode personnalisé actif */}
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && !visualSelectionMode && (
-          <div ref={customModeRef} className="max-w-2xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
+          <div ref={customModeRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-teal-200 p-6 sm:p-8 shadow-lg">
               <div className="flex items-start gap-4 mb-6">
                 <div className="flex-shrink-0">
@@ -570,7 +570,7 @@ function App() {
 
         {/* Message pendant le placement personnalisé */}
         {customMode && remainingBlocks.length === 1 && !visualSelectionMode && (
-          <div className="max-w-2xl mx-auto mb-6 sm:mb-8 animate-slide-up">
+          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-slide-up">
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-lg">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-md flex-shrink-0">
@@ -591,7 +591,7 @@ function App() {
 
         {/* Bouton Effacer tous les blocs */}
         {remainingBlocks.length > 0 && (
-          <div className="max-w-2xl mx-auto mb-8 animate-fade-in">
+          <div className="max-w-3xl mx-auto mb-8 animate-fade-in">
             <Button
               onClick={handleClearAllBlocks}
               variant="outline"
@@ -606,7 +606,7 @@ function App() {
 
         {birthDate && (
           <>
-            <div className="max-w-2xl mx-auto mb-8 animate-fade-in" id="summary">
+            <div className="max-w-3xl mx-auto mb-8 animate-fade-in" id="summary">
               <Summary
                 birthDate={birthDate}
                 employerPeriod={employerPeriod}
@@ -619,7 +619,7 @@ function App() {
             </div>
 
             {mandatoryPeriod && (
-              <div ref={letterRef} className="max-w-2xl mx-auto mb-8 animate-fade-in-delay" id="letter">
+              <div ref={letterRef} className="max-w-3xl mx-auto mb-8 animate-fade-in-delay" id="letter">
                 <LetterGenerator
                   birthDate={birthDate}
                   mandatoryPeriod={mandatoryPeriod}
@@ -632,7 +632,7 @@ function App() {
 
 
         {birthDate && (
-          <div className="text-center mt-8 max-w-2xl mx-auto animate-fade-in-delay">
+          <div className="text-center mt-8 max-w-3xl mx-auto animate-fade-in-delay">
             <Button
               onClick={handleResetRequest}
               variant="secondary"
@@ -646,7 +646,7 @@ function App() {
           </div>
         )}
 
-        <div className="mt-16 max-w-2xl mx-auto mb-12" id="legal">
+        <div className="mt-16 max-w-3xl mx-auto mb-12" id="legal">
           <LegalInfo />
         </div>
       </div>
