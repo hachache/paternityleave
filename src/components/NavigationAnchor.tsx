@@ -54,7 +54,7 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
             ratios.set(id, entry.intersectionRatio);
           });
 
-          // Debounce pour éviter le clignotement
+          // Debounce pour éviter le clignotement (80ms optimisé pour le scroll tactile mobile)
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
             // Pick the section with the highest ratio
@@ -70,12 +70,12 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
               setActiveSection(prev => prev !== bestId ? bestId : prev);
             }
             debounceTimerRef.current = null;
-          }, 150); // Debounce de 150ms pour éviter les changements trop rapides
+          }, 80); // Debounce de 80ms - réponse plus rapide pour mobile
         },
         {
           root: null,
-          rootMargin: '-10% 0px -30% 0px', // Zone centrale plus stricte
-          threshold: [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
+          rootMargin: '-80px 0px -30% 0px', // Aligné avec scroll-mt-20 (80px) pour cohérence
+          threshold: [0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] // Granularité augmentée
         }
       );
       targets.forEach(el => io.observe(el));
@@ -93,9 +93,11 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
 
   useEffect(() => {
     if (!show) return;
-    // Initial detection (IO may not fire immediately)
-    const id = window.setTimeout(() => detectActiveSection(), 100);
-    return () => window.clearTimeout(id);
+    // Initial detection seulement si IntersectionObserver n'est pas supporté
+    if (!('IntersectionObserver' in window)) {
+      const id = window.setTimeout(() => detectActiveSection(), 100);
+      return () => window.clearTimeout(id);
+    }
   }, [show, detectActiveSection]);
 
   if (!show) return null;
