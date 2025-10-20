@@ -45,33 +45,43 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
       if (targets.length === 0) return;
 
       const ratios = new Map<string, number>();
+      const debounceTimerRef = { current: null as NodeJS.Timeout | null };
+
       const io = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             const id = (entry.target as HTMLElement).id;
             ratios.set(id, entry.intersectionRatio);
           });
-          // Pick the section with the highest ratio
-          let bestId = activeSection;
-          let best = -1;
-          ratios.forEach((ratio, id) => {
-            if (ratio > best) {
-              best = ratio;
-              bestId = id;
+
+          // Debounce pour éviter le clignotement
+          if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+          debounceTimerRef.current = setTimeout(() => {
+            // Pick the section with the highest ratio
+            let bestId = '';
+            let best = -1;
+            ratios.forEach((ratio, id) => {
+              if (ratio > best) {
+                best = ratio;
+                bestId = id;
+              }
+            });
+            if (bestId && best > 0.1) {
+              setActiveSection(prev => prev !== bestId ? bestId : prev);
             }
-          });
-          if (bestId && bestId !== activeSection) setActiveSection(bestId);
+            debounceTimerRef.current = null;
+          }, 150); // Debounce de 150ms pour éviter les changements trop rapides
         },
         {
           root: null,
-          // Favor the section that is most visible around center viewport
-          rootMargin: '0px 0px -20% 0px',
-          threshold: [0, 0.25, 0.5, 0.75, 1]
+          rootMargin: '-10% 0px -30% 0px', // Zone centrale plus stricte
+          threshold: [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
         }
       );
       targets.forEach(el => io.observe(el));
       observerRef.current = io;
       return () => {
+        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
         io.disconnect();
         observerRef.current = null;
       };
@@ -79,7 +89,7 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
       // Fallback: measure once
       detectActiveSection();
     }
-  }, [show, sections, detectActiveSection, activeSection]);
+  }, [show, sections, detectActiveSection]); // Retiré activeSection pour éviter boucle
 
   useEffect(() => {
     if (!show) return;
@@ -101,15 +111,25 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
             href={`#${section.id}`}
             className={`
               relative px-2 sm:px-3 md:px-5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm md:text-sm
-              font-semibold transition-all duration-300 ease-out
+              font-semibold whitespace-nowrap
               ${
                 isActive
                   ? 'text-white bg-gradient-to-b from-teal-500 to-teal-600 shadow-lg'
-                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
+                  : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-700'
               }
-              active:scale-95 hover:scale-105 whitespace-nowrap
             `}
+            style={{
+              transition: 'background 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              transform: isActive ? 'scale(1)' : 'scale(0.98)'
+            }}
             title={section.label}
+            onClick={(e) => {
+              e.preventDefault();
+              const element = document.getElementById(section.id);
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
           >
             <span className="hidden sm:inline">{section.label}</span>
             <span className="sm:hidden">{section.shortLabel}</span>
@@ -123,7 +143,12 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
   if (isMobile) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
-        <nav className="pointer-events-auto flex justify-around gap-1 px-2 py-2 bg-white/95 backdrop-blur-lg border-t border-slate-200/80 shadow-lg">
+        <nav
+          className="pointer-events-auto flex justify-around gap-1 px-2 py-2 bg-white/95 dark:bg-slate-800/90 backdrop-blur-lg border-t border-slate-200/80 dark:border-slate-600 shadow-lg"
+          style={{
+            transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }}
+        >
           {navContent}
         </nav>
       </div>
@@ -133,7 +158,12 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
   // Top nav pour desktop
   return (
     <div className="fixed top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-3 sm:py-4 pointer-events-none">
-      <nav className="pointer-events-auto flex gap-1.5 px-3 py-2.5 rounded-2xl bg-white/95 backdrop-blur-lg border border-slate-200/80 shadow-md transition-all duration-300">
+      <nav
+        className="pointer-events-auto flex gap-1.5 px-3 py-2.5 rounded-2xl bg-white/95 dark:bg-slate-800/90 backdrop-blur-lg border border-slate-200/80 dark:border-slate-600 shadow-md"
+        style={{
+          transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        }}
+      >
         {navContent}
       </nav>
     </div>

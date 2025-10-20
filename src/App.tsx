@@ -60,12 +60,25 @@ function App() {
   const customModeRef = useRef<HTMLDivElement>(null);
   const letterRef = useRef<HTMLDivElement>(null);
 
-  // Smooth scroll utility
+  // Smooth scroll utility - STABLE (pas de dépendances)
   const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>) => {
     const node = ref.current;
     if (!node) return;
     node.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
+
+  // Schedule scroll after RAF to avoid race conditions - STABLE
+  const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>, offset: number = -20) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const node = ref.current;
+        if (!node) return;
+        const elementPosition = node.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset + offset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      });
+    });
+  }, []); // Pas de dépendances = fonction stable, pas de re-création
 
   const scrollIntoViewIfNeeded = useCallback(
     (ref: React.RefObject<HTMLDivElement>) => {
@@ -85,7 +98,7 @@ function App() {
 
   const handleSelectBirthDate = (date: Date) => {
     selectBirthDate(date);
-    setTimeout(() => smoothScrollTo(planningRef), 600);
+    scheduleSmoothScroll(planningRef, -100);
   };
 
   const handleSelectRemainingDay = (date: Date) => {
@@ -114,7 +127,7 @@ function App() {
 
   const handleStartVisualSelection = () => {
     startVisualSelection();
-    setTimeout(() => smoothScrollTo(calendarRef), 300);
+    scheduleSmoothScroll(calendarRef, -100);
   };
 
   const handleCancelVisualSelection = () => {
@@ -130,10 +143,10 @@ function App() {
   const previousScenarioId = useRef(scenarioId);
   useEffect(() => {
     if (previousScenarioId.current !== scenarioId && !birthDate) {
-      setTimeout(() => smoothScrollTo(calendarRef), 400);
+      scheduleSmoothScroll(calendarRef, -100);
     }
     previousScenarioId.current = scenarioId;
-  }, [scenarioId, birthDate, smoothScrollTo]);
+  }, [scenarioId, birthDate, scheduleSmoothScroll]);
 
   const previousPlannedDays = useRef(totalPlannedDays);
   useEffect(() => {
