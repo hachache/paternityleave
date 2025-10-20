@@ -133,6 +133,15 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
+  // Auto-scroll to calendar after scenario selection
+  const previousScenarioId = useRef(scenarioId);
+  useEffect(() => {
+    if (previousScenarioId.current !== scenarioId && !birthDate) {
+      setTimeout(() => smoothScrollTo(calendarRef, -100), 400);
+    }
+    previousScenarioId.current = scenarioId;
+  }, [scenarioId, birthDate, smoothScrollTo]);
+
   const previousPlannedDays = useRef(totalPlannedDays);
   useEffect(() => {
     if (
@@ -189,8 +198,8 @@ function App() {
 
         <div className="max-w-2xl mx-auto mb-8">
           <SectionCard
-            title="Votre situation"
-            description="Adaptez le nombre de jours fractionnables selon votre cas"
+            title="1. Choisissez votre situation"
+            description="Commencez par sélectionner votre cas pour adapter le nombre de jours"
             accent="teal"
           >
             <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
