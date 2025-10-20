@@ -38,9 +38,9 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
   useEffect(() => {
     if (show) {
       setIsVisible(true);
-      // Désactiver les confettis sur mobile et quand motion réduit
-      setShowConfetti(!prefersReducedMotion && !isCoarsePointer);
-      const timer = setTimeout(() => setShowConfetti(false), isCoarsePointer ? 1500 : 4000);
+      // Confettis légers si motion OK (mobile compris)
+      setShowConfetti(!prefersReducedMotion);
+      const timer = setTimeout(() => setShowConfetti(false), isCoarsePointer ? 1000 : 3000);
       return () => clearTimeout(timer);
     } else {
       setIsVisible(false);
@@ -129,19 +129,64 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
 
   if (!show && !isVisible) return null;
 
+  // Mobile: toast léger + mini confettis localisés
+  if (isCoarsePointer) {
+    if (!show) return null;
+    return (
+      <>
+        {showConfetti && (
+          <Confetti
+            width={windowSize.width}
+            height={Math.min(windowSize.height, 220)}
+            numberOfPieces={24}
+            recycle={false}
+            gravity={0.35}
+            colors={['#10b981', '#34d399', '#a7f3d0']}
+            style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
+          />
+        )}
+        <div
+          className="fixed inset-x-0 bottom-3 z-50 px-4"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="mx-auto max-w-md rounded-2xl border border-emerald-200 bg-white/95 shadow-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <p className="text-base font-bold text-slate-900">Félicitations ! 🎉</p>
+                <p className="text-sm text-slate-600 mt-0.5">
+                  Planning complet ({totalDays} jours). Vous pouvez générer votre lettre.
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-sm font-semibold"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Desktop: overlay + confettis
   return (
     <>
-      {/* Confettis plein écran */}
       {showConfetti && (
         <Confetti
           width={windowSize.width}
           height={windowSize.height}
           numberOfPieces={Math.min(
             160,
-            Math.max(40, Math.floor((windowSize.width * windowSize.height) / (isCoarsePointer ? 120000 : 80000)))
+            Math.max(40, Math.floor((windowSize.width * windowSize.height) / 80000))
           )}
           recycle={false}
-          gravity={isCoarsePointer ? 0.2 : 0.3}
+          gravity={0.3}
           colors={['#0f766e', '#14b8a6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#f43f5e']}
           style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
         />
@@ -153,24 +198,22 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
           ${isVisible ? 'opacity-100' : 'opacity-0'}
         `}
         style={{
-          transition: `opacity ${isCoarsePointer ? 200 : 400}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
-          backdropFilter: isCoarsePointer ? 'none' : (isVisible ? 'blur(4px)' : 'blur(0px)'),
-          WebkitBackdropFilter: isCoarsePointer ? 'none' : (isVisible ? 'blur(4px)' : 'blur(0px)')
+          transition: 'opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          backdropFilter: isVisible ? 'blur(4px)' : 'blur(0px)',
+          WebkitBackdropFilter: isVisible ? 'blur(4px)' : 'blur(0px)'
         }}
         onClick={() => {
           setIsVisible(false);
           setShowConfetti(false);
-          setTimeout(onClose, isCoarsePointer ? 200 : 400);
+          setTimeout(onClose, 400);
         }}
       >
         <div
           className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden"
           style={{
-            transform: isCoarsePointer ? 'none' : (isVisible ? 'scale(1)' : 'scale(0.95)'),
+            transform: isVisible ? 'scale(1)' : 'scale(0.95)',
             opacity: isVisible ? 1 : 0,
-            transition: isCoarsePointer
-              ? 'opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-              : 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
           }}
           ref={dialogRef}
           role="dialog"
@@ -179,68 +222,66 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
         >
+          <div className="text-center relative z-10">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-full mb-4 shadow-lg">
+              <CheckCircle className="w-12 h-12 text-white" strokeWidth={2.5} />
+            </div>
 
-        {/* Contenu */}
-        <div className="text-center relative z-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-full mb-4 shadow-lg">
-            <CheckCircle className="w-12 h-12 text-white" strokeWidth={2.5} />
-          </div>
+            <h3 className="text-3xl font-bold text-slate-900 mb-3 animate-slide-up">
+              Félicitations ! 🎉
+            </h3>
 
-          <h3 className="text-3xl font-bold text-slate-900 mb-3 animate-slide-up">
-            Félicitations ! 🎉
-          </h3>
-
-          <p className="text-slate-600 text-base mb-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            Votre planning de congé paternité est complet
-          </p>
-
-          <div
-            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 mt-4 animate-slide-up"
-            style={{ animationDelay: '0.2s' }}
-          >
-            <p className="text-sm font-semibold text-emerald-900">
-              ✓ {totalDays} jours planifiés avec succès
+            <p className="text-slate-600 text-base mb-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Votre planning de congé paternité est complet
             </p>
-            <p className="text-xs text-emerald-700 mt-1">
-              3 jours employeur + 4 jours obligatoires + {totalFractionableDays} jours fractionnés
+
+            <div
+              className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 mt-4 animate-slide-up"
+              style={{ animationDelay: '0.2s' }}
+            >
+              <p className="text-sm font-semibold text-emerald-900">
+                ✓ {totalDays} jours planifiés avec succès
+              </p>
+              <p className="text-xs text-emerald-700 mt-1">
+                3 jours employeur + 4 jours obligatoires + {totalFractionableDays} jours fractionnés
+              </p>
+            </div>
+
+            <p className="text-xs text-slate-500 mt-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              Vous pouvez maintenant générer votre lettre pour l'employeur
             </p>
+
+            <button
+              onClick={() => {
+                setIsVisible(false);
+                setShowConfetti(false);
+                setTimeout(onClose, 400);
+              }}
+              className="mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold w-full"
+              style={{
+                transition: 'background-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.02)';
+                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'scale(0.98)';
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = 'scale(1.02)';
+              }}
+              data-autofocus
+            >
+              Super ! 👍
+            </button>
           </div>
-
-          <p className="text-xs text-slate-500 mt-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            Vous pouvez maintenant générer votre lettre pour l'employeur
-          </p>
-
-          <button
-            onClick={() => {
-              setIsVisible(false);
-              setShowConfetti(false);
-              setTimeout(onClose, isCoarsePointer ? 200 : 400);
-            }}
-            className="mt-6 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold w-full"
-            style={{
-              transition: 'background-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.02)';
-              e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '';
-            }}
-            onMouseDown={(e) => {
-              e.currentTarget.style.transform = 'scale(0.98)';
-            }}
-            onMouseUp={(e) => {
-              e.currentTarget.style.transform = 'scale(1.02)';
-            }}
-            data-autofocus
-          >
-            Super ! 👍
-          </button>
         </div>
       </div>
-    </div>
     </>
   );
-}
+  }
