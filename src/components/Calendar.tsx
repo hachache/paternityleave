@@ -164,6 +164,15 @@ export function Calendar({
       const type = getDayType(date);
 
       if (!birthDate) {
+        const today = startOfDay(new Date());
+        if (isBefore(date, today)) {
+          return {
+            type,
+            selectable: false,
+            reason: "La date de naissance ne peut pas être antérieure à aujourd'hui",
+            action: 'static'
+          };
+        }
         return { type, selectable: true, action: 'select' };
       }
 
@@ -273,7 +282,9 @@ export function Calendar({
       const detail = metadata ?? describeDay(date);
 
       if (!birthDate) {
-        onSelectBirthDate(date);
+        if (detail.selectable) {
+          onSelectBirthDate(date);
+        }
         return;
       }
 

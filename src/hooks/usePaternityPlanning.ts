@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { differenceInDays, startOfDay } from 'date-fns';
+import { differenceInDays, startOfDay, isBefore } from 'date-fns';
 import {
   calculateAutomaticRemainingPeriod,
   calculateEmployerPeriod,
@@ -101,6 +101,11 @@ export function usePaternityPlanning() {
 
   const selectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
+    const today = startOfDay(new Date());
+    if (isBefore(normalized, today)) {
+      setError("La date de naissance ne peut pas être antérieure à aujourd'hui");
+      return;
+    }
     setBirthDate(normalized);
 
     const employer = calculateEmployerPeriod(normalized);
