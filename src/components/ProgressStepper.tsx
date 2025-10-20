@@ -13,7 +13,7 @@ export function ProgressStepper({ currentStep, fractionableDays }: ProgressStepp
   ];
 
   return (
-    <div className="max-w-2xl mx-auto mb-8 px-4 animate-slide-up">
+    <div className="max-w-3xl mx-auto mb-8 animate-slide-up">
       <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-lg">
         <div className="flex items-center justify-between relative">
           {/* Progress bar background */}
