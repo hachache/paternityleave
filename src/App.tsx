@@ -69,16 +69,17 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
     node.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  // Schedule scroll after RAF to avoid race conditions - STABLE
+  // Schedule scroll after RAF to avoid race conditions; use instant scroll on mobile
   const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>, offset: number = -20) => {
     requestAnimationFrame(() => {
       const node = ref.current;
       if (!node) return;
       const elementPosition = node.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset + offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      const behavior: ScrollBehavior = isCoarsePointer ? 'auto' : 'smooth';
+      window.scrollTo({ top: offsetPosition, behavior });
     });
-  }, []); // Pas de dépendances = fonction stable, pas de re-création
+  }, [isCoarsePointer]);
 
   const scrollIntoViewIfNeeded = useCallback(
     (ref: React.RefObject<HTMLDivElement>) => {
@@ -98,7 +99,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
   const handleSelectBirthDate = (date: Date) => {
     selectBirthDate(date);
-    scheduleSmoothScroll(planningRef, -100);
+    // Scrolling is deferred until planning section is mounted (effect below)
   };
 
   const handleSelectRemainingDay = (date: Date) => {
@@ -147,6 +148,18 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
     }
     previousScenarioId.current = scenarioId;
   }, [scenarioId, birthDate, scheduleSmoothScroll]);
+
+  // After selecting birth date, scroll to the planning section once it is mounted
+  const previousBirthDateTs = useRef<number | null>(null);
+  useEffect(() => {
+    const planningIntroVisible = Boolean(birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode);
+    if (!planningIntroVisible) return;
+    const ts = birthDate ? birthDate.getTime() : null;
+    if (ts && previousBirthDateTs.current !== ts) {
+      previousBirthDateTs.current = ts;
+      scheduleSmoothScroll(planningRef, -100);
+    }
+  }, [birthDate, mandatoryPeriod, remainingBlocks.length, customMode, scheduleSmoothScroll]);
 
   const previousPlannedDays = useRef(totalPlannedDays);
   useEffect(() => {
@@ -361,8 +374,8 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
         </div>
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
-          <div ref={planningRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-fade-in scroll-mt-20">
-            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg transition-apple-smooth">
+          <div ref={planningRef} className={`max-w-3xl mx-auto mb-6 sm:mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'} scroll-mt-20`}>
+            <div className={`bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg ${isCoarsePointer ? '' : 'transition-apple-smooth'}`}>
               <div className="text-center mb-6 sm:mb-8">
                 <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-700 mb-3 sm:mb-4 shadow-sm">
                   <span className="text-2xl sm:text-3xl" aria-hidden="true">
