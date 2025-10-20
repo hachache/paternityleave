@@ -1,5 +1,3 @@
-/// <reference types="vitest" />
-
 import { addDays, addMonths, startOfDay } from 'date-fns';
 import { describe, expect, it } from 'vitest';
 

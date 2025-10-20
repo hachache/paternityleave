@@ -20,13 +20,13 @@ export function ScrollIndicator({ show }: ScrollIndicatorProps) {
   useEffect(() => {
     if (!visible) return;
 
-    const handleScroll = () => {
+    const handleScroll = (): void => {
       if (window.scrollY > 100) {
         setVisible(false);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [visible]);
 

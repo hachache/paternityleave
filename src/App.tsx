@@ -61,21 +61,14 @@ function App() {
   const letterRef = useRef<HTMLDivElement>(null);
 
   // Smooth scroll utility
-  const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>, offset = -20) => {
+  const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>) => {
     const node = ref.current;
     if (!node) return;
-
-    const elementPosition = node.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset + offset;
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: 'smooth'
-    });
+    node.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
   const scrollIntoViewIfNeeded = useCallback(
-    (ref: React.RefObject<HTMLDivElement>, offset = -20) => {
+    (ref: React.RefObject<HTMLDivElement>) => {
       const node = ref.current;
       if (!node) return;
 
@@ -84,7 +77,7 @@ function App() {
       const fullyVisible = rect.top >= 0 && rect.bottom <= viewportHeight;
 
       if (!fullyVisible) {
-        smoothScrollTo(ref, offset);
+        smoothScrollTo(ref);
       }
     },
     [smoothScrollTo]
@@ -92,7 +85,7 @@ function App() {
 
   const handleSelectBirthDate = (date: Date) => {
     selectBirthDate(date);
-    setTimeout(() => smoothScrollTo(planningRef, -100), 600);
+    setTimeout(() => smoothScrollTo(planningRef), 600);
   };
 
   const handleSelectRemainingDay = (date: Date) => {
@@ -121,7 +114,7 @@ function App() {
 
   const handleStartVisualSelection = () => {
     startVisualSelection();
-    setTimeout(() => smoothScrollTo(calendarRef, -100), 300);
+    setTimeout(() => smoothScrollTo(calendarRef), 300);
   };
 
   const handleCancelVisualSelection = () => {
@@ -130,14 +123,14 @@ function App() {
 
   // Scroll to top on initial page load
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
 
   // Auto-scroll to calendar after scenario selection
   const previousScenarioId = useRef(scenarioId);
   useEffect(() => {
     if (previousScenarioId.current !== scenarioId && !birthDate) {
-      setTimeout(() => smoothScrollTo(calendarRef, -100), 400);
+      setTimeout(() => smoothScrollTo(calendarRef), 400);
     }
     previousScenarioId.current = scenarioId;
   }, [scenarioId, birthDate, smoothScrollTo]);
@@ -148,7 +141,7 @@ function App() {
       previousPlannedDays.current < totalFractionableDays &&
       totalPlannedDays === totalFractionableDays
     ) {
-      scrollIntoViewIfNeeded(letterRef, -120);
+      scrollIntoViewIfNeeded(letterRef);
     }
     previousPlannedDays.current = totalPlannedDays;
   }, [scrollIntoViewIfNeeded, totalFractionableDays, totalPlannedDays]);
@@ -237,7 +230,7 @@ function App() {
           show={showCelebration}
           onClose={() => {
             hideCelebration();
-            setTimeout(() => smoothScrollTo(letterRef, -100), 400);
+            setTimeout(() => smoothScrollTo(letterRef), 400);
           }}
           totalFractionableDays={totalFractionableDays}
         />
@@ -385,7 +378,7 @@ function App() {
                   <Button
                     onClick={() => {
                       setCustomMode(true);
-                      setTimeout(() => smoothScrollTo(customModeRef, -100), 300);
+                      setTimeout(() => smoothScrollTo(customModeRef), 300);
                     }}
                     variant="primary"
                     size="md"

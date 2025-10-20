@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import Confetti from 'react-confetti';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 interface CelebrationModalProps {
   show: boolean;
@@ -15,6 +16,7 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const totalDays = 7 + totalFractionableDays;
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   useEffect(() => {
     const handleResize = () => {
@@ -27,7 +29,7 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
   useEffect(() => {
     if (show) {
       setIsVisible(true);
-      setShowConfetti(true);
+      setShowConfetti(!prefersReducedMotion);
       // Arrêter les confettis après 5 secondes
       const timer = setTimeout(() => setShowConfetti(false), 5000);
       return () => clearTimeout(timer);
@@ -35,7 +37,7 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
       setIsVisible(false);
       setShowConfetti(false);
     }
-  }, [show]);
+  }, [show, prefersReducedMotion]);
 
   useEffect(() => {
     if (!show) {
@@ -120,7 +122,10 @@ export function CelebrationModal({ show, onClose, totalFractionableDays }: Celeb
         <Confetti
           width={windowSize.width}
           height={windowSize.height}
-          numberOfPieces={400}
+          numberOfPieces={Math.min(
+            200,
+            Math.max(80, Math.floor((windowSize.width * windowSize.height) / 60000))
+          )}
           recycle={false}
           gravity={0.3}
           colors={['#0f766e', '#14b8a6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#f43f5e']}

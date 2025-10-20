@@ -5,6 +5,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Provide top padding for sticky UI so scrollIntoView aligns correctly */
+    scroll-padding-top: 80px;
+  }
+  @media (min-width: 640px) {
+    html { scroll-padding-top: 96px; }
   }
 }
 
@@ -274,19 +279,19 @@
 
 @layer components {
   .transition-apple {
-    transition-property: all;
+    transition-property: transform, opacity, box-shadow, background-color, color, border-color;
     transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
     transition-duration: 350ms;
   }
 
   .transition-apple-fast {
-    transition-property: all;
+    transition-property: transform, opacity, box-shadow, background-color, color, border-color;
     transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
     transition-duration: 200ms;
   }
 
   .transition-apple-smooth {
-    transition-property: all;
+    transition-property: transform, opacity, box-shadow, background-color, color, border-color;
     transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transition-duration: 400ms;
   }

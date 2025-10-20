@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 interface NavigationAnchorProps {
   show: boolean;
@@ -6,26 +7,24 @@ interface NavigationAnchorProps {
 
 export function NavigationAnchor({ show }: NavigationAnchorProps) {
   const [activeSection, setActiveSection] = useState<string>('calendar');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const sections = [
+  const sections = useMemo(() => [
     { id: 'calendar', label: '📅 Calendrier', shortLabel: '📅' },
     { id: 'summary', label: '📊 Résumé', shortLabel: '📊' },
     { id: 'letter', label: '📬 Lettre', shortLabel: '📬' },
     { id: 'legal', label: '⚖️ Légal', shortLabel: '⚖️' }
-  ] as const;
+  ] as const, []);
 
   const detectActiveSection = useCallback(() => {
-    const sectionElements = sections.map(section => ({
-      id: section.id,
-      element: document.getElementById(section.id)
-    })).filter(item => item.element);
-
+    // Fallback for environments without IntersectionObserver
+    const sectionElements = sections
+      .map(section => ({ id: section.id, element: document.getElementById(section.id) }))
+      .filter(item => item.element);
     if (sectionElements.length === 0) return;
-
     let closestSection = sectionElements[0];
     let closestDistance = Math.abs(closestSection.element!.getBoundingClientRect().top);
-
     sectionElements.forEach(item => {
       const distance = Math.abs(item.element!.getBoundingClientRect().top);
       if (distance < closestDistance) {
@@ -33,31 +32,60 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
         closestSection = item;
       }
     });
-
     setActiveSection(closestSection.id);
-  }, []);
+  }, [sections]);
 
+  // IntersectionObserver for active section tracking
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    if (!show) return;
+    if ('IntersectionObserver' in window) {
+      const targets = sections
+        .map(s => document.getElementById(s.id))
+        .filter((el): el is HTMLElement => Boolean(el));
+      if (targets.length === 0) return;
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+      const ratios = new Map<string, number>();
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            const id = (entry.target as HTMLElement).id;
+            ratios.set(id, entry.intersectionRatio);
+          });
+          // Pick the section with the highest ratio
+          let bestId = activeSection;
+          let best = -1;
+          ratios.forEach((ratio, id) => {
+            if (ratio > best) {
+              best = ratio;
+              bestId = id;
+            }
+          });
+          if (bestId && bestId !== activeSection) setActiveSection(bestId);
+        },
+        {
+          root: null,
+          // Favor the section that is most visible around center viewport
+          rootMargin: '0px 0px -20% 0px',
+          threshold: [0, 0.25, 0.5, 0.75, 1]
+        }
+      );
+      targets.forEach(el => io.observe(el));
+      observerRef.current = io;
+      return () => {
+        io.disconnect();
+        observerRef.current = null;
+      };
+    } else {
+      // Fallback: measure once
+      detectActiveSection();
+    }
+  }, [show, sections, detectActiveSection, activeSection]);
 
   useEffect(() => {
     if (!show) return;
-
-    setTimeout(() => detectActiveSection(), 100);
-
-    const handleScroll = () => {
-      detectActiveSection();
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Initial detection (IO may not fire immediately)
+    const id = window.setTimeout(() => detectActiveSection(), 100);
+    return () => window.clearTimeout(id);
   }, [show, detectActiveSection]);
 
   if (!show) return null;
@@ -82,13 +110,6 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
               active:scale-95 hover:scale-105 whitespace-nowrap
             `}
             title={section.label}
-            onClick={(e) => {
-              e.preventDefault();
-              const element = document.getElementById(section.id);
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }}
           >
             <span className="hidden sm:inline">{section.label}</span>
             <span className="sm:hidden">{section.shortLabel}</span>
