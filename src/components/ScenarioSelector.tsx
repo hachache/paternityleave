@@ -20,7 +20,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
   const scenarios = Object.values(LEAVE_SCENARIOS);
 
   return (
-    <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+    <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-3 sm:gap-4 sm:grid-cols-2 auto-rows-fr">
       {scenarios.map(config => {
         const isSelected = config.id === selectedScenario;
         const details = formatScenarioDetails(config);
@@ -32,7 +32,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             role="radio"
             aria-checked={isSelected}
             onClick={() => onScenarioChange(config.id)}
-            className={`rounded-2xl border-2 p-4 text-left transition-all ${
+            className={`rounded-2xl border-2 p-4 text-left transition-all h-full ${
               isSelected
                 ? 'border-teal-500 bg-teal-50 shadow-lg'
                 : 'border-slate-200 bg-white hover:border-teal-200 hover:shadow-md'
