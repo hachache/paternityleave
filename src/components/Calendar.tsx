@@ -348,8 +348,9 @@ export function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
+      // Removed transition-colors to prevent micro-lag on mobile (35-42 cells transitioning simultaneously)
       let classes =
-        'aspect-square flex items-center justify-center text-sm sm:text-base rounded-xl transition-colors duration-200 font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 border border-transparent';
+        'aspect-square flex items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 border border-transparent touch-manipulation';
 
       if (!isCurrentMonthDay) {
         classes += ' text-slate-400';
@@ -401,7 +402,7 @@ export function Calendar({
   );
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8 shadow-lg transition-apple-smooth">
+    <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8 shadow-lg">
       {!birthDate && (
         <div className="mb-4 sm:mb-6 rounded-2xl border border-teal-200 bg-white p-4 sm:p-5">
           <p className="text-sm sm:text-base text-teal-800 text-center font-medium">
