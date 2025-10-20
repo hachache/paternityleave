@@ -39,14 +39,14 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             }`}
           >
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-semibold uppercase tracking-wide text-teal-600">
                   {config.label}
                 </p>
                 <p className="mt-1 text-base text-slate-600 leading-relaxed">{config.description}</p>
               </div>
               <span
-                className={`mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
+                className={`flex-shrink-0 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
                   isSelected ? 'border-teal-600 bg-teal-600 text-white' : 'border-slate-300 text-slate-400'
                 }`}
                 aria-hidden="true"
