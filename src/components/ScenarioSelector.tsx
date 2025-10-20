@@ -55,14 +55,14 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
               </span>
             </div>
 
-            <div className="mt-4 grid gap-2 sm:gap-3 text-slate-700 sm:grid-cols-2">
-              <div className="rounded-xl bg-white/80 p-3 space-y-1">
+            <div className="mt-4 grid gap-2 sm:gap-3 text-slate-700 sm:grid-cols-2 items-start">
+              <div className="rounded-xl bg-white/80 p-3 space-y-1 h-full">
                 <p className="font-semibold text-slate-900 text-base leading-relaxed">{details.totalText}</p>
                 {details.bonusText && (
                   <p className="text-sm font-semibold text-emerald-600">{details.bonusText}</p>
                 )}
               </div>
-              <div className="rounded-xl bg-white/80 p-3 space-y-1">
+              <div className="rounded-xl bg-white/80 p-3 space-y-1 h-full">
                 <p className="font-semibold text-slate-900 text-base leading-relaxed">{details.limitText}</p>
                 <p className="text-sm text-slate-500 leading-relaxed">Fractionnement en 2 périodes minimum</p>
               </div>
