@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useMediaQuery } from './hooks/useMediaQuery';
 import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
@@ -16,7 +17,8 @@ import { ScenarioSelector } from './components/ScenarioSelector';
 import { Button } from './components/Button';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
-function App() {
+  function App() {
+  const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const {
     birthDate,
     employerPeriod,
@@ -285,7 +287,7 @@ function App() {
         )}
 
         {(error || (successMessage && !visualSelectionMode)) && (
-          <div className="max-w-3xl mx-auto space-y-3 mb-6 animate-fade-in">
+          <div className={`max-w-3xl mx-auto space-y-3 mb-6 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
             {error && (
               <FeedbackBanner
                 tone="error"
@@ -598,7 +600,7 @@ function App() {
 
         {/* Bouton Effacer tous les blocs */}
         {remainingBlocks.length > 0 && (
-          <div className="max-w-3xl mx-auto mb-8 animate-fade-in">
+          <div className={`max-w-3xl mx-auto mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
             <Button
               onClick={handleClearAllBlocks}
               variant="outline"
@@ -613,7 +615,7 @@ function App() {
 
         {birthDate && (
           <>
-            <div className="max-w-3xl mx-auto mb-8 animate-fade-in" id="summary">
+            <div className={`max-w-3xl mx-auto mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'}`} id="summary">
               <Summary
                 birthDate={birthDate}
                 employerPeriod={employerPeriod}
@@ -626,7 +628,7 @@ function App() {
             </div>
 
             {mandatoryPeriod && (
-              <div ref={letterRef} className="max-w-3xl mx-auto mb-8 animate-fade-in-delay" id="letter">
+              <div ref={letterRef} className={`max-w-3xl mx-auto mb-8 ${isCoarsePointer ? '' : 'animate-fade-in-delay'}`} id="letter">
                 <LetterGenerator
                   birthDate={birthDate}
                   mandatoryPeriod={mandatoryPeriod}

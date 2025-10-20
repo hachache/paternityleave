@@ -15,6 +15,7 @@ import {
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import { getFrenchHolidays, isFrenchHoliday, isWeekend } from '../utils/holidays';
 import {
   LeaveBlock,
@@ -57,6 +58,7 @@ export function Calendar({
   onRemoveBlock,
   scenario
 }: CalendarProps) {
+  const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const [currentMonth, setCurrentMonth] = useState<Date>(() => startOfMonth(new Date()));
   const [focusedDate, setFocusedDate] = useState<Date>(() => startOfDay(new Date()));
   const dayRefs = useRef<Record<number, HTMLButtonElement | null>>({});
@@ -121,12 +123,13 @@ export function Calendar({
   }, [birthDate]);
 
   useEffect(() => {
+    if (isCoarsePointer) return; // Avoid programmatic focus on mobile to reduce jank
     const key = startOfDay(focusedDate).getTime();
     const target = dayRefs.current[key];
     if (target && document.activeElement !== target) {
       target.focus();
     }
-  }, [focusedDate, currentMonth]);
+  }, [focusedDate, currentMonth, isCoarsePointer]);
 
   const getDayType = useCallback(
     (date: Date): DayType => {
@@ -380,6 +383,18 @@ export function Calendar({
     [focusDate, focusedDate, handleDayInteraction, moveFocusBy]
   );
 
+  // Unified focus handler to avoid per-cell closures
+  const handleCellFocus = useCallback(
+    (event: React.FocusEvent<HTMLButtonElement>) => {
+      if (isCoarsePointer) return;
+      const ts = Number((event.currentTarget as HTMLButtonElement).getAttribute('data-date'));
+      if (!ts || Number.isNaN(ts)) return;
+      const date = dayKeyMap.get(ts);
+      if (date) setFocusedDate(date);
+    },
+    [isCoarsePointer, dayKeyMap]
+  );
+
   const getDayClasses = useCallback(
     (date: Date, metadata: DayMetadata) => {
       const isCurrentMonthDay = isSameMonth(date, currentMonth);
@@ -418,11 +433,22 @@ export function Calendar({
     [currentMonth, holidays]
   );
 
-  const buildAriaLabel = useCallback(
-    (date: Date, metadata: DayMetadata) => {
-      const base = format(date, 'EEEE d MMMM yyyy', { locale: fr });
+  // Precompute ARIA labels with a lighter formatter than date-fns for better mobile perf
+  const ariaLabelByKey = useMemo(() => {
+    const m = new Map<number, string>();
+    for (const d of days) {
+      const date = startOfDay(d);
+      const key = date.getTime();
+      const metadata = metadataByKey.get(key) ?? { type: null, selectable: true, action: 'select' };
+      const base = isCoarsePointer
+        ? `${date.getDate()} ${date.toLocaleDateString('fr-FR', { month: 'long' })}`
+        : date.toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
       const details = new Set<string>();
-
       if (metadata.type === 'birth') details.add('date de naissance');
       if (metadata.type === 'employer') details.add('période employeur');
       if (metadata.type === 'mandatory') details.add('période obligatoire');
@@ -430,14 +456,15 @@ export function Calendar({
       if (metadata.reason) details.add(metadata.reason.toLowerCase());
       if (!metadata.selectable && metadata.action !== 'remove') details.add('indisponible');
       if (metadata.action === 'remove') details.add('cliquer pour supprimer');
-      if (isFrenchHoliday(date, holidays)) details.add('jour férié');
-      if (isWeekend(date)) details.add('week-end');
-
+      if (!isCoarsePointer) {
+        if (isFrenchHoliday(date, holidays)) details.add('jour férié');
+        if (isWeekend(date)) details.add('week-end');
+      }
       const detailText = Array.from(details).join(', ');
-      return detailText ? `${base}, ${detailText}` : base;
-    },
-    [holidays]
-  );
+      m.set(key, detailText ? `${base}, ${detailText}` : base);
+    }
+    return m;
+  }, [days, metadataByKey, holidays, isCoarsePointer]);
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8 shadow-lg">
@@ -519,12 +546,12 @@ export function Calendar({
               data-date={dayKey}
               className={getDayClasses(dayStart, metadata)}
               tabIndex={isFocused ? 0 : -1}
-              aria-label={buildAriaLabel(dayStart, metadata)}
+              aria-label={ariaLabelByKey.get(dayKey)}
               aria-disabled={ariaDisabled}
               aria-selected={metadata.type === 'remaining'}
               aria-current={metadata.type === 'birth' ? 'date' : undefined}
               title={metadata.reason}
-              onFocus={() => setFocusedDate(dayStart)}
+              onFocus={handleCellFocus}
             >
               {dayStart.getDate()}
             </button>
