@@ -18,6 +18,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
   const [adresse, setAdresse] = useState('');
   const [fonction, setFonction] = useState('');
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   const baseLetter = useMemo(() => {
     const birthDateFormatted = format(birthDate, 'dd/MM/yyyy');
@@ -55,12 +56,20 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
     return () => clearTimeout(timeout);
   }, [copied]);
 
+  useEffect(() => {
+    if (!copyError) return;
+    const timeout = setTimeout(() => setCopyError(false), 3000);
+    return () => clearTimeout(timeout);
+  }, [copyError]);
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(baseLetter);
       setCopied(true);
+      setCopyError(false);
     } catch (err) {
-      console.error('Erreur lors de la copie:', err);
+      setCopyError(true);
+      setCopied(false);
     }
   };
 
@@ -182,6 +191,14 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
           Lettre générée automatiquement. Cliquez sur "Copier le courrier" puis collez-la dans votre éditeur pour la modifier si besoin.
         </p>
       </div>
+
+      {copyError && (
+        <div className="mb-4 p-4 rounded-xl border border-red-300 bg-red-50 animate-fade-in">
+          <p className="text-sm text-red-800 font-medium">
+            ❌ Impossible de copier le courrier. Veuillez le sélectionner manuellement et utiliser Ctrl+C (ou Cmd+C sur Mac).
+          </p>
+        </div>
+      )}
 
       <Button
         onClick={handleCopy}

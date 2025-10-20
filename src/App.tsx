@@ -243,7 +243,7 @@ function App() {
           show={showCelebration}
           onClose={() => {
             hideCelebration();
-            setTimeout(() => smoothScrollTo(letterRef), 400);
+            scheduleSmoothScroll(letterRef, -100);
           }}
           totalFractionableDays={totalFractionableDays}
         />
@@ -391,7 +391,7 @@ function App() {
                   <Button
                     onClick={() => {
                       setCustomMode(true);
-                      setTimeout(() => smoothScrollTo(customModeRef), 300);
+                      scheduleSmoothScroll(customModeRef, -100);
                     }}
                     variant="primary"
                     size="md"
