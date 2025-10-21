@@ -1,7 +1,11 @@
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Scale } from 'lucide-react';
 import { LEAVE_SCENARIOS } from '../utils/paternityLeave';
 
-export function LegalInfo() {
+interface LegalInfoProps {
+  onShowLegalReferences?: () => void;
+}
+
+export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
   const standard = LEAVE_SCENARIOS.standard;
   const multiples = LEAVE_SCENARIOS['multiple-births'];
   const hospitalized = LEAVE_SCENARIOS['hospitalized-newborn'];
@@ -16,25 +20,42 @@ export function LegalInfo() {
         </div>
         <span className="text-base font-bold text-slate-800">Cadre légal</span>
       </summary>
-      <div className="px-6 pb-6 animate-slide-in">
+      <div className="px-6 pb-6 animate-slide-in space-y-4">
         <ul className="space-y-3 text-sm text-slate-700">
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">3 jours</span>
-            <span className="font-medium">à la charge de l'employeur</span>
+            <div className="flex-1">
+              <span className="font-medium">ouvrables à la charge de l'employeur</span>
+              <p className="text-xs text-slate-500 mt-1">
+                Jours ouvrables = lundi à samedi (hors dimanches et jours fériés)
+              </p>
+            </div>
           </li>
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">4 jours</span>
-            <span className="font-medium">obligatoires immédiatement après</span>
+            <div className="flex-1">
+              <span className="font-medium">calendaires obligatoires immédiatement après</span>
+              <p className="text-xs text-slate-500 mt-1">
+                Jours calendaires = weekends et jours fériés inclus
+              </p>
+            </div>
           </li>
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">{standard.fractionableDays} jours</span>
-            <span className="font-medium">
-              fractionnables en situation standard (minimum 5 jours consécutifs), à poser dans les {standard.limitMonthsAfterBirth} mois
-            </span>
+            <div className="flex-1">
+              <span className="font-medium">
+                calendaires fractionnables en situation standard (minimum 5 jours calendaires consécutifs), à poser dans les {standard.limitMonthsAfterBirth} mois
+              </span>
+              <p className="text-xs text-slate-500 mt-1">
+                Jours calendaires = incluant samedis, dimanches et jours fériés
+              </p>
+            </div>
           </li>
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">+{multiplesBonus} jours</span>
-            <span className="font-medium">en cas de naissances multiples (soit {multiples.fractionableDays} jours fractionnables)</span>
+            <div className="flex-1">
+              <span className="font-medium">calendaires en cas de naissances multiples (soit {multiples.fractionableDays} jours fractionnables)</span>
+            </div>
           </li>
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">Hospitalisation</span>
@@ -42,9 +63,24 @@ export function LegalInfo() {
           </li>
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">Adoption</span>
-            <span className="font-medium">{adoption.fractionableDays} jours fractionnables à prendre dans les {adoption.limitMonthsAfterBirth} mois suivant l'arrivée</span>
+            <span className="font-medium">{adoption.fractionableDays} jours calendaires fractionnables à prendre dans les {adoption.limitMonthsAfterBirth} mois suivant l'arrivée</span>
           </li>
         </ul>
+
+        {onShowLegalReferences && (
+          <div className="mt-6 pt-4 border-t border-slate-200">
+            <button
+              onClick={onShowLegalReferences}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-all hover:shadow-md font-medium text-sm"
+            >
+              <Scale className="w-4 h-4" />
+              Consulter toutes les références légales
+            </button>
+            <p className="text-xs text-slate-500 text-center mt-2">
+              Textes de loi, articles du Code du Travail, liens vers Légifrance et Service-Public.fr
+            </p>
+          </div>
+        )}
       </div>
     </details>
   );

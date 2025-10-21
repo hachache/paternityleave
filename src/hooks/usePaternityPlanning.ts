@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { differenceInDays, startOfDay, isBefore } from 'date-fns';
+import { differenceInDays, startOfDay } from 'date-fns';
 import {
   calculateAutomaticRemainingPeriod,
   calculateEmployerPeriod,
@@ -12,6 +12,7 @@ import {
   DEFAULT_LEAVE_SCENARIO_ID,
   getLeaveScenarioConfig
 } from '../utils/paternityLeave';
+import { validateBirthDate } from '../utils/dateValidation';
 
 export type SelectionStep = 'idle' | 'selecting-start' | 'selecting-end';
 
@@ -101,11 +102,15 @@ export function usePaternityPlanning() {
 
   const selectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);
-    const today = startOfDay(new Date());
-    if (isBefore(normalized, today)) {
-      setError("La date de naissance ne peut pas être antérieure à aujourd'hui");
+    
+    // Validation complete de la date de naissance
+    const validation = validateBirthDate(normalized);
+    
+    if (!validation.valid) {
+      setError(validation.error || 'Date de naissance invalide');
       return;
     }
+
     setBirthDate(normalized);
 
     const employer = calculateEmployerPeriod(normalized);
@@ -116,7 +121,14 @@ export function usePaternityPlanning() {
 
     setRemainingBlocks([]);
     setError(null);
-    setSuccessMessage(null);
+    
+    // Afficher un avertissement si date passee ou cas particulier
+    if (validation.warning) {
+      setSuccessMessage(validation.warning);
+    } else {
+      setSuccessMessage(null);
+    }
+    
     setCustomMode(false);
     setVisualSelectionMode(false);
     setSelectionStep('idle');

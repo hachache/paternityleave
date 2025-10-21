@@ -52,8 +52,152 @@ export function isFrenchHoliday(date: Date, holidays: Date[]): boolean {
   );
 }
 
+/**
+ * Vérifie si un jour est ouvré (jour travaillé).
+ * Jours ouvrés = Lundi à Vendredi, excluant les jours fériés.
+ * 
+ * @param date Date à vérifier
+ * @returns true si le jour est ouvré (lundi-vendredi hors fériés)
+ */
 export function isWorkingDay(date: Date): boolean {
   const year = getYear(date);
   const holidays = getFrenchHolidays(year);
   return !isWeekend(date) && !isFrenchHoliday(date, holidays);
+}
+
+/**
+ * Vérifie si un jour est ouvrable (jour légal de travail possible).
+ * Jours ouvrables = Lundi à Samedi, excluant les jours fériés.
+ * 
+ * LÉGISLATION : Utilisé pour le congé de naissance (3 jours ouvrables à charge employeur)
+ * selon l'article L1225-65 du Code du Travail.
+ * 
+ * @param date Date à vérifier
+ * @returns true si le jour est ouvrable (lundi-samedi hors fériés et dimanche)
+ */
+export function isWorkableDay(date: Date): boolean {
+  const year = getYear(date);
+  const holidays = getFrenchHolidays(year);
+  const day = date.getDay();
+  
+  // Dimanche = 0, exclure uniquement dimanche (samedi = 6 est ouvrable)
+  const isSunday = day === 0;
+  
+  return !isSunday && !isFrenchHoliday(date, holidays);
+}
+
+/**
+ * Compte le nombre de jours ouvres (lun-ven hors feries) dans une periode.
+ * Utile pour informer l'utilisateur du nombre reel de jours travailles.
+ * 
+ * @param startDate Date de debut (incluse)
+ * @param endDate Date de fin (incluse)
+ * @returns Nombre de jours ouvres dans la periode
+ */
+export function countWorkingDaysInRange(startDate: Date, endDate: Date): number {
+  let count = 0;
+  let current = new Date(startDate);
+  const end = new Date(endDate);
+  
+  while (current <= end) {
+    if (isWorkingDay(current)) {
+      count++;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  
+  return count;
+}
+
+/**
+ * Compte le nombre de weekends (samedi + dimanche) dans une periode.
+ * 
+ * @param startDate Date de debut (incluse)
+ * @param endDate Date de fin (incluse)
+ * @returns Nombre de jours de weekend
+ */
+export function countWeekendsInRange(startDate: Date, endDate: Date): number {
+  let count = 0;
+  let current = new Date(startDate);
+  const end = new Date(endDate);
+  
+  while (current <= end) {
+    if (isWeekend(current)) {
+      count++;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  
+  return count;
+}
+
+/**
+ * Compte le nombre de jours feries dans une periode.
+ * 
+ * @param startDate Date de debut (incluse)
+ * @param endDate Date de fin (incluse)
+ * @returns Nombre de jours feries
+ */
+export function countHolidaysInRange(startDate: Date, endDate: Date): number {
+  const years = new Set<number>();
+  let current = new Date(startDate);
+  const end = new Date(endDate);
+  
+  while (current <= end) {
+    years.add(current.getFullYear());
+    current.setDate(current.getDate() + 1);
+  }
+  
+  const allHolidays = Array.from(years).flatMap(year => getFrenchHolidays(year));
+  
+  let count = 0;
+  current = new Date(startDate);
+  
+  while (current <= end) {
+    if (isFrenchHoliday(current, allHolidays)) {
+      count++;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  
+  return count;
+}
+
+/**
+ * Analyse detaillee d'une periode calendaire.
+ * Retourne le nombre de jours calendaires, ouvres, weekends et feries.
+ * 
+ * @param startDate Date de debut (incluse)
+ * @param endDate Date de fin (incluse)
+ * @returns Analyse complete de la periode
+ */
+export interface PeriodAnalysis {
+  calendarDays: number;
+  workingDays: number;
+  weekendDays: number;
+  holidayDays: number;
+  workingDaysPercentage: number;
+}
+
+export function analyzePeriod(startDate: Date, endDate: Date): PeriodAnalysis {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  // Calcul jours calendaires
+  const calendarDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  
+  // Calculs detailles
+  const workingDays = countWorkingDaysInRange(start, end);
+  const weekendDays = countWeekendsInRange(start, end);
+  const holidayDays = countHolidaysInRange(start, end);
+  
+  const workingDaysPercentage = calendarDays > 0 ? (workingDays / calendarDays) * 100 : 0;
+  
+  return {
+    calendarDays,
+    workingDays,
+    weekendDays,
+    holidayDays,
+    workingDaysPercentage
+  };
 }

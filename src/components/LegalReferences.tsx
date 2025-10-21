@@ -1,0 +1,335 @@
+import { ExternalLink, Scale, BookOpen, FileText } from 'lucide-react';
+
+interface LegalReference {
+  title: string;
+  article: string;
+  url: string;
+  description: string;
+  category: 'code-travail' | 'code-secu' | 'service-public' | 'ameli';
+}
+
+const LEGAL_REFERENCES: LegalReference[] = [
+  {
+    title: 'Durée du congé de paternité',
+    article: 'Article L1225-35 du Code du Travail',
+    url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923150',
+    description: '25 jours calendaires pour naissance simple, 32 jours pour naissances multiples',
+    category: 'code-travail'
+  },
+  {
+    title: 'Fractionnement du congé',
+    article: 'Article L1225-35-1 du Code du Travail',
+    url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923140',
+    description: 'Période obligatoire de 4 jours + 21 jours fractionnables en 2 blocs minimum de 5 jours',
+    category: 'code-travail'
+  },
+  {
+    title: 'Période de référence',
+    article: 'Article L1225-35-2 du Code du Travail',
+    url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923132',
+    description: 'Congé à prendre dans les 6 mois suivant la naissance (12 mois en cas d\'hospitalisation)',
+    category: 'code-travail'
+  },
+  {
+    title: 'Congé de naissance',
+    article: 'Article L1225-35-3 du Code du Travail',
+    url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923122',
+    description: '3 jours ouvrables (lundi-samedi hors fériés) rémunérés par l\'employeur',
+    category: 'code-travail'
+  },
+  {
+    title: 'Indemnisation du congé',
+    article: 'Article L331-8 du Code de la Sécurité Sociale',
+    url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923074',
+    description: 'Indemnités journalières versées par la CPAM pendant le congé de paternité',
+    category: 'code-secu'
+  },
+  {
+    title: 'Guide pratique du congé paternité',
+    article: 'Service-Public.fr - Congé de paternité',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F583',
+    description: 'Informations pratiques sur les démarches et conditions du congé de paternité',
+    category: 'service-public'
+  },
+  {
+    title: 'Démarches Assurance Maladie',
+    article: 'Ameli.fr - Congé paternité et d\'accueil',
+    url: 'https://www.ameli.fr/assure/droits-demarches/famille/maternite-paternite-adoption/conge-paternite-accueil-enfant',
+    description: 'Démarches pour bénéficier des indemnités journalières',
+    category: 'ameli'
+  }
+];
+
+const DEFINITIONS = [
+  {
+    term: 'Jours ouvrables',
+    definition: 'Tous les jours de la semaine sauf dimanche et jours fériés (lundi-samedi hors fériés)',
+    usage: 'Utilisé pour le congé de naissance (3 jours)',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F2258'
+  },
+  {
+    term: 'Jours ouvrés',
+    definition: 'Jours normalement travaillés dans l\'entreprise (généralement lundi-vendredi)',
+    usage: 'Utilisé pour le comptage informatif des jours réellement travaillés',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F2258'
+  },
+  {
+    term: 'Jours calendaires',
+    definition: 'Tous les jours du calendrier, y compris weekends et jours fériés',
+    usage: 'Utilisé pour les périodes obligatoire (4 jours) et fractionnable (21/28 jours)',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F583'
+  }
+];
+
+function getCategoryIcon(category: LegalReference['category']) {
+  switch (category) {
+    case 'code-travail':
+    case 'code-secu':
+      return <Scale className="w-5 h-5" />;
+    case 'service-public':
+      return <BookOpen className="w-5 h-5" />;
+    case 'ameli':
+      return <FileText className="w-5 h-5" />;
+  }
+}
+
+function getCategoryLabel(category: LegalReference['category']) {
+  switch (category) {
+    case 'code-travail':
+      return 'Code du Travail';
+    case 'code-secu':
+      return 'Code de la Sécurité Sociale';
+    case 'service-public':
+      return 'Service Public';
+    case 'ameli':
+      return 'Assurance Maladie';
+  }
+}
+
+function getCategoryColor(category: LegalReference['category']) {
+  switch (category) {
+    case 'code-travail':
+      return 'bg-blue-50 border-blue-200 text-blue-700';
+    case 'code-secu':
+      return 'bg-purple-50 border-purple-200 text-purple-700';
+    case 'service-public':
+      return 'bg-green-50 border-green-200 text-green-700';
+    case 'ameli':
+      return 'bg-cyan-50 border-cyan-200 text-cyan-700';
+  }
+}
+
+export function LegalReferences() {
+  return (
+    <div className="max-w-5xl mx-auto p-6 space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full">
+          <Scale className="w-8 h-8 text-blue-600" />
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Références Légales
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Toutes les règles de calcul de cette application sont basées sur les textes de loi officiels français.
+        </p>
+      </div>
+
+      {/* Important Notice */}
+      <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6">
+        <div className="flex gap-4">
+          <div className="flex-shrink-0">
+            <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+              <span className="text-2xl">⚖️</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-semibold text-amber-900">
+              Application de la loi du 19 juillet 2021
+            </h3>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              Cette application applique la <strong>Loi n° 2021-953 du 19 juillet 2021</strong> qui a allongé 
+              le congé de paternité de 11 à 25 jours calendaires. Toutes les règles implémentées sont conformes 
+              au Code du Travail et au Code de la Sécurité Sociale en vigueur.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Legal References */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+          <BookOpen className="w-6 h-6 text-blue-600" />
+          Textes de Loi
+        </h2>
+        
+        <div className="grid gap-4">
+          {LEGAL_REFERENCES.map((ref, index) => (
+            <a
+              key={index}
+              href={ref.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`block p-5 border-2 rounded-xl hover:shadow-md transition-all ${getCategoryColor(ref.category)}`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">
+                  {getCategoryIcon(ref.category)}
+                </div>
+                
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">
+                        {ref.title}
+                      </h3>
+                      <p className="text-sm font-medium opacity-75">
+                        {ref.article}
+                      </p>
+                    </div>
+                    <ExternalLink className="w-4 h-4 flex-shrink-0 opacity-50" />
+                  </div>
+                  
+                  <p className="text-sm leading-relaxed">
+                    {ref.description}
+                  </p>
+                  
+                  <div className="flex items-center gap-2 text-xs font-medium opacity-60">
+                    <span>{getCategoryLabel(ref.category)}</span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Definitions */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+          <FileText className="w-6 h-6 text-blue-600" />
+          Définitions des Types de Jours
+        </h2>
+        
+        <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
+          {DEFINITIONS.map((def, index) => (
+            <div
+              key={index}
+              className={`p-5 ${index !== DEFINITIONS.length - 1 ? 'border-b-2 border-gray-200' : ''}`}
+            >
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="font-bold text-gray-900 text-lg">
+                    {def.term}
+                  </h3>
+                  <a
+                    href={def.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                
+                <p className="text-gray-700 leading-relaxed">
+                  {def.definition}
+                </p>
+                
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
+                  <p className="text-sm text-blue-900">
+                    <strong>Utilisé dans l'application :</strong> {def.usage}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Additional Resources */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900">
+          Ressources Complémentaires
+        </h2>
+        
+        <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Documentation Technique
+              </h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Pour une documentation complète des références légales, consultez le fichier LEGAL.md du projet.
+              </p>
+              <a
+                href="https://github.com/yourusername/paternityleave/blob/main/LEGAL.md"
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                <BookOpen className="w-4 h-4" />
+                Voir LEGAL.md
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+            
+            <hr className="border-gray-300" />
+            
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Sites Officiels
+              </h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="https://www.legifrance.gouv.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+                  >
+                    Légifrance - Textes officiels
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.service-public.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+                  >
+                    Service-Public.fr - Informations pratiques
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.ameli.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+                  >
+                    Ameli.fr - Assurance Maladie
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <div className="bg-gray-100 border-2 border-gray-300 rounded-xl p-6">
+        <h3 className="font-semibold text-gray-900 mb-2">
+          Avertissement
+        </h3>
+        <p className="text-sm text-gray-700 leading-relaxed">
+          Cette application est un outil d'aide à la planification. Bien que basée sur les textes de loi officiels, 
+          elle ne se substitue pas à un conseil juridique professionnel. En cas de doute, consultez votre employeur, 
+          un représentant du personnel, ou la Direction Départementale de l'Emploi, du Travail et des Solidarités (DDETS).
+        </p>
+      </div>
+    </div>
+  );
+}
+

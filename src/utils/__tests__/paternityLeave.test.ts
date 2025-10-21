@@ -14,19 +14,55 @@ const standardScenario = LEAVE_SCENARIOS.standard;
 const hospitalizedScenario = LEAVE_SCENARIOS['hospitalized-newborn'];
 
 describe('calculateEmployerPeriod', () => {
-  it('starts on the next working day and spans three working days', () => {
-    const birthDate = new Date(2024, 0, 6); // Saturday
+  it('calcule 3 jours ouvrables (lundi-samedi hors fériés) depuis une naissance le samedi', () => {
+    const birthDate = new Date(2024, 0, 6); // Samedi 6 janvier 2024
 
     const period = calculateEmployerPeriod(birthDate);
 
-    const expectedStart = startOfDay(new Date(2024, 0, 8)); // Monday
-    const expectedEnd = startOfDay(new Date(2024, 0, 10)); // Wednesday
+    // Le samedi 6 janvier est ouvrable (pas dimanche, pas férié)
+    // Donc : samedi 6 + lundi 8 + mardi 9 (le dimanche 7 est exclu)
+    const expectedStart = startOfDay(new Date(2024, 0, 6)); // Samedi
+    const expectedEnd = startOfDay(new Date(2024, 0, 9)); // Mardi
 
     expect(period.start.getTime()).toBe(expectedStart.getTime());
     expect(period.end.getTime()).toBe(expectedEnd.getTime());
     expect(period.days).toBe(3);
     expect(period.workingDatesOnly).toHaveLength(3);
+    // [6 (samedi), 1 (lundi), 2 (mardi)]
+    expect(period.workingDatesOnly?.map(date => date.getDay())).toEqual([6, 1, 2]);
+  });
+
+  it('calcule 3 jours ouvrables depuis une naissance le dimanche', () => {
+    const birthDate = new Date(2024, 0, 7); // Dimanche 7 janvier 2024
+
+    const period = calculateEmployerPeriod(birthDate);
+
+    // Le dimanche est exclu, donc commence lundi 8
+    // Lundi 8 + mardi 9 + mercredi 10
+    const expectedStart = startOfDay(new Date(2024, 0, 8)); // Lundi
+    const expectedEnd = startOfDay(new Date(2024, 0, 10)); // Mercredi
+
+    expect(period.start.getTime()).toBe(expectedStart.getTime());
+    expect(period.end.getTime()).toBe(expectedEnd.getTime());
+    expect(period.days).toBe(3);
+    expect(period.workingDatesOnly).toHaveLength(3);
+    // [1 (lundi), 2 (mardi), 3 (mercredi)]
     expect(period.workingDatesOnly?.map(date => date.getDay())).toEqual([1, 2, 3]);
+  });
+
+  it('calcule 3 jours ouvrables depuis une naissance le lundi', () => {
+    const birthDate = new Date(2024, 0, 8); // Lundi 8 janvier 2024
+
+    const period = calculateEmployerPeriod(birthDate);
+
+    // Lundi 8 + mardi 9 + mercredi 10
+    const expectedStart = startOfDay(new Date(2024, 0, 8)); // Lundi
+    const expectedEnd = startOfDay(new Date(2024, 0, 10)); // Mercredi
+
+    expect(period.start.getTime()).toBe(expectedStart.getTime());
+    expect(period.end.getTime()).toBe(expectedEnd.getTime());
+    expect(period.days).toBe(3);
+    expect(period.workingDatesOnly).toHaveLength(3);
   });
 });
 
@@ -76,7 +112,7 @@ describe('validateRemainingBlock', () => {
     );
 
     expect(result.valid).toBe(false);
-    expect(result.error).toContain(`${standardScenario.fractionableDays} jours disponibles`);
+    expect(result.error).toContain(`${standardScenario.fractionableDays} jours calendaires disponibles`);
   });
 
   it('accepts a valid block inside the allowed window', () => {

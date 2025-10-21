@@ -64,9 +64,9 @@ export function Summary({
           <div className="rounded-2xl border border-sky-200 bg-sky-50 p-5 mb-3 transition-apple-smooth hover:shadow-md">
             <p className="font-semibold text-sky-900 text-base mb-2 flex items-center gap-2">
               <span className="w-2 h-2 bg-sky-500 rounded-full" />
-              Période employeur
+              Congé de naissance (employeur)
             </p>
-            <p className="text-sm text-sky-700 mb-2 font-medium">3 jours ouvrés</p>
+            <p className="text-sm text-sky-700 mb-2 font-medium">3 jours ouvrables (lun-sam hors fériés)</p>
             <p className="text-sm text-sky-800">
               Du {format(employerPeriod.start, 'd MMM', { locale: fr })} au{' '}
               {format(employerPeriod.end, 'd MMM yyyy', { locale: fr })}
@@ -80,7 +80,7 @@ export function Summary({
               <span className="w-2 h-2 bg-amber-500 rounded-full" />
               Période obligatoire
             </p>
-            <p className="text-sm text-amber-700 mb-2 font-medium">4 jours calendaires</p>
+            <p className="text-sm text-amber-700 mb-2 font-medium">4 jours calendaires (weekends inclus)</p>
             <p className="text-sm text-amber-800">
               Du {format(mandatoryPeriod.start, 'd MMM', { locale: fr })} au{' '}
               {format(mandatoryPeriod.end, 'd MMM yyyy', { locale: fr })}
@@ -91,7 +91,7 @@ export function Summary({
         <div className="rounded-2xl border border-teal-200 bg-teal-50 p-5 transition-apple-smooth hover:shadow-md">
           <p className="font-semibold text-teal-900 text-base mb-4 flex items-center gap-2">
             <span className="w-2 h-2 bg-teal-500 rounded-full" />
-            Jours fractionnables
+            Jours fractionnables (calendaires)
           </p>
           {remainingBlocks.length > 0 ? (
             <div className="space-y-3">

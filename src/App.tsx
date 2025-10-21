@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
 import { LegalInfo } from './components/LegalInfo';
+import { LegalReferences } from './components/LegalReferences';
 import { LetterGenerator } from './components/LetterGenerator';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import { CelebrationModal } from './components/CelebrationModal';
@@ -18,6 +19,7 @@ import { Button } from './components/Button';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
   function App() {
+  const [showLegalReferences, setShowLegalReferences] = useState(false);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const {
     birthDate,
@@ -135,10 +137,20 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
     cancelVisualSelection();
   };
 
-  // Scroll to top on initial page load
+  const handleShowLegalReferences = () => {
+    setShowLegalReferences(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleHideLegalReferences = () => {
+    setShowLegalReferences(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Scroll to top on initial page load and when toggling legal references
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
-  }, []);
+  }, [showLegalReferences]);
 
   // Auto-scroll to calendar after scenario selection
   const previousScenarioId = useRef(scenarioId);
@@ -171,6 +183,26 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
     }
     previousPlannedDays.current = totalPlannedDays;
   }, [scrollIntoViewIfNeeded, totalFractionableDays, totalPlannedDays]);
+
+  // If showing legal references, render that view instead
+  if (showLegalReferences) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="py-8 px-4">
+          <div className="max-w-5xl mx-auto mb-6">
+            <Button
+              onClick={handleHideLegalReferences}
+              variant="secondary"
+              size="sm"
+            >
+              ← Retour au planificateur
+            </Button>
+          </div>
+          <LegalReferences />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -674,7 +706,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
         )}
 
         <div className="mt-16 max-w-3xl mx-auto mb-12" id="legal">
-          <LegalInfo />
+          <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
         </div>
       </div>
     </div>
