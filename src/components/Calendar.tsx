@@ -420,9 +420,9 @@ export function Calendar({
         classes += ' text-slate-400';
       }
 
-      if (weekend || holiday) {
-        classes += ' bg-slate-100';
-      }
+      // Déterminer la couleur de la période en priorité
+      // (avant d'appliquer le gris des weekends/fériés)
+      const hasLeaveType = metadata.type === 'birth' || metadata.type === 'employer' || metadata.type === 'mandatory' || metadata.type === 'remaining';
 
       if (metadata.type === 'birth') {
         classes += ' bg-slate-900 text-white font-semibold';
@@ -437,6 +437,11 @@ export function Calendar({
           ' cursor-pointer text-slate-900 hover:bg-teal-50 hover:border-teal-300';
       } else {
         classes += ' cursor-not-allowed opacity-50';
+      }
+
+      // Appliquer le gris des weekends/fériés UNIQUEMENT s'il n'y a pas de période de congé
+      if (!hasLeaveType && (weekend || holiday)) {
+        classes += ' bg-slate-100';
       }
 
       return classes;
