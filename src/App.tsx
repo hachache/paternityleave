@@ -187,10 +187,15 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
           <button
             onClick={handleResetRequest}
-            className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 bg-teal-600 text-white shadow-lg transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 ${birthDate ? 'cursor-pointer' : 'cursor-default'}`}
+            className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 bg-teal-600 text-white shadow-lg transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
             title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
           >
-            <CalendarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            <div className="logo-icon-container w-8 h-8 sm:w-10 sm:h-10 relative">
+              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 0, 50% 0, 50% 50%, 0 50%)' }} />
+              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)' }} />
+              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 50%, 50% 50%, 50% 100%, 0 100%)' }} />
+              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }} />
+            </div>
           </button>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
