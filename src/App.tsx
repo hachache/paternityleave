@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMediaQuery } from './hooks/useMediaQuery';
-import { Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
+import { Calendar as CalendarIcon, RotateCcw, Linkedin } from 'lucide-react';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
 import { LegalInfo } from './components/LegalInfo';
@@ -242,9 +242,16 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
           <span className="text-xs text-slate-600 font-medium">Made with</span>
           <span className="text-red-500 animate-pulse-subtle text-base">❤️</span>
           <span className="text-xs text-slate-600 font-medium">by</span>
-          <span className="text-xs font-bold text-teal-700">
+          <a
+            href="https://www.linkedin.com/in/hedi-a-2382551a1/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-[#0A66C2] hover:text-[#084c94] transition-colors underline decoration-2 decoration-[#0A66C2] hover:decoration-[#084c94] underline-offset-4 inline-flex items-center gap-1"
+            aria-label="Profil LinkedIn de Hedi ACHACHE"
+          >
+            <Linkedin className="w-3.5 h-3.5" aria-hidden="true" />
             Hedi ACHACHE
-          </span>
+          </a>
         </div>
         </header>
 
