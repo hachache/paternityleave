@@ -127,7 +127,13 @@ export function Calendar({
     const key = startOfDay(focusedDate).getTime();
     const target = dayRefs.current[key];
     if (target && document.activeElement !== target) {
-      target.focus();
+      try {
+        // Prevent browser from auto-scrolling the calendar cell into view
+        target.focus({ preventScroll: true } as FocusOptions);
+      } catch {
+        // Fallback for older browsers
+        target.focus();
+      }
     }
   }, [focusedDate, currentMonth, isCoarsePointer]);
 

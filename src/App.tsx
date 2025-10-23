@@ -71,15 +71,14 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
     node.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  // Schedule scroll after RAF to avoid race conditions; use instant scroll on mobile
-  const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>, offset: number = -20) => {
+  // Schedule scroll after RAF to avoid race conditions;
+  // rely on CSS scroll-padding/scroll-margin for alignment to reduce jank
+  const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>, _offset: number = -20) => {
     requestAnimationFrame(() => {
       const node = ref.current;
       if (!node) return;
-      const elementPosition = node.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset + offset;
       const behavior: ScrollBehavior = isCoarsePointer ? 'auto' : 'smooth';
-      window.scrollTo({ top: offsetPosition, behavior });
+      node.scrollIntoView({ behavior, block: 'start' });
     });
   }, [isCoarsePointer]);
 

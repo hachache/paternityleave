@@ -6,15 +6,12 @@ interface ScrollIndicatorProps {
 }
 
 export function ScrollIndicator({ show }: ScrollIndicatorProps) {
+  // Track whether indicator should be visually shown,
+  // but keep a fixed-height wrapper to avoid layout shifts.
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (show) {
-      const timer = setTimeout(() => setVisible(true), 300);
-      return () => clearTimeout(timer);
-    } else {
-      setVisible(false);
-    }
+    setVisible(show);
   }, [show]);
 
   useEffect(() => {
@@ -30,12 +27,13 @@ export function ScrollIndicator({ show }: ScrollIndicatorProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [visible]);
 
-  if (!visible) return null;
-
+  // Always render a fixed-height wrapper so the page layout stays stable.
   return (
-    <div className="flex justify-center mb-6 animate-fade-in">
-      <div className="animate-bounce-subtle">
-        <ChevronDown className="w-6 h-6 text-slate-400" />
+    <div className="flex justify-center mb-6 h-8" aria-hidden={!visible}>
+      <div className={`transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="animate-bounce-subtle">
+          <ChevronDown className="w-6 h-6 text-slate-400" />
+        </div>
       </div>
     </div>
   );
