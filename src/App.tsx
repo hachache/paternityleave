@@ -77,10 +77,11 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
     requestAnimationFrame(() => {
       const node = ref.current;
       if (!node) return;
-      const behavior: ScrollBehavior = isCoarsePointer ? 'auto' : 'smooth';
+      // Always use smooth behavior (desktop and mobile) for a léger auto-scroll
+      const behavior: ScrollBehavior = 'smooth';
       node.scrollIntoView({ behavior, block: 'start' });
     });
-  }, [isCoarsePointer]);
+  }, []);
 
   const scrollIntoViewIfNeeded = useCallback(
     (ref: React.RefObject<HTMLDivElement>) => {
