@@ -66,16 +66,16 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
                 bestId = id;
               }
             });
-            if (bestId && best > 0.1) {
-              setActiveSection(prev => prev !== bestId ? bestId : prev);
+            if (bestId && best > 0.05) {
+              setActiveSection(bestId);
             }
             debounceTimerRef.current = null;
           }, 150); // Debounce de 150ms pour plus de stabilité
         },
         {
           root: null,
-          rootMargin: '-80px 0px -30% 0px', // Aligné avec scroll-mt-20 (80px) pour cohérence
-          threshold: [0, 0.25, 0.5, 0.75, 1] // Optimized: 5 thresholds instead of 13 for better performance
+          rootMargin: '-80px 0px -80px 0px', // Fixed values: consistent detection // Aligné avec scroll-mt-20 (80px) pour cohérence
+          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] // Optimized: 5 thresholds instead of 13 for better performance
         }
       );
       targets.forEach(el => io.observe(el));
@@ -117,7 +117,7 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
               ${
                 isActive
                   ? 'text-white bg-gradient-to-b from-teal-500 to-teal-600 shadow-lg'
-                  : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-700'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
               }
             `}
             style={{
