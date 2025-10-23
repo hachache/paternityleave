@@ -127,9 +127,9 @@ export function LegalReferences() {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full">
           <Scale className="w-8 h-8 text-blue-600" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h2 className="text-3xl font-bold text-gray-900">
           Références Légales
-        </h1>
+        </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Toutes les règles de calcul de cette application sont basées sur les textes de loi officiels français.
         </p>

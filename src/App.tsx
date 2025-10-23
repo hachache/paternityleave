@@ -55,6 +55,8 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
     setCustomFirstBlockDays
   } = usePaternityPlanning();
 
+  const mainContentId = 'contenu-principal';
+  const currentYear = new Date().getFullYear();
   const secondBlockDays = Math.max(totalFractionableDays - customFirstBlockDays, 0);
   const sliderMax = Math.max(5, totalFractionableDays - 5);
 
@@ -188,7 +190,13 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
   if (showLegalReferences) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="py-8 px-4">
+        <a
+          href={`#${mainContentId}`}
+          className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-teal-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
+        >
+          Aller directement au contenu principal
+        </a>
+        <main id={mainContentId} className="py-8 px-4">
           <div className="max-w-5xl mx-auto mb-6">
             <Button
               onClick={handleHideLegalReferences}
@@ -199,92 +207,99 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
             </Button>
           </div>
           <LegalReferences />
-        </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-16 sm:pt-20 md:pt-20 pb-16 md:pb-6">
-        <header className="mb-8 sm:mb-12 text-center animate-fade-in relative">
-          <button
-            onClick={handleResetRequest}
-            className={`absolute top-0 right-2 sm:right-4 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-xl hover:bg-white hover:shadow-lg transition-apple-smooth text-xs sm:text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-1 sm:gap-2 ${!birthDate ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-fade-in'}`}
-          >
-            <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Réinitialiser</span>
-            <span className="sm:hidden">Reset</span>
-          </button>
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      <a
+        href={`#${mainContentId}`}
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-teal-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
+      >
+        Aller directement au contenu principal
+      </a>
+      <main id={mainContentId} className="flex-1">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-16 sm:pt-20 md:pt-20 pb-16 md:pb-6">
+          <header className="mb-8 sm:mb-12 text-center animate-fade-in relative">
+            <button
+              onClick={handleResetRequest}
+              className={`absolute top-0 right-2 sm:right-4 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-xl hover:bg-white hover:shadow-lg transition-apple-smooth text-xs sm:text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-1 sm:gap-2 ${!birthDate ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-fade-in'}`}
+            >
+              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Réinitialiser</span>
+              <span className="sm:hidden">Reset</span>
+            </button>
 
-          <button
-            onClick={handleResetRequest}
-            className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 bg-teal-600 text-white shadow-lg transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
-            title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
-          >
-            <div className="logo-icon-container w-8 h-8 sm:w-10 sm:h-10 relative">
-              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 0, 50% 0, 50% 50%, 0 50%)' }} />
-              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)' }} />
-              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 50%, 50% 50%, 50% 100%, 0 100%)' }} />
-              <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }} />
-            </div>
-          </button>
+            <button
+              onClick={handleResetRequest}
+              className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 bg-teal-600 text-white shadow-lg transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
+              title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
+            >
+              <div className="logo-icon-container w-8 h-8 sm:w-10 sm:h-10 relative">
+                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 0, 50% 0, 50% 50%, 0 50%)' }} />
+                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)' }} />
+                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 50%, 50% 50%, 50% 100%, 0 100%)' }} />
+                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }} />
+              </div>
+            </button>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
-            Congé Paternité
-          </h1>
-          <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-3xl mx-auto leading-relaxed">
-            Planifiez votre congé selon la législation française
-          </p>
-
-        {/* Made by badge */}
-        <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 rounded-full border border-slate-200 shadow-sm hover:shadow-md transition-apple-smooth hover:scale-105 mt-2">
-          <span className="text-xs text-slate-600 font-medium">Made with</span>
-          <span className="text-red-500 animate-pulse-subtle text-base">❤️</span>
-          <span className="text-xs text-slate-600 font-medium">by</span>
-          <a
-            href="https://www.linkedin.com/in/hedi-a-2382551a1/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-semibold text-[#0A66C2] hover:text-[#084c94] transition-colors underline decoration-2 decoration-[#0A66C2] hover:decoration-[#084c94] underline-offset-4 inline-flex items-center gap-1"
-            aria-label="Profil LinkedIn de Hedi ACHACHE"
-          >
-            <Linkedin className="w-3.5 h-3.5" aria-hidden="true" />
-            Hedi ACHACHE
-          </a>
-        </div>
-        </header>
-
-        <ScrollIndicator show={birthDate !== null} />
-
-        <NavigationAnchor show={birthDate !== null} />
-
-        <div className="max-w-3xl mx-auto mb-8">
-          <SectionCard
-            title="1. Choisissez votre situation"
-            description="Commencez par sélectionner votre cas pour adapter le nombre de jours"
-            accent="teal"
-          >
-            <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
-          </SectionCard>
-        </div>
-
-        <div className="max-w-3xl mx-auto mb-8">
-          <ProgressStepper currentStep={planningStep} fractionableDays={totalFractionableDays} />
-          {birthDate && (
-            <p className="mt-3 text-center text-sm text-slate-600">
-              {totalPlannedDays} / {totalFractionableDays} jours planifiés
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
+              Congé Paternité
+            </h1>
+            <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-3xl mx-auto leading-relaxed">
+              Planifiez votre congé selon la législation française
             </p>
-          )}
-        </div>
 
-        <div className="max-w-3xl mx-auto mb-8">
-          <SectionCard
-            title="Étapes suivantes"
-            description="Suivez les actions à réaliser pour finaliser votre demande"
-            accent="teal"
-          >
-            <NextStepsCard
+            {/* Made by badge */}
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 rounded-full border border-slate-200 shadow-sm hover:shadow-md transition-apple-smooth hover:scale-105 mt-2">
+              <span className="text-xs text-slate-600 font-medium">Made with</span>
+              <span className="text-red-500 animate-pulse-subtle text-base" aria-label="amour">❤️</span>
+              <span className="text-xs text-slate-600 font-medium">by</span>
+              <a
+                href="https://www.linkedin.com/in/hedi-a-2382551a1/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-semibold text-[#0A66C2] hover:text-[#084c94] transition-colors underline decoration-2 decoration-[#0A66C2] hover:decoration-[#084c94] underline-offset-4 inline-flex items-center gap-1"
+                aria-label="Profil LinkedIn de Hedi ACHACHE"
+              >
+                <Linkedin className="w-3.5 h-3.5" aria-hidden="true" />
+                Hedi ACHACHE
+              </a>
+            </div>
+          </header>
+
+          <ScrollIndicator show={birthDate !== null} />
+
+          <NavigationAnchor show={birthDate !== null} />
+
+          <div className="max-w-3xl mx-auto mb-8">
+            <SectionCard
+              title="1. Choisissez votre situation"
+              description="Commencez par sélectionner votre cas pour adapter le nombre de jours"
+              accent="teal"
+            >
+              <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
+            </SectionCard>
+          </div>
+
+          <div className="max-w-3xl mx-auto mb-8">
+            <ProgressStepper currentStep={planningStep} fractionableDays={totalFractionableDays} />
+            {birthDate && (
+              <p className="mt-3 text-center text-sm text-slate-600">
+                {totalPlannedDays} / {totalFractionableDays} jours planifiés
+              </p>
+            )}
+          </div>
+
+          <div className="max-w-3xl mx-auto mb-8">
+            <SectionCard
+              title="Étapes suivantes"
+              description="Suivez les actions à réaliser pour finaliser votre demande"
+              accent="teal"
+            >
+              <NextStepsCard
               planningStep={planningStep}
               totalPlannedDays={totalPlannedDays}
               hasBirthDate={Boolean(birthDate)}
@@ -422,7 +437,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
             <div className={`bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg ${isCoarsePointer ? '' : 'transition-apple-smooth'}`}>
               <div className="text-center mb-6 sm:mb-8">
                 <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-700 mb-3 sm:mb-4 shadow-sm">
-                  <span className="text-2xl sm:text-3xl" aria-hidden="true">
+                  <span className="text-2xl sm:text-3xl" aria-label="calendrier" aria-hidden="true">
                     📅
                   </span>
                 </div>
@@ -491,7 +506,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
               <div className="flex items-start gap-4 mb-6">
                 <div className="flex-shrink-0">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-md">
-                    <span aria-hidden="true">⚙️</span>
+                    <span aria-hidden="true" aria-label="personnalisation">⚙️</span>
                   </div>
                 </div>
                 <div className="flex-1">
@@ -510,7 +525,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
                 <div className="bg-white rounded-2xl p-5 border border-teal-200 hover:border-teal-400 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl flex-shrink-0">
-                      <span aria-hidden="true">🎚️</span>
+                      <span aria-hidden="true" aria-label="curseur">🎚️</span>
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">Avec curseur</h4>
@@ -526,7 +541,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
                 <div className="bg-white rounded-2xl p-5 border border-emerald-200 hover:border-emerald-400 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl flex-shrink-0">
-                      <span aria-hidden="true">👆</span>
+                      <span aria-hidden="true" aria-label="clic">👆</span>
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">Sélection directe</h4>
@@ -712,10 +727,30 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
           </div>
         )}
 
-        <div className="mt-16 max-w-3xl mx-auto mb-12" id="legal">
-          <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
+          <div className="mt-16 max-w-3xl mx-auto mb-12" id="legal">
+            <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
+          </div>
         </div>
-      </div>
+      </main>
+      <footer className="bg-white/80 border-t border-slate-200 backdrop-blur-sm">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+            <p className="text-slate-600 font-medium">
+              © {currentYear} Congé Paternité
+            </p>
+            <p className="text-xs text-slate-500">
+              Informations basées sur la législation française en vigueur.
+            </p>
+          </div>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="px-4 py-2 text-sm font-semibold text-teal-700 hover:text-teal-900 transition-colors inline-flex items-center justify-center gap-2 hover:bg-teal-50 rounded-lg"
+            aria-label="Retourner au haut de la page"
+          >
+            ↑ Retour au haut
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }
