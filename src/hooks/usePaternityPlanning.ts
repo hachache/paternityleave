@@ -76,13 +76,16 @@ export function usePaternityPlanning() {
       setSelectionStartDate(null);
       setBirthDate(null);
       setCustomFirstBlockDays(computeDefaultFirstBlock(scenario));
+      setRemainingBlocks([]);
+      setSuccessMessage(null);
+      setShowCelebration(false);
 
       if (totalPlannedDays > totalFractionableDays) {
-        setRemainingBlocks([]);
-        setSuccessMessage(null);
         setError(
           `Le scénario sélectionné prévoit ${totalFractionableDays} jours fractionnables. Votre planning a été réinitialisé.`
         );
+      } else {
+        setError(null);
       }
 
       hasShownCelebration.current = false;
