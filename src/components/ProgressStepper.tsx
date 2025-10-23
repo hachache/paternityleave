@@ -57,7 +57,7 @@ export function ProgressStepper({ currentStep, fractionableDays }: ProgressStepp
                   <p className={`
                     text-xs sm:text-sm font-semibold transition-all duration-300
                     ${isCompleted ? 'text-emerald-700' : ''}
-                    ${isCurrent ? 'text-teal-700' : ''}
+                    ${isCurrent ? 'text-teal-900' : ''}
                     ${isPending ? 'text-slate-400' : ''}
                   `}>
                     <span className="hidden sm:inline">{step.label}</span>

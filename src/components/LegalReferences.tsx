@@ -147,7 +147,7 @@ export function LegalReferences() {
             <h3 className="font-semibold text-amber-900">
               Application de la loi du 19 juillet 2021
             </h3>
-            <p className="text-sm text-amber-800 leading-relaxed">
+            <p className="text-sm text-amber-900 leading-relaxed">
               Cette application applique la <strong>Loi n° 2021-953 du 19 juillet 2021</strong> qui a allongé 
               le congé de paternité de 11 à 25 jours calendaires. Toutes les règles implémentées sont conformes 
               au Code du Travail et au Code de la Sécurité Sociale en vigueur.

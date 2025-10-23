@@ -35,7 +35,7 @@ export function Summary({
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg transition-apple-smooth">
       <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-teal-100 text-teal-700">
+        <div className="p-2 rounded-xl bg-teal-100 text-teal-900">
           <CheckCircle2 className="w-5 h-5" />
         </div>
         Votre planning
@@ -43,9 +43,9 @@ export function Summary({
 
       <div className="space-y-4">
         <div className="rounded-2xl border border-teal-200 bg-teal-50 p-5 transition-apple-smooth hover:shadow-md">
-          <p className="text-xs font-semibold uppercase tracking-wide text-teal-700 mb-1">Situation</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-teal-900 mb-1">Situation</p>
           <p className="text-base font-semibold text-teal-900 leading-relaxed">{scenario.label}</p>
-          <p className="text-sm text-teal-700 mt-1 leading-relaxed">
+          <p className="text-sm text-teal-900 mt-1 leading-relaxed">
             {totalFractionableDays} jours fractionnables • Jusqu&apos;à {scenario.limitMonthsAfterBirth} mois après la naissance
           </p>
         </div>
@@ -81,7 +81,7 @@ export function Summary({
               Période obligatoire
             </p>
             <p className="text-sm text-amber-700 mb-2 font-medium">4 jours calendaires (weekends inclus)</p>
-            <p className="text-sm text-amber-800">
+            <p className="text-sm text-amber-900">
               Du {format(mandatoryPeriod.start, 'd MMM', { locale: fr })} au{' '}
               {format(mandatoryPeriod.end, 'd MMM yyyy', { locale: fr })}
             </p>
@@ -103,7 +103,7 @@ export function Summary({
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 space-y-1.5">
-                      <p className="text-sm text-teal-700 font-semibold group-hover:text-red-700 transition-colors">
+                      <p className="text-sm text-teal-900 font-semibold group-hover:text-red-700 transition-colors">
                         Bloc {index + 1}
                       </p>
                       <p className="text-base text-slate-900 group-hover:text-red-900 transition-colors font-medium leading-relaxed">
@@ -122,7 +122,7 @@ export function Summary({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-teal-700 font-medium">Aucun bloc planifié</p>
+            <p className="text-sm text-teal-900 font-medium">Aucun bloc planifié</p>
           )}
         </div>
 

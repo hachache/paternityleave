@@ -40,7 +40,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
           >
             <div className="flex items-start justify-between gap-3 mb-4">
               <div className="flex-1">
-                <p className="text-sm font-extrabold uppercase tracking-wide text-teal-700">
+                <p className="text-sm font-extrabold uppercase tracking-wide text-teal-900">
                   {config.label}
                 </p>
                 <p className="mt-1 text-base text-slate-600 leading-relaxed">{config.description}</p>

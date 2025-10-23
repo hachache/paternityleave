@@ -436,7 +436,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
           <div ref={planningRef} className={`max-w-3xl mx-auto mb-6 sm:mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'} scroll-mt-20`}>
             <div className={`bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg ${isCoarsePointer ? '' : 'transition-apple-smooth'}`}>
               <div className="text-center mb-6 sm:mb-8">
-                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-700 mb-3 sm:mb-4 shadow-sm">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-900 mb-3 sm:mb-4 shadow-sm">
                   <span className="text-2xl sm:text-3xl" aria-label="calendrier" aria-hidden="true">
                     📅
                   </span>
@@ -456,7 +456,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
                     <h4 className="text-base font-bold text-teal-900 mb-1">
                       Mode personnalisé
                     </h4>
-                    <p className="text-base text-teal-700 leading-relaxed">
+                    <p className="text-base text-teal-900 leading-relaxed">
                       Choisissez vous-même où placer vos 2 périodes (min. 5j chacune)
                     </p>
                   </div>
@@ -524,7 +524,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
                 {/* Option 1 : Avec Slider */}
                 <div className="bg-white rounded-2xl p-5 border border-teal-200 hover:border-teal-400 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-900 flex items-center justify-center text-xl flex-shrink-0">
                       <span aria-hidden="true" aria-label="curseur">🎚️</span>
                     </div>
                     <div>
@@ -744,7 +744,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
           </div>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="px-4 py-2 text-sm font-semibold text-teal-700 hover:text-teal-900 transition-colors inline-flex items-center justify-center gap-2 hover:bg-teal-50 rounded-lg"
+            className="px-4 py-2 text-sm font-semibold text-teal-900 hover:text-teal-900 transition-colors inline-flex items-center justify-center gap-2 hover:bg-teal-50 rounded-lg"
             aria-label="Retourner au haut de la page"
           >
             ↑ Retour au haut
