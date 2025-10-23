@@ -20,6 +20,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
   function App() {
   const [showLegalReferences, setShowLegalReferences] = useState(false);
+  const [hasScrolledPastStart, setHasScrolledPastStart] = useState(false);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const {
     birthDate,
@@ -65,6 +66,14 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
   const planningRef = useRef<HTMLDivElement>(null);
   const customModeRef = useRef<HTMLDivElement>(null);
   const letterRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleScroll = () => {
+      setHasScrolledPastStart(window.scrollY > 200);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
 
   // Smooth scroll utility - STABLE (pas de dépendances)
   const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>) => {
@@ -272,7 +281,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
           <ScrollIndicator show={birthDate !== null} />
 
-          <NavigationAnchor show={birthDate !== null} />
+          <NavigationAnchor show={birthDate !== null && hasScrolledPastStart} />
 
           <div className="max-w-3xl mx-auto mb-8">
             <SectionCard

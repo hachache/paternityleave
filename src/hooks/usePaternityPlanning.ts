@@ -74,6 +74,7 @@ export function usePaternityPlanning() {
       setVisualSelectionMode(false);
       setSelectionStep('idle');
       setSelectionStartDate(null);
+      setBirthDate(null);
       setCustomFirstBlockDays(computeDefaultFirstBlock(scenario));
 
       if (totalPlannedDays > totalFractionableDays) {
