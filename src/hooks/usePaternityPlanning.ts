@@ -307,9 +307,6 @@ export function usePaternityPlanning() {
     const daysLeft = totalFractionableDays - totalUsedDays;
 
     if (daysLeft === 0) {
-      setSuccessMessage(
-        `🎉 Planning complet ! Vous avez planifié les ${7 + totalFractionableDays} jours de congé paternité (3j + 4j + ${totalFractionableDays}j)`
-      );
       return;
     }
 
@@ -345,8 +342,11 @@ export function usePaternityPlanning() {
 
     setRemainingBlocks(prev => [...prev, autoBlock]);
     setError(null);
-    if (!customMode) {
+    if (!customMode && totalUsedDays + autoBlock.days === totalFractionableDays) {
       setSuccessMessage(`✅ Les ${totalFractionableDays} jours ont été planifiés automatiquement !`);
+    } else if (!customMode) {
+      const blocDays = autoBlock.days;
+      setSuccessMessage(`✅ Bloc de ${blocDays} jours planifié ! ${totalFractionableDays - totalUsedDays - autoBlock.days} jours restants.`);
     }
   };
 
