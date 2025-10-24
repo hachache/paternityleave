@@ -1,4 +1,4 @@
-import { BookOpen, Scale } from 'lucide-react';
+import { BookOpen, Scale, AlertCircle } from 'lucide-react';
 import { LEAVE_SCENARIOS } from '../utils/paternityLeave';
 
 interface LegalInfoProps {
@@ -21,6 +21,21 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
         <span className="text-base font-bold text-slate-800">Cadre légal</span>
       </summary>
       <div className="px-6 pb-6 animate-slide-in space-y-4">
+        {/* Avertissement secteur public */}
+        <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-xl flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-900 mb-1">
+              ⚠️ Secteur privé uniquement
+            </p>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              Cette application s'applique au <strong>secteur privé</strong> selon le Code du Travail (articles L1225-35 et suivants).
+              Les agents de la <strong>fonction publique</strong> (État, territoriale, hospitalière) sont soumis à des règles différentes.
+              Certaines <strong>conventions collectives</strong> peuvent prévoir des jours supplémentaires.
+            </p>
+          </div>
+        </div>
+
         <ul className="space-y-3 text-sm text-slate-700">
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">3 jours</span>

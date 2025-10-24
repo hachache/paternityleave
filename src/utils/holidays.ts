@@ -70,7 +70,7 @@ export function isWorkingDay(date: Date): boolean {
  * Jours ouvrables = Lundi à Samedi, excluant les jours fériés.
  * 
  * LÉGISLATION : Utilisé pour le congé de naissance (3 jours ouvrables à charge employeur)
- * selon l'article L1225-65 du Code du Travail.
+ * selon l'article L1225-35-3 du Code du Travail.
  * 
  * @param date Date à vérifier
  * @returns true si le jour est ouvrable (lundi-samedi hors fériés et dimanche)

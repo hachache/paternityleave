@@ -13,7 +13,7 @@ export interface BirthDateValidationResult {
 /**
  * Valide une date de naissance pour le conge de paternite.
  * 
- * LEGISLATION : Article L1225-65 du Code du Travail
+ * LEGISLATION : Article L1225-35 du Code du Travail
  * - Les jours fractionnables doivent etre pris dans les 6 mois (standard) ou 12 mois (hospitalisation)
  * - Le conge de naissance (3j employeur) est pris immediatement apres la naissance
  * 
