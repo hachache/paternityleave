@@ -302,7 +302,7 @@ export function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
+      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation active:scale-90 ';
 
       if (!isCurrentMonthDay) {
         // Make non-current month days much fainter

@@ -199,8 +199,8 @@ function App() {
   // If showing legal references, render that view instead
   if (showLegalReferences) {
     return (
-      <div className="min-h-screen bg-surface-50 text-slate-900 font-sans">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-brand-100 selection:text-brand-900">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-50"></div>
         <a
           href={`#${mainContentId}`}
           className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-brand-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
@@ -224,11 +224,20 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-50 flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900">
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-brand-50/50 to-transparent blur-3xl opacity-60" />
-        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-purple-100/30 rounded-full blur-[100px] opacity-40" />
-        <div className="absolute top-40 left-0 w-[400px] h-[400px] bg-blue-100/30 rounded-full blur-[80px] opacity-40" />
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900 overflow-x-hidden">
+      {/* Animated Aurora Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="aurora-blob aurora-1 rounded-full mix-blend-multiply blur-3xl opacity-40"></div>
+        <div className="aurora-blob aurora-2 rounded-full mix-blend-multiply blur-3xl opacity-40"></div>
+        <div className="aurora-blob aurora-3 rounded-full mix-blend-multiply blur-3xl opacity-40"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]"></div>
+        
+        {/* Floating Thematic Particles */}
+        <div className="absolute top-[15%] left-[10%] text-4xl opacity-[0.08] animate-float blur-[1px] select-none" style={{ animationDelay: '0s' }}>🍼</div>
+        <div className="absolute top-[25%] right-[15%] text-3xl opacity-[0.06] animate-float blur-[1px] select-none" style={{ animationDelay: '2.5s' }}>🧸</div>
+        <div className="absolute bottom-[20%] left-[20%] text-5xl opacity-[0.05] animate-float blur-[2px] select-none" style={{ animationDelay: '4s' }}>✨</div>
+        <div className="absolute bottom-[30%] right-[10%] text-4xl opacity-[0.07] animate-float blur-[1px] select-none" style={{ animationDelay: '1.5s' }}>👶</div>
+        <div className="absolute top-[40%] left-[50%] text-2xl opacity-[0.06] animate-float blur-[1px] select-none" style={{ animationDelay: '3s' }}>📅</div>
       </div>
 
       <a
@@ -253,13 +262,13 @@ function App() {
 
             {/* Logo avec animation de construction */}
             <div className="inline-flex mb-6 relative group">
-              <div className="absolute inset-0 bg-brand-400 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-brand-400 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
               <button
                 onClick={handleResetRequest}
-                className={`relative inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-xl shadow-brand-500/20 transition-transform duration-500 hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
+                className={`relative inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-2xl shadow-brand-500/30 transition-transform duration-500 hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
                 title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
               >
-                <div className="logo-icon-container w-10 h-10 sm:w-12 sm:h-12 relative drop-shadow-md">
+                <div className="logo-icon-container w-12 h-12 relative drop-shadow-md">
                   <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(0 0, 50% 0, 50% 50%, 0 50%)' }} />
                   <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)' }} />
                   <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(0 50%, 50% 50%, 50% 100%, 0 100%)' }} />
@@ -268,15 +277,18 @@ function App() {
               </button>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-4 tracking-tight font-display leading-[1.1]">
-              Congé <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-400">Paternité</span>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight font-display leading-[1.1] relative inline-block">
+              Congé <span className="text-gradient-animate">Paternité</span>
+              <span className="absolute -top-8 -right-10 rotate-12 bg-brand-100 text-brand-700 text-sm font-bold px-3 py-1.5 rounded-xl border border-brand-200 shadow-sm animate-bounce-subtle hidden sm:inline-block">
+                2025 Ready ✨
+              </span>
             </h1>
-            <p className="text-slate-600 text-lg sm:text-xl font-medium mb-6 px-4 max-w-2xl mx-auto leading-relaxed">
-              L'outil moderne pour planifier simplement votre congé paternité selon la législation française.
+            <p className="text-slate-600 text-2xl sm:text-3xl font-hand -rotate-1 mb-8 px-4 max-w-2xl mx-auto leading-relaxed text-brand-900/80">
+              L'outil moderne pour planifier simplement votre congé paternité.
             </p>
 
             {/* Made by badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/60 backdrop-blur-sm rounded-full border border-white/50 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 mt-2">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-md rounded-full border border-white/60 shadow-lg shadow-brand-900/5 hover:shadow-xl hover:scale-105 transition-all duration-300 mt-2">
               <span className="text-xs text-slate-500 font-medium">Made with</span>
               <span className="text-red-500 animate-pulse-heart text-base" aria-label="amour">❤️</span>
               <span className="text-xs text-slate-500 font-medium">by</span>
@@ -310,7 +322,7 @@ function App() {
           <div className="max-w-3xl mx-auto mb-12">
             <ProgressStepper currentStep={planningStep} fractionableDays={totalFractionableDays} />
             {birthDate && (
-              <p className="mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm">
+              <p className="mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm backdrop-blur-sm">
                 {totalPlannedDays} / {totalFractionableDays} jours planifiés
               </p>
             )}
@@ -346,9 +358,9 @@ function App() {
         {/* Modal de confirmation de réinitialisation */}
         {showResetConfirm && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 px-4 animate-fade-in">
-            <div className="bg-white rounded-3xl shadow-2xl shadow-brand-900/20 max-w-md w-full p-8 animate-pop transform transition-all">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-brand-900/20 max-w-md w-full p-8 animate-pop transform transition-all border border-white/50">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-5">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-5 shadow-inner">
                   <RotateCcw className="w-8 h-8" />
                 </div>
                 <h3 className="text-2xl font-bold font-display text-slate-900 mb-3">
@@ -404,7 +416,7 @@ function App() {
         {/* Bannière d'instruction pour le mode sélection visuelle */}
         {visualSelectionMode && selectionStep !== 'idle' && (
           <div className="mb-6 max-w-3xl mx-auto animate-fade-in-up sticky top-24 z-30">
-            <div className="rounded-2xl border border-brand-200 bg-brand-50/90 backdrop-blur-md p-5 shadow-glass">
+            <div className="rounded-2xl border border-brand-200 bg-white/90 backdrop-blur-xl p-5 shadow-2xl shadow-brand-900/10 ring-1 ring-black/5">
               <div className="flex items-center gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-brand-500/30">
@@ -423,7 +435,7 @@ function App() {
                       : `Cliquez sur la dernière date (min. 5 jours)`}
                   </p>
                   {selectionStartDate && selectionStep === 'selecting-end' && (
-                    <div className="mt-2 inline-flex px-3 py-1 bg-white rounded-lg text-xs font-bold text-brand-700 shadow-sm">
+                    <div className="mt-2 inline-flex px-3 py-1 bg-white rounded-lg text-xs font-bold text-brand-700 shadow-sm border border-brand-100">
                       Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                     </div>
                   )}
@@ -441,7 +453,9 @@ function App() {
           </div>
         )}
 
-        <div ref={calendarRef} className="mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28" id="calendar">
+        <div ref={calendarRef} className="mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20" id="calendar">
+           {/* Glow effect behind calendar */}
+           <div className="absolute inset-0 -z-10 bg-brand-500/5 blur-3xl rounded-[3rem] transform scale-105"></div>
           <Calendar
             birthDate={birthDate}
             onSelectBirthDate={handleSelectBirthDate}
@@ -457,9 +471,9 @@ function App() {
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
           <div ref={planningRef} className={`max-w-3xl mx-auto mb-8 sm:mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'} scroll-mt-28`}>
-            <div className={`bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-8 shadow-soft ${isCoarsePointer ? '' : 'transition-all duration-500'}`}>
+            <div className={`premium-card p-6 sm:p-8 ${isCoarsePointer ? '' : 'transition-all duration-500'}`}>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mb-4 shadow-inner">
                   <span className="text-3xl">📅</span>
                 </div>
                 <h3 className="text-2xl font-bold font-display text-slate-900 mb-2">
@@ -471,7 +485,7 @@ function App() {
               </div>
 
               {/* Mode personnalisé toggle */}
-              <div className="group bg-slate-50 hover:bg-brand-50/50 border border-slate-200 hover:border-brand-200 rounded-2xl p-6 mb-6 transition-all duration-300">
+              <div className="group bg-slate-50/50 hover:bg-brand-50/30 border border-slate-200/60 hover:border-brand-200/60 rounded-2xl p-6 mb-6 transition-all duration-300 backdrop-blur-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex-1">
                     <h4 className="text-lg font-bold text-slate-900 group-hover:text-brand-900 mb-1 font-display">
@@ -495,7 +509,7 @@ function App() {
                 </div>
 
                 {/* Prévisualisation */}
-                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                <div className="bg-white/80 rounded-xl p-4 border border-slate-100 shadow-sm">
                   <div className="flex gap-3 mb-2 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
                     <span className="flex-1">Période 1</span>
                     <span className="flex-1">Période 2</span>
@@ -524,7 +538,7 @@ function App() {
         {/* Mode personnalisé actif */}
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && !visualSelectionMode && (
           <div ref={customModeRef} className="max-w-3xl mx-auto mb-8 sm:mb-12 animate-fade-in-up scroll-mt-28">
-            <div className="bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-8 shadow-xl shadow-slate-200/50">
+            <div className="premium-card p-6 sm:p-8">
               <div className="flex items-start gap-5 mb-8">
                 <div className="flex-shrink-0">
                   <div className="w-16 h-16 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-brand-600/30">
@@ -543,7 +557,7 @@ function App() {
 
               <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
                 {/* Option 1 : Avec Slider */}
-                <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group">
+                <div className="bg-slate-50/80 rounded-3xl p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group backdrop-blur-sm">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-white text-slate-700 border border-slate-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
                       <span aria-hidden="true">🎚️</span>
@@ -559,7 +573,7 @@ function App() {
                 </div>
 
                 {/* Option 2 : Sélection visuelle */}
-                <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group relative overflow-hidden">
+                <div className="bg-slate-50/80 rounded-3xl p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group relative overflow-hidden backdrop-blur-sm">
                   <div className="relative z-10">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
@@ -587,7 +601,7 @@ function App() {
               </div>
 
               {/* Slider personnalisé */}
-              <div className="bg-slate-50 rounded-3xl p-6 sm:p-8 mb-6 border border-slate-100">
+              <div className="bg-slate-50/50 rounded-3xl p-6 sm:p-8 mb-6 border border-slate-100 backdrop-blur-sm">
                 <div className="text-center mb-8">
                   <p className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">
                     Répartition des jours
@@ -664,7 +678,7 @@ function App() {
         {/* Message pendant le placement personnalisé */}
         {customMode && remainingBlocks.length === 1 && !visualSelectionMode && (
           <div className="max-w-3xl mx-auto mb-8 sm:mb-12 animate-fade-in-up sticky top-24 z-30">
-             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/90 backdrop-blur-md p-5 shadow-glass">
+             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/90 backdrop-blur-md p-5 shadow-2xl shadow-emerald-500/10">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-emerald-500/30 flex-shrink-0">
                   2
