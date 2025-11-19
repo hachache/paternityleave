@@ -274,6 +274,23 @@ function App() {
             <p className="text-slate-600 text-lg sm:text-xl font-medium mb-6 px-4 max-w-2xl mx-auto leading-relaxed">
               L'outil moderne pour planifier simplement votre congé paternité selon la législation française.
             </p>
+
+            {/* Made by badge */}
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/60 backdrop-blur-sm rounded-full border border-white/50 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 mt-2">
+              <span className="text-xs text-slate-500 font-medium">Made with</span>
+              <span className="text-red-500 animate-pulse-heart text-base" aria-label="amour">❤️</span>
+              <span className="text-xs text-slate-500 font-medium">by</span>
+              <a
+                href="https://www.linkedin.com/in/hedi-a-2382551a1/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold text-slate-800 hover:text-brand-600 transition-colors flex items-center gap-1.5"
+                aria-label="Profil LinkedIn de Hedi ACHACHE"
+              >
+                <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" aria-hidden="true" />
+                Hedi ACHACHE
+              </a>
+            </div>
           </header>
 
           <ScrollIndicator show={birthDate !== null} />
