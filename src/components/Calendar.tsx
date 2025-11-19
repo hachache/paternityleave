@@ -334,7 +334,16 @@ export function Calendar({
   );
 
   return (
-    <div className="rounded-[2rem] border border-white bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft">
+    <div className="rounded-[2rem] border border-white bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft relative">
+      {!birthDate && (
+        <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 hidden sm:block animate-bounce-subtle">
+           <div className="relative bg-white px-4 py-2 rounded-full shadow-lg border border-brand-200 text-brand-700 font-hand text-xl font-bold rotate-[-2deg]">
+             Commencez ici ! 👇
+             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-brand-200 transform rotate-45"></div>
+           </div>
+        </div>
+      )}
+
       {!birthDate && (
         <div className="mb-6 rounded-2xl bg-brand-50 p-5 border border-brand-100 animate-fade-in-up">
           <p className="text-brand-800 text-center font-medium flex items-center justify-center gap-2">

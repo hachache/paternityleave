@@ -29,9 +29,14 @@ export function NextStepsCard({ planningStep, totalPlannedDays, hasBirthDate, ha
               ? 'bg-white border border-brand-100 shadow-soft scale-[1.02]' 
               : 'group-hover:bg-slate-50'
           }`}>
-            <p className={`font-bold text-base ${item.status === 'done' ? 'text-slate-900' : item.status === 'active' ? 'text-brand-900' : 'text-slate-500'}`}>
-              {item.label}
-            </p>
+            <div className="flex justify-between items-start">
+              <p className={`font-bold text-base ${item.status === 'done' ? 'text-slate-900' : item.status === 'active' ? 'text-brand-900' : 'text-slate-500'}`}>
+                {item.label}
+              </p>
+              {item.index === 4 && item.status === 'active' && (
+                <span className="text-brand-500 font-hand text-lg -rotate-6 animate-pulse-subtle hidden sm:inline-block">Dernière ligne droite ! 🏁</span>
+              )}
+            </div>
             {item.hint && <p className="text-sm text-slate-500 font-medium leading-relaxed">{item.hint}</p>}
           </div>
         </li>
@@ -83,6 +88,11 @@ function buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasManda
     status: hasAllBlocks ? 'active' : 'pending', // Active only when everything else is done
     index: 4
   });
+
+  // Add a final "done" message
+  if (hasAllBlocks) {
+     // No op, handled in UI
+  }
 
   return steps;
 }

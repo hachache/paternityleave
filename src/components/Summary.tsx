@@ -162,7 +162,12 @@ export function Summary({
             </div>
             <div>
               <p className="text-xs font-bold uppercase text-slate-400">Total planifié</p>
-              <p className="text-xl font-bold text-slate-900">{totalRemainingDays} <span className="text-sm font-medium text-slate-500">/ {totalFractionableDays} jours</span></p>
+              <p className="text-xl font-bold text-slate-900">
+                {totalRemainingDays} <span className="text-sm font-medium text-slate-500">/ {totalFractionableDays} jours</span>
+                {remainingDaysLeft === 0 && (
+                  <span className="ml-3 text-emerald-500 font-hand text-2xl font-bold -rotate-2 inline-block">Tout est bon ! 👌</span>
+                )}
+              </p>
             </div>
           </div>
         </div>

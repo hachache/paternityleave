@@ -178,17 +178,25 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
           </div>
         )}
 
-        <Button
-          onClick={handleCopy}
-          variant="primary"
-          size="lg"
-          fullWidth
-          icon={copied ? Check : Copy}
-          iconPosition="left"
-          className={`shadow-xl transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-1'}`}
-        >
-          {copied ? 'Courrier copié !' : 'Copier le courrier'}
-        </Button>
+        <div className="relative">
+          <Button
+            onClick={handleCopy}
+            variant="primary"
+            size="lg"
+            fullWidth
+            icon={copied ? Check : Copy}
+            iconPosition="left"
+            className={`shadow-xl transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-1'}`}
+          >
+            {copied ? 'Courrier copié !' : 'Copier le courrier'}
+          </Button>
+          {copied && (
+            <div className="absolute -right-4 top-1/2 -translate-y-1/2 translate-x-full hidden sm:block animate-fade-in">
+               <span className="text-emerald-600 font-hand text-xl font-bold -rotate-12 inline-block">Prêt à envoyer ! ✉️</span>
+               <svg className="w-8 h-8 text-emerald-400 absolute -left-6 top-4 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17l9.2-9.2M17 17V7H7" /></svg>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

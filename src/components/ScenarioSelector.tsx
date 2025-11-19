@@ -41,9 +41,14 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             {/* Selection Indicator */}
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1">
-                <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-500'}`}>
-                  {config.label}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-500'}`}>
+                    {config.label}
+                  </p>
+                  {config.id === 'standard' && (
+                    <span className="text-brand-500 font-hand font-bold text-lg -rotate-6 -mt-3 animate-pulse-subtle">Le plus courant !</span>
+                  )}
+                </div>
                 <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">{config.description}</p>
               </div>
               <div
