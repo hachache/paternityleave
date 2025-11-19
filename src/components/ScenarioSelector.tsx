@@ -20,7 +20,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
   const scenarios = Object.values(LEAVE_SCENARIOS);
 
   return (
-    <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-3 sm:gap-4 sm:grid-cols-2 auto-rows-fr">
+    <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-4 sm:grid-cols-2 auto-rows-fr">
       {scenarios.map(config => {
         const isSelected = config.id === selectedScenario;
         const details = formatScenarioDetails(config);
@@ -32,39 +32,39 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             role="radio"
             aria-checked={isSelected}
             onClick={() => onScenarioChange(config.id)}
-            className={`rounded-2xl border-2 p-4 text-left transition-all h-full flex flex-col ${
+            className={`group relative rounded-3xl p-6 text-left transition-all duration-300 h-full flex flex-col border-2 ${
               isSelected
-                ? 'border-teal-500 bg-teal-50 shadow-lg'
-                : 'border-slate-200 bg-white hover:border-teal-200 hover:shadow-md'
+                ? 'border-brand-500 bg-brand-50/50 shadow-lg shadow-brand-500/10'
+                : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
             }`}
           >
-            <div className="flex items-start justify-between gap-3 mb-4">
+            {/* Selection Indicator */}
+            <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1">
-                <p className="text-sm font-extrabold uppercase tracking-wide text-teal-900">
+                <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-500'}`}>
                   {config.label}
                 </p>
-                <p className="mt-1 text-base text-slate-600 leading-relaxed">{config.description}</p>
+                <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">{config.description}</p>
               </div>
-              <span
-                className={`flex-shrink-0 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
-                  isSelected ? 'border-teal-600 bg-teal-600 text-white' : 'border-slate-300 text-slate-400'
+              <div
+                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
+                  isSelected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-200 group-hover:border-brand-300'
                 }`}
-                aria-hidden="true"
               >
-                {isSelected ? '✓' : ''}
-              </span>
+                {isSelected && <span className="text-xs font-bold">✓</span>}
+              </div>
             </div>
 
-            <div className="mt-auto grid gap-2 sm:gap-3 text-slate-700 sm:grid-cols-2 items-start">
-              <div className="rounded-xl bg-white/80 p-3 space-y-1 h-full">
-                <p className="font-semibold text-slate-900 text-base leading-relaxed">{details.totalText}</p>
+            <div className="mt-auto pt-4 border-t border-slate-100/50 grid sm:grid-cols-2 gap-3">
+              <div className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
+                <p className="font-bold text-slate-900 text-sm">{details.totalText}</p>
                 {details.bonusText && (
-                  <p className="text-sm font-semibold text-emerald-600">{details.bonusText}</p>
+                  <p className="text-xs font-bold text-emerald-600 mt-0.5">{details.bonusText}</p>
                 )}
               </div>
-              <div className="rounded-xl bg-white/80 p-3 space-y-1 h-full">
-                <p className="font-semibold text-slate-900 text-base leading-relaxed">{details.limitText}</p>
-                <p className="text-sm text-slate-500 leading-relaxed">Fractionnement en 2 périodes minimum</p>
+              <div className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
+                <p className="font-bold text-slate-900 text-sm">{details.limitText}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide">2 périodes min.</p>
               </div>
             </div>
           </button>
@@ -73,4 +73,3 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
     </div>
   );
 }
-

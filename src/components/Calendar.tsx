@@ -62,6 +62,7 @@ export function Calendar({
   const [currentMonth, setCurrentMonth] = useState<Date>(() => startOfMonth(new Date()));
   const [focusedDate, setFocusedDate] = useState<Date>(() => startOfDay(new Date()));
   const dayRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+  const today = useMemo(() => startOfDay(new Date()), []);
 
   const monthStart = currentMonth;
   const monthEnd = useMemo(() => endOfMonth(currentMonth), [currentMonth]);
@@ -80,12 +81,10 @@ export function Calendar({
     return result;
   }, [calendarStart, endTimestamp]);
 
-  // Precompute normalized timestamps for event delegation and lookups
   const dayKeyMap = useMemo(() => {
     const m = new Map<number, Date>();
     for (const d of days) {
       const key = startOfDay(d).getTime();
-      // store normalized date to avoid recomputing startOfDay
       m.set(key, startOfDay(d));
     }
     return m;
@@ -116,22 +115,19 @@ export function Calendar({
     if (!birthDate) {
       return;
     }
-
     const normalized = startOfDay(birthDate);
     setCurrentMonth(startOfMonth(normalized));
     setFocusedDate(normalized);
   }, [birthDate]);
 
   useEffect(() => {
-    if (isCoarsePointer) return; // Avoid programmatic focus on mobile to reduce jank
+    if (isCoarsePointer) return;
     const key = startOfDay(focusedDate).getTime();
     const target = dayRefs.current[key];
     if (target && document.activeElement !== target) {
       try {
-        // Prevent browser from auto-scrolling the calendar cell into view
         target.focus({ preventScroll: true } as FocusOptions);
       } catch {
-        // Fallback for older browsers
         target.focus();
       }
     }
@@ -140,25 +136,12 @@ export function Calendar({
   const getDayType = useCallback(
     (date: Date): DayType => {
       if (!birthDate) return null;
-
-      if (isSameDay(date, birthDate)) {
-        return 'birth';
-      }
-
-      if (employerPeriod && isDateInBlock(date, employerPeriod)) {
-        return 'employer';
-      }
-
-      if (mandatoryPeriod && isDateInBlock(date, mandatoryPeriod)) {
-        return 'mandatory';
-      }
-
+      if (isSameDay(date, birthDate)) return 'birth';
+      if (employerPeriod && isDateInBlock(date, employerPeriod)) return 'employer';
+      if (mandatoryPeriod && isDateInBlock(date, mandatoryPeriod)) return 'mandatory';
       for (const block of remainingBlocks) {
-        if (isDateInBlock(date, block)) {
-          return 'remaining';
-        }
+        if (isDateInBlock(date, block)) return 'remaining';
       }
-
       return null;
     },
     [birthDate, employerPeriod, mandatoryPeriod, remainingBlocks]
@@ -170,7 +153,6 @@ export function Calendar({
       const type = getDayType(date);
 
       if (!birthDate) {
-        const today = startOfDay(new Date());
         if (isBefore(date, today)) {
           return {
             type,
@@ -182,63 +164,22 @@ export function Calendar({
         return { type, selectable: true, action: 'select' };
       }
 
-      if (type === 'birth') {
-        return {
-          type,
-          selectable: false,
-          reason: "Date de naissance de l'enfant",
-          action: 'static'
-        };
-      }
-
-      if (type === 'employer') {
-        return {
-          type,
-          selectable: false,
-          reason: 'Période à la charge de l’employeur',
-          action: 'static'
-        };
-      }
-
-      if (type === 'mandatory') {
-        return {
-          type,
-          selectable: false,
-          reason: 'Période obligatoire de 4 jours',
-          action: 'static'
-        };
-      }
-
-      if (type === 'remaining') {
-        return {
-          type,
-          selectable: true,
-          reason: 'Bloc planifié – cliquer pour le supprimer',
-          action: 'remove'
-        };
-      }
+      if (type === 'birth') return { type, selectable: false, reason: "Date de naissance", action: 'static' };
+      if (type === 'employer') return { type, selectable: false, reason: 'Période employeur', action: 'static' };
+      if (type === 'mandatory') return { type, selectable: false, reason: 'Période obligatoire', action: 'static' };
+      if (type === 'remaining') return { type, selectable: true, reason: 'Bloc planifié', action: 'remove' };
 
       if (isBefore(date, birthDate)) {
-        return {
-          type: null,
-          selectable: false,
-          reason: 'Disponible uniquement après la naissance',
-          action: 'static'
-        };
+        return { type: null, selectable: false, reason: 'Disponible uniquement après la naissance', action: 'static' };
       }
 
       if (usageLimit && isAfter(date, usageLimit)) {
-        return {
-          type: null,
-          selectable: false,
-          reason: `Au-delà des ${scenario.limitMonthsAfterBirth} mois autorisés`,
-          action: 'static'
-        };
+        return { type: null, selectable: false, reason: `Au-delà de la limite`, action: 'static' };
       }
 
       return { type: null, selectable: true, action: 'select' };
     },
-    [birthDate, getDayType, scenario.limitMonthsAfterBirth, usageLimit]
+    [birthDate, getDayType, scenario.limitMonthsAfterBirth, usageLimit, today]
   );
 
   const focusDate = useCallback(
@@ -271,9 +212,7 @@ export function Calendar({
       const target = startOfMonth(addMonths(currentMonth, offset));
       setCurrentMonth(target);
       setFocusedDate(prev => {
-        if (prev && isSameMonth(prev, target)) {
-          return startOfDay(prev);
-        }
+        if (prev && isSameMonth(prev, target)) return startOfDay(prev);
         return target;
       });
     },
@@ -286,45 +225,24 @@ export function Calendar({
   const handleDayInteraction = useCallback(
     (date: Date, metadata?: DayMetadata) => {
       const detail = metadata ?? describeDay(date);
-
       if (!birthDate) {
-        if (detail.selectable) {
-          onSelectBirthDate(date);
-        }
+        if (detail.selectable) onSelectBirthDate(date);
         return;
       }
-
-      if (detail.action === 'static') {
-        return;
-      }
-
+      if (detail.action === 'static') return;
       if (detail.action === 'remove') {
         const blockIndex = remainingBlocks.findIndex(block =>
           isDateInRange(date, block.start, block.end)
         );
-        if (blockIndex !== -1) {
-          onRemoveBlock(blockIndex);
-        }
+        if (blockIndex !== -1) onRemoveBlock(blockIndex);
         return;
       }
-
-      if (!detail.selectable) {
-        return;
-      }
-
+      if (!detail.selectable) return;
       onSelectRemainingDay(date);
     },
-    [
-      birthDate,
-      describeDay,
-      onRemoveBlock,
-      onSelectBirthDate,
-      onSelectRemainingDay,
-      remainingBlocks
-    ]
+    [birthDate, describeDay, onRemoveBlock, onSelectBirthDate, onSelectRemainingDay, remainingBlocks]
   );
 
-  // Precompute per-day metadata to reuse in delegated handlers and rendering
   const metadataByKey = useMemo(() => {
     const m = new Map<number, DayMetadata>();
     for (const d of days) {
@@ -334,12 +252,9 @@ export function Calendar({
     return m;
   }, [days, describeDay]);
 
-  // Delegate clicks at the grid level to reduce per-cell handlers and closures
   const handleGridClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const target = (event.target as HTMLElement).closest('button[data-date]') as
-        | HTMLButtonElement
-        | null;
+      const target = (event.target as HTMLElement).closest('button[data-date]') as HTMLButtonElement | null;
       if (!target) return;
       const ts = Number(target.getAttribute('data-date'));
       if (!ts || Number.isNaN(ts)) return;
@@ -354,53 +269,22 @@ export function Calendar({
   const handleGridKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (!focusedDate) return;
-
       switch (event.key) {
-        case 'ArrowUp':
-          event.preventDefault();
-          moveFocusBy(-7);
-          break;
-        case 'ArrowDown':
-          event.preventDefault();
-          moveFocusBy(7);
-          break;
-        case 'ArrowLeft':
-          event.preventDefault();
-          moveFocusBy(-1);
-          break;
-        case 'ArrowRight':
-          event.preventDefault();
-          moveFocusBy(1);
-          break;
-        case 'Home':
-          event.preventDefault();
-          focusDate(startOfWeek(focusedDate, { locale: fr }));
-          break;
-        case 'End':
-          event.preventDefault();
-          focusDate(endOfWeek(focusedDate, { locale: fr }));
-          break;
-        case 'PageUp':
-          event.preventDefault();
-          focusDate(addMonths(focusedDate, event.shiftKey ? -12 : -1));
-          break;
-        case 'PageDown':
-          event.preventDefault();
-          focusDate(addMonths(focusedDate, event.shiftKey ? 12 : 1));
-          break;
-        case 'Enter':
-        case ' ':
-          event.preventDefault();
-          handleDayInteraction(focusedDate);
-          break;
-        default:
-          break;
+        case 'ArrowUp': event.preventDefault(); moveFocusBy(-7); break;
+        case 'ArrowDown': event.preventDefault(); moveFocusBy(7); break;
+        case 'ArrowLeft': event.preventDefault(); moveFocusBy(-1); break;
+        case 'ArrowRight': event.preventDefault(); moveFocusBy(1); break;
+        case 'Home': event.preventDefault(); focusDate(startOfWeek(focusedDate, { locale: fr })); break;
+        case 'End': event.preventDefault(); focusDate(endOfWeek(focusedDate, { locale: fr })); break;
+        case 'PageUp': event.preventDefault(); focusDate(addMonths(focusedDate, event.shiftKey ? -12 : -1)); break;
+        case 'PageDown': event.preventDefault(); focusDate(addMonths(focusedDate, event.shiftKey ? 12 : 1)); break;
+        case 'Enter': case ' ': event.preventDefault(); handleDayInteraction(focusedDate); break;
+        default: break;
       }
     },
     [focusDate, focusedDate, handleDayInteraction, moveFocusBy]
   );
 
-  // Unified focus handler to avoid per-cell closures
   const handleCellFocus = useCallback(
     (event: React.FocusEvent<HTMLButtonElement>) => {
       if (isCoarsePointer) return;
@@ -418,129 +302,75 @@ export function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      // Removed transition-colors to prevent micro-lag on mobile (35-42 cells transitioning simultaneously)
-      let classes =
-        'aspect-square flex items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 border border-transparent touch-manipulation';
+      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
 
       if (!isCurrentMonthDay) {
-        classes += ' text-slate-400';
+        // Make non-current month days much fainter
+        classes += ' text-slate-300 opacity-25';
       }
 
-      // Déterminer la couleur de la période en priorité
-      // (avant d'appliquer le gris des weekends/fériés)
-      const hasLeaveType = metadata.type === 'birth' || metadata.type === 'employer' || metadata.type === 'mandatory' || metadata.type === 'remaining';
+      const hasLeaveType = ['birth', 'employer', 'mandatory', 'remaining'].includes(metadata.type || '');
 
       if (metadata.type === 'birth') {
-        classes += ' bg-slate-900 text-white font-semibold';
+        classes += ' bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/30 ring-2 ring-slate-900 ring-offset-2';
       } else if (metadata.type === 'employer') {
-        classes += ' bg-sky-600 text-white';
+        classes += ' bg-brand-300 text-white shadow-sm';
       } else if (metadata.type === 'mandatory') {
-        classes += ' bg-amber-500 text-white';
+        classes += ' bg-brand-600 text-white shadow-md shadow-brand-600/30';
       } else if (metadata.type === 'remaining') {
-        classes += ' bg-teal-500 text-white cursor-pointer hover:bg-teal-600';
+        classes += ' bg-success-500 text-white cursor-pointer hover:bg-success-600 hover:-translate-y-0.5 shadow-md shadow-success-500/30';
       } else if (metadata.selectable && isCurrentMonthDay) {
-        classes +=
-          ' cursor-pointer text-slate-900 hover:bg-teal-50 hover:border-teal-300';
+        classes += ' cursor-pointer text-slate-700 hover:bg-brand-50 hover:text-brand-700 active:scale-95';
       } else {
-        classes += ' cursor-not-allowed opacity-50';
+        classes += ' cursor-not-allowed';
+        if (isCurrentMonthDay) classes += ' opacity-40';
       }
 
-      // Appliquer le gris des weekends/fériés UNIQUEMENT s'il n'y a pas de période de congé
-      if (!hasLeaveType && (weekend || holiday)) {
-        classes += ' bg-slate-100';
-      }
+      if (!hasLeaveType && (weekend || holiday) && isCurrentMonthDay) classes += ' bg-slate-50 text-slate-400';
 
       return classes;
     },
     [currentMonth, holidays]
   );
 
-  // Precompute ARIA labels with a lighter formatter than date-fns for better mobile perf
-  const ariaLabelByKey = useMemo(() => {
-    const m = new Map<number, string>();
-    for (const d of days) {
-      const date = startOfDay(d);
-      const key = date.getTime();
-      const metadata = metadataByKey.get(key) ?? { type: null, selectable: true, action: 'select' };
-      const base = isCoarsePointer
-        ? `${date.getDate()} ${date.toLocaleDateString('fr-FR', { month: 'long' })}`
-        : date.toLocaleDateString('fr-FR', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          });
-      const details = new Set<string>();
-      if (metadata.type === 'birth') details.add('date de naissance');
-      if (metadata.type === 'employer') details.add('période employeur');
-      if (metadata.type === 'mandatory') details.add('période obligatoire');
-      if (metadata.type === 'remaining') details.add('bloc planifié');
-      if (metadata.reason) details.add(metadata.reason.toLowerCase());
-      if (!metadata.selectable && metadata.action !== 'remove') details.add('indisponible');
-      if (metadata.action === 'remove') details.add('cliquer pour supprimer');
-      if (!isCoarsePointer) {
-        if (isFrenchHoliday(date, holidays)) details.add('jour férié');
-        if (isWeekend(date)) details.add('week-end');
-      }
-      const detailText = Array.from(details).join(', ');
-      m.set(key, detailText ? `${base}, ${detailText}` : base);
-    }
-    return m;
-  }, [days, metadataByKey, holidays, isCoarsePointer]);
-
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8 shadow-lg">
+    <div className="rounded-[2rem] border border-white bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft">
       {!birthDate && (
-        <div className="mb-4 sm:mb-6 rounded-2xl border border-teal-200 bg-white p-4 sm:p-5">
-          <p className="text-sm sm:text-base text-teal-800 text-center font-medium">
-            👶 Sélectionnez la date de naissance pour commencer votre planification
+        <div className="mb-6 rounded-2xl bg-brand-50 p-5 border border-brand-100 animate-fade-in-up">
+          <p className="text-brand-800 text-center font-medium flex items-center justify-center gap-2">
+            <span className="text-xl">👶</span>
+            Sélectionnez la date de naissance pour commencer
           </p>
         </div>
       )}
 
-      {birthDate && remainingBlocks.length === 0 && mandatoryPeriod && (
-        <div className="mb-4 sm:mb-6 rounded-2xl border border-teal-200 bg-teal-50/60 p-4 sm:p-5">
-          <p className="text-sm sm:text-base text-teal-900 text-center font-medium">
-            👇 Choisissez où commencer vos {scenario.fractionableDays} jours ou activez le mode personnalisé
-          </p>
-        </div>
-      )}
-
-      {birthDate && remainingBlocks.length > 0 && (
-        <div className="mb-4 sm:mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 sm:p-5">
-          <p className="text-sm sm:text-base text-emerald-900 text-center font-medium">
-            ✓ Cliquez sur les blocs verts existants pour les retirer
-          </p>
-        </div>
-      )}
-
-      <div className="flex items-center justify-between mb-6 sm:mb-8">
+      <div className="flex items-center justify-between mb-8">
         <button
           type="button"
           onClick={previousMonth}
-          className="rounded-xl border border-slate-200 p-2 sm:p-3 transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
           aria-label="Mois précédent"
         >
-          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-slate-600" />
+          <ChevronLeft className="h-6 w-6" />
         </button>
 
-        <h2 className="text-base sm:text-xl font-semibold text-slate-900 capitalize tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900 capitalize tracking-tight">
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
 
         <button
           type="button"
           onClick={nextMonth}
-          className="rounded-xl border border-slate-200 p-2 sm:p-3 transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
           aria-label="Mois suivant"
         >
-          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-slate-600" />
+          <ChevronRight className="h-6 w-6" />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 mb-2 sm:mb-4">
+      <div className="grid grid-cols-7 gap-2 mb-4">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-xs sm:text-sm font-semibold text-slate-500">
+          <div key={day} className="text-center text-xs uppercase tracking-wider font-bold text-slate-400 py-2">
             {day}
           </div>
         ))}
@@ -548,8 +378,7 @@ export function Calendar({
 
       <div
         role="grid"
-        aria-label="Calendrier des congés paternité"
-        className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4"
+        className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3"
         onKeyDown={handleGridKeyDown}
         onClick={handleGridClick}
       >
@@ -558,8 +387,8 @@ export function Calendar({
           const dayKey = dayStart.getTime();
           const metadata = metadataByKey.get(dayKey) ?? { type: null, selectable: true, action: 'select' };
           const isFocused = dayKey === startOfDay(focusedDate).getTime();
-          const ariaDisabled = !metadata.selectable && metadata.action !== 'remove';
-
+          const isTodayDate = isSameDay(dayStart, today);
+          
           return (
             <button
               key={dayKey}
@@ -568,14 +397,12 @@ export function Calendar({
               data-date={dayKey}
               className={getDayClasses(dayStart, metadata)}
               tabIndex={isFocused ? 0 : -1}
-              aria-label={ariaLabelByKey.get(dayKey)}
-              aria-disabled={ariaDisabled}
-              aria-selected={metadata.type === 'remaining'}
-              aria-current={metadata.type === 'birth' ? 'date' : undefined}
               title={metadata.reason}
-              onFocus={handleCellFocus}
             >
               {dayStart.getDate()}
+              {isTodayDate && (
+                <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-brand-500"></span>
+              )}
             </button>
           );
         })}

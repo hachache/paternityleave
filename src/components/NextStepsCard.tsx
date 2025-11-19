@@ -11,19 +11,28 @@ export function NextStepsCard({ planningStep, totalPlannedDays, hasBirthDate, ha
   const checklist = buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks, fractionableDays });
 
   return (
-    <ol className="space-y-4 text-base text-slate-700">
+    <ol className="relative space-y-0">
+      <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-slate-100" />
       {checklist.map(item => (
-        <li key={item.label} className="flex items-start gap-3 pb-3 border-b border-slate-100 last:border-0 last:pb-0">
+        <li key={item.label} className="group relative pl-12 py-4 first:pt-0 last:pb-0 transition-all duration-300">
           <span
-            className={`mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
-              item.status === 'done' ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
+            className={`absolute left-0 top-4 inline-flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold shadow-sm ring-4 ring-white transition-all duration-500 ${
+              item.status === 'done' 
+                ? 'bg-emerald-500 text-white scale-100' 
+                : 'bg-white text-slate-300 border-2 border-slate-100 group-hover:border-brand-200 group-hover:text-brand-300'
             }`}
           >
             {item.status === 'done' ? '✓' : item.index}
           </span>
-          <div className="space-y-1.5 flex-1">
-            <p className="font-semibold text-slate-900 leading-relaxed">{item.label}</p>
-            {item.hint && <p className="text-sm text-slate-500 leading-relaxed">{item.hint}</p>}
+          <div className={`space-y-1 p-4 rounded-2xl transition-all duration-300 ${
+            item.status === 'active' 
+              ? 'bg-white border border-brand-100 shadow-soft scale-[1.02]' 
+              : 'group-hover:bg-slate-50'
+          }`}>
+            <p className={`font-bold text-base ${item.status === 'done' ? 'text-slate-900' : item.status === 'active' ? 'text-brand-900' : 'text-slate-500'}`}>
+              {item.label}
+            </p>
+            {item.hint && <p className="text-sm text-slate-500 font-medium leading-relaxed">{item.hint}</p>}
           </div>
         </li>
       ))}
@@ -36,41 +45,42 @@ type ChecklistArgs = Required<
 >;
 
 function buildChecklist({ planningStep, totalPlannedDays, hasBirthDate, hasMandatory, remainingBlocks, fractionableDays }: ChecklistArgs) {
-  const steps: Array<{ label: string; hint?: string; status: 'pending' | 'done'; index: number }> = [];
+  const steps: Array<{ label: string; hint?: string; status: 'pending' | 'active' | 'done'; index: number }> = [];
 
+  const isStep1Done = hasBirthDate;
   steps.push({
     label: 'Définir la date de naissance',
-    hint: "Cliquez sur votre date dans le calendrier",
-    status: hasBirthDate ? 'done' : 'pending',
+    hint: "Point de départ de tout le calcul",
+    status: isStep1Done ? 'done' : 'active',
     index: 1
   });
 
+  const isStep2Done = hasMandatory || planningStep > 1;
   steps.push({
-    label: 'Valider la période obligatoire (3j + 4j)',
-    hint: 'Nous la proposons automatiquement juste après la naissance',
-    status: hasMandatory || planningStep > 1 ? 'done' : 'pending',
+    label: 'Valider la période obligatoire',
+    hint: '3 jours naissance + 4 jours obligatoires',
+    status: isStep2Done ? 'done' : (isStep1Done ? 'active' : 'pending'),
     index: 2
   });
 
   const hasAllBlocks = totalPlannedDays >= fractionableDays;
   const remainingDays = Math.max(fractionableDays - totalPlannedDays, 0);
-
+  
   steps.push({
-    label: `Planifier vos ${fractionableDays} jours fractionnables`,
-    hint:
-      remainingBlocks === 0
-        ? 'Placez vos blocs en respectant minimum 5 jours'
+    label: `Planifier vos ${fractionableDays} jours restants`,
+    hint: remainingBlocks === 0
+        ? 'À poser en 2 périodes minimum (min. 5j chacune)'
         : remainingDays > 0
-          ? `${remainingDays} jours restants à planifier`
-          : 'Cliquez sur un bloc vert pour le modifier',
-    status: hasAllBlocks ? 'done' : 'pending',
+          ? `${remainingDays} jours encore à planifier`
+          : 'Planning complet !',
+    status: hasAllBlocks ? 'done' : (isStep2Done ? 'active' : 'pending'),
     index: 3
   });
 
   steps.push({
-    label: 'Générer votre lettre de demande',
-    hint: 'Remplissez les champs puis copiez le texte à envoyer à votre employeur',
-    status: hasAllBlocks ? 'done' : 'pending',
+    label: 'Générer votre lettre',
+    hint: 'Modèle officiel prêt à envoyer à votre employeur',
+    status: hasAllBlocks ? 'active' : 'pending', // Active only when everything else is done
     index: 4
   });
 

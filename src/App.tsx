@@ -18,7 +18,7 @@ import { ScenarioSelector } from './components/ScenarioSelector';
 import { Button } from './components/Button';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
-  function App() {
+function App() {
   const [showLegalReferences, setShowLegalReferences] = useState(false);
   const [hasScrolledPastStart, setHasScrolledPastStart] = useState(false);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
@@ -66,6 +66,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
   const planningRef = useRef<HTMLDivElement>(null);
   const customModeRef = useRef<HTMLDivElement>(null);
   const letterRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       setHasScrolledPastStart(window.scrollY > 200);
@@ -198,14 +199,15 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
   // If showing legal references, render that view instead
   if (showLegalReferences) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-surface-50 text-slate-900 font-sans">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
         <a
           href={`#${mainContentId}`}
-          className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-teal-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
+          className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-brand-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
         >
           Aller directement au contenu principal
         </a>
-        <main id={mainContentId} className="py-8 px-4">
+        <main id={mainContentId} className="py-8 px-4 relative">
           <div className="max-w-5xl mx-auto mb-6">
             <Button
               onClick={handleHideLegalReferences}
@@ -222,91 +224,86 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-surface-50 flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-brand-50/50 to-transparent blur-3xl opacity-60" />
+        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-purple-100/30 rounded-full blur-[100px] opacity-40" />
+        <div className="absolute top-40 left-0 w-[400px] h-[400px] bg-blue-100/30 rounded-full blur-[80px] opacity-40" />
+      </div>
+
       <a
         href={`#${mainContentId}`}
-        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-teal-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-brand-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
       >
         Aller directement au contenu principal
       </a>
-      <main id={mainContentId} className="flex-1">
-        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-16 sm:pt-20 md:pt-20 pb-16 md:pb-6">
-          <header className="mb-8 sm:mb-12 text-center animate-fade-in relative">
-            <button
-              onClick={handleResetRequest}
-              className={`absolute top-0 right-2 sm:right-4 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-xl hover:bg-white hover:shadow-lg transition-apple-smooth text-xs sm:text-sm font-semibold active:scale-[0.96] hover:scale-[1.02] border border-slate-300/50 flex items-center gap-1 sm:gap-2 ${!birthDate ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-fade-in'}`}
-            >
-              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Réinitialiser</span>
-              <span className="sm:hidden">Reset</span>
-            </button>
-
-            <button
-              onClick={handleResetRequest}
-              className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 bg-teal-600 text-white shadow-lg transition-apple-smooth hover:shadow-xl hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
-              title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
-            >
-              <div className="logo-icon-container w-8 h-8 sm:w-10 sm:h-10 relative">
-                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 0, 50% 0, 50% 50%, 0 50%)' }} />
-                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)' }} />
-                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(0 50%, 50% 50%, 50% 100%, 0 100%)' }} />
-                <CalendarIcon className="logo-icon-part w-8 h-8 sm:w-10 sm:h-10 text-white" style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }} />
-              </div>
-            </button>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
-              Congé Paternité
-            </h1>
-            <p className="text-slate-600 text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 max-w-3xl mx-auto leading-relaxed">
-              Planifiez votre congé selon la législation française
-            </p>
-
-            {/* Made by badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 rounded-full border border-slate-200 shadow-sm hover:shadow-md transition-apple-smooth hover:scale-105 mt-2">
-              <span className="text-xs text-slate-600 font-medium">Made with</span>
-              <span className="text-red-500 animate-pulse-subtle text-base" aria-label="amour">❤️</span>
-              <span className="text-xs text-slate-600 font-medium">by</span>
-              <a
-                href="https://www.linkedin.com/in/hedi-a-2382551a1/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-semibold text-[#0A66C2] hover:text-[#084c94] transition-colors underline decoration-2 decoration-[#0A66C2] hover:decoration-[#084c94] underline-offset-4 inline-flex items-center gap-1"
-                aria-label="Profil LinkedIn de Hedi ACHACHE"
+      
+      <main id={mainContentId} className="flex-1 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl pt-20 sm:pt-24 pb-20 md:pb-12">
+          <header className="mb-12 sm:mb-16 text-center animate-fade-in-up relative">
+            <div className="absolute top-0 right-2 sm:right-0">
+               <button
+                onClick={handleResetRequest}
+                className={`px-4 py-2 bg-white/80 backdrop-blur-md text-slate-600 rounded-xl hover:bg-white hover:text-brand-600 hover:shadow-lg transition-all duration-300 text-sm font-medium active:scale-95 border border-white shadow-sm flex items-center gap-2 group ${!birthDate ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
               >
-                <Linkedin className="w-3.5 h-3.5" aria-hidden="true" />
-                Hedi ACHACHE
-              </a>
+                <RotateCcw className="w-4 h-4 group-hover:-rotate-180 transition-transform duration-500" />
+                <span className="hidden sm:inline">Réinitialiser</span>
+              </button>
             </div>
+
+            {/* Logo avec animation de construction */}
+            <div className="inline-flex mb-6 relative group">
+              <div className="absolute inset-0 bg-brand-400 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
+              <button
+                onClick={handleResetRequest}
+                className={`relative inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-xl shadow-brand-500/20 transition-transform duration-500 hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
+                title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
+              >
+                <div className="logo-icon-container w-10 h-10 sm:w-12 sm:h-12 relative drop-shadow-md">
+                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(0 0, 50% 0, 50% 50%, 0 50%)' }} />
+                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)' }} />
+                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(0 50%, 50% 50%, 50% 100%, 0 100%)' }} />
+                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }} />
+                </div>
+              </button>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-4 tracking-tight font-display leading-[1.1]">
+              Congé <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-400">Paternité</span>
+            </h1>
+            <p className="text-slate-600 text-lg sm:text-xl font-medium mb-6 px-4 max-w-2xl mx-auto leading-relaxed">
+              L'outil moderne pour planifier simplement votre congé paternité selon la législation française.
+            </p>
           </header>
 
           <ScrollIndicator show={birthDate !== null} />
 
           <NavigationAnchor show={birthDate !== null && hasScrolledPastStart} />
 
-          <div className="max-w-3xl mx-auto mb-8">
+          <div className="max-w-3xl mx-auto mb-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             <SectionCard
-              title="1. Choisissez votre situation"
-              description="Commencez par sélectionner votre cas pour adapter le nombre de jours"
-              accent="teal"
+              title="Votre situation"
+              description="Adaptez le calendrier à votre cas spécifique"
+              accent="brand"
             >
               <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
             </SectionCard>
           </div>
 
-          <div className="max-w-3xl mx-auto mb-8">
+          <div className="max-w-3xl mx-auto mb-12">
             <ProgressStepper currentStep={planningStep} fractionableDays={totalFractionableDays} />
             {birthDate && (
-              <p className="mt-3 text-center text-sm text-slate-600">
+              <p className="mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm">
                 {totalPlannedDays} / {totalFractionableDays} jours planifiés
               </p>
             )}
           </div>
 
-          <div className="max-w-3xl mx-auto mb-8">
+          <div className="max-w-3xl mx-auto mb-12">
             <SectionCard
-              title="Étapes suivantes"
-              description="Suivez les actions à réaliser pour finaliser votre demande"
-              accent="teal"
+              title="Prochaines étapes"
+              description="Votre guide pour finaliser la demande"
+              accent="slate"
             >
               <NextStepsCard
               planningStep={planningStep}
@@ -331,26 +328,26 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
         {/* Modal de confirmation de réinitialisation */}
         {showResetConfirm && (
-          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fade-in">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-spring-in">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500 text-white mb-4 shadow-md">
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 px-4 animate-fade-in">
+            <div className="bg-white rounded-3xl shadow-2xl shadow-brand-900/20 max-w-md w-full p-8 animate-pop transform transition-all">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-5">
                   <RotateCcw className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
-                  Réinitialiser ?
+                <h3 className="text-2xl font-bold font-display text-slate-900 mb-3">
+                  Réinitialiser le planning ?
                 </h3>
                 <p className="text-slate-600 text-base leading-relaxed">
-                  Êtes-vous sûr de vouloir réinitialiser toute la planification ? Cette action ne peut pas être annulée.
+                  Toute votre progression actuelle sera perdue. Cette action est irréversible.
                 </p>
               </div>
 
-              <div className="flex gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <Button
                   onClick={handleResetCancel}
                   variant="secondary"
                   size="lg"
-                  className="flex-1"
+                  className="w-full"
                 >
                   Annuler
                 </Button>
@@ -358,9 +355,9 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
                   onClick={handleResetConfirm}
                   variant="danger"
                   size="lg"
-                  className="flex-1"
+                  className="w-full"
                 >
-                  Réinitialiser
+                  Confirmer
                 </Button>
               </div>
             </div>
@@ -368,11 +365,11 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
         )}
 
         {(error || (successMessage && !visualSelectionMode)) && (
-          <div className={`max-w-3xl mx-auto space-y-3 mb-6 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
+          <div className={`max-w-3xl mx-auto space-y-4 mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
             {error && (
               <FeedbackBanner
                 tone="error"
-                title="Action requise"
+                title="Attention"
                 message={error}
               />
             )}
@@ -380,54 +377,54 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
             {successMessage && !visualSelectionMode && (
               <FeedbackBanner
                 tone="success"
-                title="C’est enregistré"
+                title="Succès"
                 message={successMessage}
               />
             )}
           </div>
         )}
 
-        {/* Bannière d'instruction pour le mode sélection visuelle - juste au-dessus du calendrier */}
+        {/* Bannière d'instruction pour le mode sélection visuelle */}
         {visualSelectionMode && selectionStep !== 'idle' && (
-          <div className="mb-4 max-w-3xl mx-auto animate-slide-up">
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5 shadow-lg">
-              <div className="flex items-center gap-3">
+          <div className="mb-6 max-w-3xl mx-auto animate-fade-in-up sticky top-24 z-30">
+            <div className="rounded-2xl border border-brand-200 bg-brand-50/90 backdrop-blur-md p-5 shadow-glass">
+              <div className="flex items-center gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                  <div className="w-12 h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-brand-500/30">
                     {selectionStep === 'selecting-start' ? '1' : '2'}
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-base sm:text-lg font-bold text-emerald-900 mb-1">
+                  <h4 className="text-lg font-bold text-brand-900 mb-1 font-display">
                     {selectionStep === 'selecting-start'
-                      ? '📍 Cliquez sur la date de DÉBUT'
-                      : '📍 Cliquez sur la date de FIN'}
+                      ? 'Sélectionnez le DÉBUT'
+                      : 'Sélectionnez la FIN'}
                   </h4>
-                  <p className="text-sm sm:text-base text-emerald-800">
+                  <p className="text-sm text-brand-700 font-medium">
                     {selectionStep === 'selecting-start'
-                      ? 'Choisissez le premier jour de votre première période'
-                      : `Choisissez le dernier jour (min. 5 jours)`}
+                      ? 'Cliquez sur la première date de votre période'
+                      : `Cliquez sur la dernière date (min. 5 jours)`}
                   </p>
                   {selectionStartDate && selectionStep === 'selecting-end' && (
-                    <div className="mt-2 p-2 bg-white/60 rounded-lg border border-emerald-200 animate-scale-in">
-                      <p className="text-sm font-semibold text-emerald-900">
-                        ✓ Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                      </p>
+                    <div className="mt-2 inline-flex px-3 py-1 bg-white rounded-lg text-xs font-bold text-brand-700 shadow-sm">
+                      Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                     </div>
                   )}
                 </div>
-                <button
+                <Button
                   onClick={handleCancelVisualSelection}
-                  className="flex-shrink-0 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition-apple-smooth hover:shadow-md border border-slate-200 active:scale-95"
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white hover:bg-white shadow-sm"
                 >
                   Annuler
-                </button>
+                </Button>
               </div>
             </div>
           </div>
         )}
 
-        <div ref={calendarRef} className="mb-6 sm:mb-8 max-w-3xl mx-auto scroll-mt-20" id="calendar">
+        <div ref={calendarRef} className="mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28" id="calendar">
           <Calendar
             birthDate={birthDate}
             onSelectBirthDate={handleSelectBirthDate}
@@ -442,31 +439,29 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
         </div>
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
-          <div ref={planningRef} className={`max-w-3xl mx-auto mb-6 sm:mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'} scroll-mt-20`}>
-            <div className={`bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg ${isCoarsePointer ? '' : 'transition-apple-smooth'}`}>
-              <div className="text-center mb-6 sm:mb-8">
-                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-100 text-teal-900 mb-3 sm:mb-4 shadow-sm">
-                  <span className="text-2xl sm:text-3xl" aria-label="calendrier" aria-hidden="true">
-                    📅
-                  </span>
+          <div ref={planningRef} className={`max-w-3xl mx-auto mb-8 sm:mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'} scroll-mt-28`}>
+            <div className={`bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-8 shadow-soft ${isCoarsePointer ? '' : 'transition-all duration-500'}`}>
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mb-4">
+                  <span className="text-3xl">📅</span>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
-                  Planifiez vos {totalFractionableDays} jours restants
+                <h3 className="text-2xl font-bold font-display text-slate-900 mb-2">
+                  Planifiez vos {totalFractionableDays} jours
                 </h3>
-                <p className="text-slate-600 text-base px-4 leading-relaxed">
-                  Cliquez sur une date dans le calendrier pour placer vos {totalFractionableDays} jours automatiquement
+                <p className="text-slate-500 text-lg max-w-md mx-auto leading-relaxed">
+                  Cliquez sur une date pour placer vos jours automatiquement, ou choisissez une méthode personnalisée.
                 </p>
               </div>
 
               {/* Mode personnalisé toggle */}
-              <div className="bg-white border border-teal-200 rounded-2xl p-5 sm:p-6 mb-4">
-                <div className="flex items-center justify-between mb-3">
+              <div className="group bg-slate-50 hover:bg-brand-50/50 border border-slate-200 hover:border-brand-200 rounded-2xl p-6 mb-6 transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex-1">
-                    <h4 className="text-base font-bold text-teal-900 mb-1">
+                    <h4 className="text-lg font-bold text-slate-900 group-hover:text-brand-900 mb-1 font-display">
                       Mode personnalisé
                     </h4>
-                    <p className="text-base text-teal-900 leading-relaxed">
-                      Choisissez vous-même où placer vos 2 périodes (min. 5j chacune)
+                    <p className="text-sm text-slate-600 group-hover:text-brand-700 leading-relaxed">
+                      Définissez vous-même la durée de vos périodes (min. 5j)
                     </p>
                   </div>
                   <Button
@@ -476,22 +471,23 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
                     }}
                     variant="primary"
                     size="md"
-                    className="flex-shrink-0 ml-4"
+                    className="flex-shrink-0 ml-4 shadow-none bg-slate-900 hover:bg-brand-600"
                   >
                     Activer
                   </Button>
                 </div>
 
                 {/* Prévisualisation */}
-                <div className="bg-white/90 rounded-xl p-3 sm:p-4">
-                  <p className="text-sm text-slate-600 mb-2 text-center">
-                    Répartition par défaut : {customFirstBlockDays}j + {secondBlockDays}j
-                  </p>
+                <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                  <div className="flex gap-3 mb-2 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
+                    <span className="flex-1">Période 1</span>
+                    <span className="flex-1">Période 2</span>
+                  </div>
                   <div className="flex gap-2">
-                    <div className="flex-1 h-8 sm:h-10 bg-teal-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
+                    <div className="flex-1 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 font-bold text-sm border border-slate-200">
                       {customFirstBlockDays} jours
                     </div>
-                    <div className="flex-1 h-8 sm:h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm">
+                    <div className="flex-1 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 font-bold text-sm border border-slate-200">
                       {secondBlockDays} jours
                     </div>
                   </div>
@@ -499,9 +495,9 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
               </div>
 
               {/* Instructions simples */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
-                <p className="text-sm text-slate-700 font-medium">
-                  💡 <span className="font-semibold">Mode simple</span> : 1 clic sur le calendrier = {totalFractionableDays} jours placés d'un coup
+              <div className="text-center">
+                <p className="text-sm text-slate-400 font-medium">
+                  💡 <span className="text-slate-700">Mode simple</span> : 1 clic = {totalFractionableDays} jours consécutifs
                 </p>
               </div>
             </div>
@@ -510,146 +506,136 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
         {/* Mode personnalisé actif */}
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && customMode && !visualSelectionMode && (
-          <div ref={customModeRef} className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-spring-in scroll-mt-20">
-            <div className="bg-white rounded-2xl sm:rounded-3xl border border-teal-200 p-6 sm:p-8 shadow-lg">
-              <div className="flex items-start gap-4 mb-6">
+          <div ref={customModeRef} className="max-w-3xl mx-auto mb-8 sm:mb-12 animate-fade-in-up scroll-mt-28">
+            <div className="bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-8 shadow-xl shadow-slate-200/50">
+              <div className="flex items-start gap-5 mb-8">
                 <div className="flex-shrink-0">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-md">
-                    <span aria-hidden="true" aria-label="personnalisation">⚙️</span>
+                  <div className="w-16 h-16 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-brand-600/30">
+                    <span aria-hidden="true">⚙️</span>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-teal-900 mb-2">
+                  <h3 className="text-2xl font-bold font-display text-slate-900 mb-2">
                     Mode personnalisé
                   </h3>
-                  <p className="text-base text-teal-800 mb-4 leading-relaxed">
+                  <p className="text-lg text-slate-500 font-medium">
                     Choisissez votre méthode de sélection
                   </p>
                 </div>
               </div>
 
-              {/* Deux options : Slider ou Sélection visuelle */}
-              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+              <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
                 {/* Option 1 : Avec Slider */}
-                <div className="bg-white rounded-2xl p-5 border border-teal-200 hover:border-teal-400 transition-colors">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-900 flex items-center justify-center text-xl flex-shrink-0">
-                      <span aria-hidden="true" aria-label="curseur">🎚️</span>
+                <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-white text-slate-700 border border-slate-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                      <span aria-hidden="true">🎚️</span>
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900">Avec curseur</h4>
-                      <p className="text-sm text-slate-600">Ajustez puis placez</p>
+                      <h4 className="text-base font-bold text-slate-900">Curseur</h4>
+                      <p className="text-xs font-bold uppercase text-slate-400 tracking-wider">Simple & Rapide</p>
                     </div>
                   </div>
-                  <p className="text-sm text-slate-600 mb-3 leading-relaxed">
-                    Utilisez le curseur pour choisir la répartition, puis cliquez 2 fois sur le calendrier
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    Ajustez la répartition avec le curseur ci-dessous, puis cliquez sur le calendrier.
                   </p>
                 </div>
 
                 {/* Option 2 : Sélection visuelle */}
-                <div className="bg-white rounded-2xl p-5 border border-emerald-200 hover:border-emerald-400 transition-colors">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl flex-shrink-0">
-                      <span aria-hidden="true" aria-label="clic">👆</span>
+                <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group relative overflow-hidden">
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                        <span aria-hidden="true">👆</span>
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-slate-900">Sélection directe</h4>
+                        <p className="text-xs font-bold uppercase text-brand-500 tracking-wider">Précis</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">Sélection directe</h4>
-                      <p className="text-sm text-slate-600">Cliquez début + fin</p>
-                    </div>
+                    <p className="text-sm text-slate-600 mb-5 leading-relaxed">
+                      Sélectionnez manuellement vos dates de début et de fin sur le calendrier.
+                    </p>
+                    <Button
+                      onClick={handleStartVisualSelection}
+                      variant="primary"
+                      size="sm"
+                      fullWidth
+                      className="shadow-none"
+                    >
+                      Commencer
+                    </Button>
                   </div>
-                  <p className="text-sm text-slate-600 mb-3 leading-relaxed">
-                    Cliquez sur la date de début, puis sur la date de fin de votre 1ère période
-                  </p>
-                  <Button
-                    onClick={handleStartVisualSelection}
-                    variant="primary"
-                    size="sm"
-                    fullWidth
-                    className="bg-emerald-600 hover:bg-emerald-700"
-                  >
-                    Utiliser ce mode
-                  </Button>
                 </div>
               </div>
 
               {/* Slider personnalisé */}
-              <div className="bg-white rounded-2xl p-5 sm:p-6 mb-4 shadow-md">
-                <div className="text-center mb-4">
-                  <p className="text-sm font-semibold text-slate-700 mb-3">
-                    Choisissez la répartition de vos {totalFractionableDays} jours
+              <div className="bg-slate-50 rounded-3xl p-6 sm:p-8 mb-6 border border-slate-100">
+                <div className="text-center mb-8">
+                  <p className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">
+                    Répartition des jours
                   </p>
-                  <div className="flex gap-2 justify-center items-center mb-3">
-                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-teal-600 text-white shadow-md">
-                      <div className="text-center">
-                        <div className="text-2xl sm:text-3xl font-bold">{customFirstBlockDays}</div>
-                        <div className="text-[10px] text-white/90">jours</div>
+                  <div className="flex gap-4 justify-center items-center">
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-600/20 flex items-center justify-center text-3xl font-bold font-display mb-2">
+                        {customFirstBlockDays}
                       </div>
+                      <span className="text-xs font-bold text-brand-700 uppercase">Période 1</span>
                     </div>
-                    <div className="text-2xl text-slate-400 font-bold">+</div>
-                    <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-emerald-600 text-white shadow-md">
-                      <div className="text-center">
-                        <div className="text-2xl sm:text-3xl font-bold">{secondBlockDays}</div>
-                        <div className="text-[10px] text-white/90">jours</div>
+                    <div className="text-2xl text-slate-300 font-light">+</div>
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 flex items-center justify-center text-3xl font-bold font-display mb-2">
+                        {secondBlockDays}
                       </div>
+                      <span className="text-xs font-bold text-emerald-600 uppercase">Période 2</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Barre visuelle */}
-                <div className="flex gap-2 mb-4">
+                <div className="h-4 bg-slate-200 rounded-full overflow-hidden mb-6 flex">
                   <div
-                    className="h-12 rounded-lg bg-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                    style={{
-                      width: `${(customFirstBlockDays / totalFractionableDays) * 100}%`
-                    }}
-                  >
-                    Période 1
-                  </div>
+                    className="h-full bg-brand-500 transition-all duration-300 ease-out"
+                    style={{ width: `${(customFirstBlockDays / totalFractionableDays) * 100}%` }}
+                  />
                   <div
-                    className="h-12 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all"
-                    style={{
-                      width: `${(secondBlockDays / totalFractionableDays) * 100}%`
-                    }}
-                  >
-                    Période 2
-                  </div>
+                    className="h-full bg-emerald-500 transition-all duration-300 ease-out"
+                    style={{ width: `${(secondBlockDays / totalFractionableDays) * 100}%` }}
+                  />
                 </div>
 
                 {/* Slider */}
-                <input
-                  type="range"
-                  min="5"
-                  max={sliderMax}
-                  value={customFirstBlockDays}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomFirstBlockDays(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb mb-2"
-                />
-                <p className="text-sm text-slate-500 text-center">
-                  Déplacez le curseur • Minimum 5 jours par période
+                <div className="relative h-12 flex items-center">
+                  <input
+                    type="range"
+                    min="5"
+                    max={sliderMax}
+                    value={customFirstBlockDays}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomFirstBlockDays(Number(e.target.value))}
+                    className="w-full absolute z-20 opacity-0 cursor-pointer h-full"
+                  />
+                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                     <div
+                        className="h-full bg-slate-300"
+                        style={{ width: `${((customFirstBlockDays - 5) / (sliderMax - 5)) * 100}%` }}
+                     />
+                  </div>
+                  <div
+                    className="absolute h-8 w-8 bg-white border-4 border-brand-500 rounded-full shadow-lg pointer-events-none transition-all duration-75"
+                    style={{ left: `calc(${((customFirstBlockDays - 5) / (sliderMax - 5)) * 100}% - 16px)` }}
+                  />
+                </div>
+                <p className="text-xs text-center text-slate-400 font-medium mt-2">
+                  Glissez pour ajuster (min. 5 jours par période)
                 </p>
-              </div>
-
-              {/* Instructions et boutons */}
-              <div className="bg-white/60 rounded-xl p-4 mb-4 border-2 border-teal-200">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
-                  <p className="text-sm text-teal-900 font-medium">
-                    Cliquez sur le calendrier pour placer le 1er bloc de <span className="font-bold">{customFirstBlockDays} jours</span>
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
-                  <p className="text-sm text-emerald-900 font-medium">
-                    Puis cliquez à nouveau pour placer le 2ème bloc de <span className="font-bold">{secondBlockDays} jours</span>
-                  </p>
-                </div>
               </div>
 
               <Button
                 onClick={() => setCustomMode(false)}
-                variant="outline"
+                variant="ghost"
                 size="lg"
                 fullWidth
+                className="text-slate-500 hover:text-slate-800"
               >
                 Annuler et revenir au mode simple
               </Button>
@@ -660,18 +646,18 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
         {/* Message pendant le placement personnalisé */}
         {customMode && remainingBlocks.length === 1 && !visualSelectionMode && (
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 animate-slide-up">
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-lg">
+          <div className="max-w-3xl mx-auto mb-8 sm:mb-12 animate-fade-in-up sticky top-24 z-30">
+             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/90 backdrop-blur-md p-5 shadow-glass">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-md flex-shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-emerald-500/30 flex-shrink-0">
                   2
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-lg sm:text-xl font-bold text-emerald-900 mb-1">
-                    Placez maintenant le second bloc
+                  <h4 className="text-lg font-bold text-emerald-900 mb-1 font-display">
+                    Dernière étape
                   </h4>
-                  <p className="text-sm text-emerald-800">
-                    Cliquez sur une date dans le calendrier pour placer les {secondBlockDays} jours restants
+                  <p className="text-emerald-800 font-medium">
+                    Cliquez sur une date pour placer les <span className="font-bold">{secondBlockDays} jours restants</span>
                   </p>
                 </div>
               </div>
@@ -681,22 +667,23 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
         {/* Bouton Effacer tous les blocs */}
         {remainingBlocks.length > 0 && (
-          <div className={`max-w-3xl mx-auto mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
+          <div className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
             <Button
               onClick={handleClearAllBlocks}
               variant="outline"
               size="md"
               fullWidth
-              className="bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 border-red-200 hover:border-red-300"
+              className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
             >
-              🗑️ Effacer tous les blocs et recommencer
+              <span className="group-hover:scale-110 transition-transform duration-300 mr-2">🗑️</span>
+              Recommencer la planification
             </Button>
           </div>
         )}
 
         {birthDate && (
           <>
-            <div className={`max-w-3xl mx-auto mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'}`} id="summary">
+            <div className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'}`} id="summary">
               <Summary
                 birthDate={birthDate}
                 employerPeriod={employerPeriod}
@@ -709,7 +696,7 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
             </div>
 
             {mandatoryPeriod && (
-              <div ref={letterRef} className={`max-w-3xl mx-auto mb-8 ${isCoarsePointer ? '' : 'animate-fade-in-delay'}`} id="letter">
+              <div ref={letterRef} className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in-delay'}`} id="letter">
                 <LetterGenerator
                   birthDate={birthDate}
                   mandatoryPeriod={mandatoryPeriod}
@@ -720,44 +707,51 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
           </>
         )}
 
-
-        {birthDate && (
-          <div className="text-center mt-8 max-w-3xl mx-auto animate-fade-in-delay">
-            <Button
-              onClick={handleResetRequest}
-              variant="secondary"
-              size="md"
-              icon={RotateCcw}
-              iconPosition="left"
-              className="mx-auto"
-            >
-              Réinitialiser
-            </Button>
-          </div>
-        )}
-
-          <div className="mt-16 max-w-3xl mx-auto mb-12" id="legal">
+          <div className="mt-24 max-w-3xl mx-auto mb-16" id="legal">
             <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
           </div>
         </div>
       </main>
-      <footer className="bg-white/80 border-t border-slate-200 backdrop-blur-sm">
-        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
-            <p className="text-slate-600 font-medium">
-              © {currentYear} Congé Paternité
+      <footer className="bg-white border-t border-slate-100 py-8 relative z-10">
+        <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center gap-6">
+          
+          {/* Logo & Tagline */}
+          <div>
+            <p className="text-slate-900 font-bold font-display text-lg">
+              Congé Paternité
             </p>
-            <p className="text-xs text-slate-500">
-              Informations basées sur la législation française en vigueur.
+            <p className="text-sm text-slate-500">
+              Simplifiez vos démarches administratives.
             </p>
           </div>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="px-4 py-2 text-sm font-semibold text-teal-900 hover:text-teal-900 transition-colors inline-flex items-center justify-center gap-2 hover:bg-teal-50 rounded-lg"
-            aria-label="Retourner au haut de la page"
-          >
-            ↑ Retour au haut
-          </button>
+
+          {/* Signature Badge */}
+          <div className="flex items-center gap-2 px-5 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm transition-transform hover:scale-105 hover:bg-white">
+            <span className="text-xs text-slate-500 font-medium">Made with</span>
+            <span className="text-red-500 animate-pulse-heart text-sm">❤️</span>
+            <span className="text-xs text-slate-500 font-medium">by</span>
+            <a
+              href="https://www.linkedin.com/in/hedi-a-2382551a1/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-slate-800 hover:text-brand-600 transition-colors flex items-center gap-1.5"
+            >
+              <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" aria-hidden="true" />
+              Hedi ACHACHE
+            </a>
+          </div>
+          
+          {/* Copyright & Back to top */}
+          <div className="flex items-center gap-4 text-xs text-slate-400 font-medium">
+            <span>© {currentYear}</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hover:text-brand-600 transition-colors"
+            >
+              Remonter ↑
+            </button>
+          </div>
         </div>
       </footer>
     </div>

@@ -74,143 +74,122 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks }:
   };
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg transition-apple-smooth">
-      <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-slate-900 text-white">
-          <Mail className="w-5 h-5" />
+    <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-soft transition-all duration-300">
+      <h2 className="text-2xl font-bold font-display text-slate-900 mb-8 flex items-center gap-4">
+        <div className="p-3 rounded-2xl bg-slate-900 text-white shadow-lg shadow-slate-900/20">
+          <Mail className="w-6 h-6" />
         </div>
         Courrier de demande
       </h2>
 
-      <div className="space-y-4 mb-6">
-        <p className="text-sm text-slate-500 leading-relaxed">* Champs obligatoires avant génération du courrier</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <div className="space-y-8">
+        {/* Formulaire */}
+        <div className="space-y-6">
+          <p className="text-sm text-slate-500 font-medium">* Remplissez ces champs pour personnaliser le modèle</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Lieu</label>
+              <input
+                type="text"
+                value={lieu}
+                onChange={(e) => setLieu(e.target.value)}
+                placeholder="Paris"
+                className="input-modern w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Date de rédaction</label>
+              <input
+                type="text"
+                value={dateRedaction}
+                onChange={(e) => setDateRedaction(e.target.value)}
+                placeholder="01/01/2024"
+                className="input-modern w-full"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Prénom</label>
+              <input
+                type="text"
+                value={prenom}
+                onChange={(e) => setPrenom(e.target.value)}
+                placeholder="Jean"
+                className="input-modern w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nom</label>
+              <input
+                type="text"
+                value={nom}
+                onChange={(e) => setNom(e.target.value)}
+                placeholder="Dupont"
+                className="input-modern w-full"
+              />
+            </div>
+          </div>
+
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Lieu <span className="text-red-500" aria-hidden="true">*</span>
-            </label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Adresse</label>
             <input
               type="text"
-              value={lieu}
-              onChange={(e) => setLieu(e.target.value)}
-              placeholder="Paris"
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
-              aria-required="true"
-              required
+              value={adresse}
+              onChange={(e) => setAdresse(e.target.value)}
+              placeholder="123 Rue de la République, 75001 Paris"
+              className="input-modern w-full"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Date de rédaction <span className="text-red-500" aria-hidden="true">*</span>
-            </label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Fonction</label>
             <input
               type="text"
-              value={dateRedaction}
-              onChange={(e) => setDateRedaction(e.target.value)}
-              placeholder="01/01/2024"
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
-              aria-required="true"
-              required
+              value={fonction}
+              onChange={(e) => setFonction(e.target.value)}
+              placeholder="Développeur"
+              className="input-modern w-full"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Prénom <span className="text-red-500" aria-hidden="true">*</span>
-            </label>
-            <input
-              type="text"
-              value={prenom}
-              onChange={(e) => setPrenom(e.target.value)}
-              placeholder="Jean"
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
-              aria-required="true"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Nom <span className="text-red-500" aria-hidden="true">*</span>
-            </label>
-            <input
-              type="text"
-              value={nom}
-              onChange={(e) => setNom(e.target.value)}
-              placeholder="Dupont"
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
-              aria-required="true"
-              required
-            />
+        {/* Prévisualisation "Papier" */}
+        <div className="mt-8">
+          <div className="bg-slate-100 rounded-3xl p-4 sm:p-8 border border-slate-200/60 shadow-inner">
+            <div className="bg-white rounded-xl shadow-xl shadow-slate-300/20 p-8 sm:p-12 min-h-[400px] flex flex-col text-slate-800 text-sm sm:text-base font-serif leading-relaxed relative overflow-hidden max-w-3xl mx-auto">
+              {/* Grain texture overlay (subtle) */}
+              <div className="absolute inset-0 bg-slate-50 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")' }}></div>
+              
+              <div className="relative z-10 whitespace-pre-line">
+                {baseLetter}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">
-            Adresse <span className="text-red-500" aria-hidden="true">*</span>
-          </label>
-          <input
-            type="text"
-            value={adresse}
-            onChange={(e) => setAdresse(e.target.value)}
-            placeholder="123 Rue de la République, 75001 Paris"
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
-            aria-required="true"
-            required
-          />
-        </div>
+        {copyError && (
+          <div className="p-4 rounded-xl border border-red-300 bg-red-50 animate-fade-in">
+            <p className="text-sm text-red-800 font-medium">
+              ❌ Impossible de copier. Sélectionnez le texte manuellement.
+            </p>
+          </div>
+        )}
 
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">
-            Fonction <span className="text-red-500" aria-hidden="true">*</span>
-          </label>
-          <input
-            type="text"
-            value={fonction}
-            onChange={(e) => setFonction(e.target.value)}
-            placeholder="Développeur"
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-apple-smooth hover:border-slate-400"
-            aria-required="true"
-            required
-          />
-        </div>
+        <Button
+          onClick={handleCopy}
+          variant="primary"
+          size="lg"
+          fullWidth
+          icon={copied ? Check : Copy}
+          iconPosition="left"
+          className={`shadow-xl transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-1'}`}
+        >
+          {copied ? 'Courrier copié !' : 'Copier le courrier'}
+        </Button>
       </div>
-
-      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 mb-6">
-        <div className="mb-3">
-          <p className="text-sm font-semibold text-slate-700">Lettre générée</p>
-        </div>
-        <textarea
-          value={baseLetter}
-          readOnly
-          className="w-full h-64 resize-vertical rounded-xl border-2 border-slate-300 bg-slate-50 px-4 py-3 font-mono text-base text-slate-800 leading-relaxed cursor-default"
-          aria-label="Lettre à envoyer"
-        />
-        <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-          Lettre générée automatiquement. Cliquez sur "Copier le courrier" puis collez-la dans votre éditeur pour la modifier si besoin.
-        </p>
-      </div>
-
-      {copyError && (
-        <div className="mb-4 p-4 rounded-xl border border-red-300 bg-red-50 animate-fade-in">
-          <p className="text-sm text-red-800 font-medium">
-            ❌ Impossible de copier le courrier. Veuillez le sélectionner manuellement et utiliser Ctrl+C (ou Cmd+C sur Mac).
-          </p>
-        </div>
-      )}
-
-      <Button
-        onClick={handleCopy}
-        variant="primary"
-        size="lg"
-        fullWidth
-        icon={copied ? Check : Copy}
-        iconPosition="left"
-        className="bg-slate-900 hover:bg-slate-800"
-      >
-        {copied ? 'Copié !' : 'Copier le courrier'}
-      </Button>
     </div>
   );
 }
