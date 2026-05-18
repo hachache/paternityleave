@@ -132,9 +132,10 @@ export function usePaternityPlanning() {
 
   const planningStep = useMemo(() => {
     if (!birthDate) return 1;
-    if (totalPlannedDays >= totalFractionableDays) return 3;
-    return 2;
-  }, [birthDate, totalFractionableDays, totalPlannedDays]);
+    if (!mandatoryPeriod) return 2;
+    if (totalPlannedDays >= totalFractionableDays) return 4;
+    return 3;
+  }, [birthDate, mandatoryPeriod, totalFractionableDays, totalPlannedDays]);
 
   const selectBirthDate = (date: Date) => {
     const normalized = startOfDay(date);

@@ -15,6 +15,7 @@ import { CalendarLegend } from './components/CalendarLegend';
 import { SectionCard } from './components/SectionCard';
 import { NextStepsCard } from './components/NextStepsCard';
 import { NavigationAnchor } from './components/NavigationAnchor';
+import { PostPlanningNavBar } from './components/PostPlanningNavBar';
 import { ScenarioSelector } from './components/ScenarioSelector';
 import { SupplementaryLeaveCard } from './components/SupplementaryLeaveCard';
 import { Button } from './components/Button';
@@ -80,6 +81,11 @@ function App() {
   const currentYear = new Date().getFullYear();
   const secondBlockDays = Math.max(totalFractionableDays - customFirstBlockDays, 0);
   const sliderMax = Math.max(5, totalFractionableDays - 5);
+  const isEligibleForSupplementaryLeave = supplementaryLeaveEligibility.isEligibleBirthDate;
+  const supplementaryLeaveConfigured =
+    supplementaryLeaveEnabled &&
+    supplementaryLeavePeriods.length > 0 &&
+    !supplementaryLeaveError;
 
   const {
     calendarRef,
@@ -169,6 +175,16 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleGoToSupplementaryLeave = () => {
+    hideCelebration();
+    scheduleSmoothScroll(supplementaryLeaveRef);
+  };
+
+  const handleGoToLetter = () => {
+    hideCelebration();
+    scheduleSmoothScroll(letterRef);
+  };
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [showLegalReferences]);
@@ -217,7 +233,10 @@ function App() {
 
           <ScrollIndicator show={birthDate !== null} />
 
-          <NavigationAnchor show={birthDate !== null && hasScrolledPastStart} />
+          <NavigationAnchor
+            show={birthDate !== null && hasScrolledPastStart}
+            showSupplementaryLink={isPaternityPlanComplete && isEligibleForSupplementaryLeave}
+          />
 
           <div className="max-w-3xl mx-auto mb-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             <SectionCard
@@ -245,13 +264,16 @@ function App() {
               accent="slate"
             >
               <NextStepsCard
-              planningStep={planningStep}
-              totalPlannedDays={totalPlannedDays}
-              hasBirthDate={Boolean(birthDate)}
-              hasMandatory={Boolean(mandatoryPeriod)}
-              remainingBlocks={remainingBlocks.length}
-              fractionableDays={totalFractionableDays}
-            />
+                planningStep={planningStep}
+                totalPlannedDays={totalPlannedDays}
+                hasBirthDate={Boolean(birthDate)}
+                hasMandatory={Boolean(mandatoryPeriod)}
+                remainingBlocks={remainingBlocks.length}
+                fractionableDays={totalFractionableDays}
+                isEligibleForSupplementaryLeave={isEligibleForSupplementaryLeave}
+                supplementaryLeaveConfigured={supplementaryLeaveConfigured}
+                supplementaryLeaveActivationHint={supplementaryLeaveEligibility.reason}
+              />
           </SectionCard>
         </div>
 
@@ -262,6 +284,9 @@ function App() {
             schedulePostPlanningScroll();
           }}
           totalFractionableDays={totalFractionableDays}
+          showSupplementaryAction={isEligibleForSupplementaryLeave}
+          onGoToSupplementary={handleGoToSupplementaryLeave}
+          onGoToLetter={handleGoToLetter}
         />
 
         <ResetConfirmDialog
@@ -636,6 +661,10 @@ function App() {
               Recommencer la planification
             </Button>
           </div>
+        )}
+
+        {isPaternityPlanComplete && (
+          <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
         )}
 
         {birthDate && isPaternityPlanComplete && (

@@ -3,19 +3,31 @@ import { useMediaQuery } from '../hooks/useMediaQuery';
 
 interface NavigationAnchorProps {
   show: boolean;
+  showSupplementaryLink?: boolean;
 }
 
-export function NavigationAnchor({ show }: NavigationAnchorProps) {
+export function NavigationAnchor({ show, showSupplementaryLink = false }: NavigationAnchorProps) {
   const [activeSection, setActiveSection] = useState<string>('calendar');
   const isMobile = useMediaQuery('(max-width: 767px)');
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const sections = useMemo(() => [
-    { id: 'calendar', label: '📅 Calendrier', shortLabel: '📅' },
-    { id: 'summary', label: '📊 Résumé', shortLabel: '📊' },
-    { id: 'letter', label: '📬 Lettre', shortLabel: '📬' },
-    { id: 'legal', label: '⚖️ Légal', shortLabel: '⚖️' }
-  ] as const, []);
+  const sections = useMemo(() => {
+    const items = [
+      { id: 'calendar', label: '📅 Calendrier', shortLabel: '📅' },
+      { id: 'summary', label: '📊 Résumé', shortLabel: '📊' }
+    ] as Array<{ id: string; label: string; shortLabel: string }>;
+
+    if (showSupplementaryLink) {
+      items.push({ id: 'conge-supplementaire', label: '✨ Congé 2026', shortLabel: '✨' });
+    }
+
+    items.push(
+      { id: 'letter', label: '📬 Courrier', shortLabel: '📬' },
+      { id: 'legal', label: '⚖️ Légal', shortLabel: '⚖️' }
+    );
+
+    return items;
+  }, [showSupplementaryLink]);
 
   const detectActiveSection = useCallback(() => {
     // Fallback for environments without IntersectionObserver
