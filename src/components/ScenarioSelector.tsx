@@ -32,44 +32,36 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             role="radio"
             aria-checked={isSelected}
             onClick={() => onScenarioChange(config.id)}
-            className={`group relative rounded-3xl p-6 text-left transition-all duration-300 h-full flex flex-col border-2 ${
+            className={`group relative rounded-3xl p-6 text-left transition-all duration-300 h-full flex flex-col border ${
               isSelected
-                ? 'border-brand-500 bg-brand-50/50 shadow-lg shadow-brand-500/10'
-                : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
+                ? 'border-black bg-[#f5f5f7]'
+                : 'border-black/10 bg-white hover:border-black/30'
             }`}
           >
-            {/* Selection Indicator */}
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-500'}`}>
-                    {config.label}
-                  </p>
-                  {config.id === 'standard' && (
-                    <span className="text-brand-500 font-hand font-bold text-lg -rotate-6 -mt-3 animate-pulse-subtle">Le plus courant !</span>
-                  )}
-                </div>
-                <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">{config.description}</p>
+                <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isSelected ? 'text-[#1d1d1f]' : 'text-[#6e6e73]'}`}>
+                  {config.label}
+                </p>
+                <p className="text-base text-[#1d1d1f] font-medium leading-relaxed">{config.description}</p>
               </div>
               <div
-                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
-                  isSelected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-200 group-hover:border-brand-300'
+                className={`flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center transition-colors duration-300 ${
+                  isSelected ? 'border-black bg-black text-white' : 'border-black/20'
                 }`}
               >
-                {isSelected && <span className="text-xs font-bold">✓</span>}
+                {isSelected && <span className="text-xs font-semibold">✓</span>}
               </div>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-slate-100/50 grid sm:grid-cols-2 gap-3">
-              <div className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
-                <p className="font-bold text-slate-900 text-sm">{details.totalText}</p>
-                {details.bonusText && (
-                  <p className="text-xs font-bold text-emerald-600 mt-0.5">{details.bonusText}</p>
-                )}
+            <div className="mt-auto pt-4 border-t border-black/10 grid sm:grid-cols-2 gap-3">
+              <div className="rounded-xl p-3 bg-white border border-black/10">
+                <p className="font-semibold text-[#1d1d1f] text-sm">{details.totalText}</p>
+                {details.bonusText && <p className="text-xs font-semibold text-[#0071e3] mt-0.5">{details.bonusText}</p>}
               </div>
-              <div className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
-                <p className="font-bold text-slate-900 text-sm">{details.limitText}</p>
-                <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide">2 périodes min.</p>
+              <div className="rounded-xl p-3 bg-white border border-black/10">
+                <p className="font-semibold text-[#1d1d1f] text-sm">{details.limitText}</p>
+                <p className="text-[10px] text-[#6e6e73] mt-0.5 font-medium uppercase tracking-wide">2 périodes min.</p>
               </div>
             </div>
           </button>

@@ -5,7 +5,7 @@ export interface LeaveBlock {
   start: Date;
   end: Date;
   days: number;
-  type: 'employer' | 'mandatory' | 'remaining';
+  type: 'employer' | 'mandatory' | 'remaining' | 'supplementary';
   workingDatesOnly?: Date[]; // Pour la période employeur : stocke uniquement les jours ouvrés
 }
 

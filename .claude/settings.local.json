@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nRefonte majeure de l''UX/UI avec système de placement interactif\n\n✨ Nouvelles fonctionnalités :\n- Mode placement interactif en 2 étapes pour le split des 21 jours\n- Interface visuelle avec 2 grandes cartes de choix (21j d''un coup vs 2 périodes)\n- Slider avec prévisualisation en temps réel de la répartition\n- Bannières d''instructions contextuelles à chaque étape du placement\n- Système de state management robuste (idle/placing-first/placing-second)\n\n📱 Responsive & Mobile :\n- Calendrier entièrement responsive (gap-1 mobile → gap-4 desktop)\n- Tailles adaptatives pour tous les éléments (textes, boutons, icônes)\n- Optimisation tactile avec touch-manipulation\n- Support iOS avec suppression du highlight bleu\n- Media queries pour différencier hover/touch\n\n🎨 Améliorations visuelles :\n- Design Apple-like cohérent avec gradients et shadows\n- Animations smooth et transitions fluides\n- Feedback visuel à chaque interaction\n- Messages d''aide contextuels et clairs\n- Cartes avec hover effects et bordures colorées\n\n🔧 Technique :\n- Code TypeScript propre avec typage explicite\n- Build optimisé : 35.41 kB CSS + 209.70 kB JS\n- Aucune erreur de compilation\n- Production-ready\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFeature: Système de placement ultra-intuitif des 21 jours\n\n✨ Nouvelle expérience utilisateur simplifiée :\n\nMode Simple (par défaut) :\n- 1 seul clic sur le calendrier = placement automatique des 21 jours\n- Aucune configuration nécessaire\n- Instructions claires et centrées\n- Feedback immédiat avec message de succès\n\nMode Personnalisé :\n- Toggle \"Mode personnalisé\" avec prévisualisation\n- Slider interactif pour choisir la répartition (5-16j pour la 1ère période)\n- Visualisation en temps réel avec 2 grandes cartes colorées\n- Instructions numérotées étape par étape (1️⃣ puis 2️⃣)\n- 1er clic = placement du 1er bloc\n- 2ème clic = placement du 2ème bloc\n- Bannière animée pendant le placement du 2ème bloc\n- Possibilité d''annuler et revenir au mode simple\n\n🎨 Améliorations visuelles :\n- Interface épurée et centrée sur l''essentiel\n- Messages d''aide contextuels adaptés à chaque mode\n- Animations smooth entre les modes\n- Design responsive sur tous les écrans\n- Alignements parfaits des textes et éléments\n\n🔧 Technique :\n- State management robuste avec customMode\n- Gestion intelligente des 2 clics en mode personnalisé\n- Validation à chaque étape\n- Messages de succès personnalisés selon le mode\n- Code propre et maintenable\n\n💡 Philosophie :\n- Mode simple = zéro friction, 1 clic suffit\n- Mode personnalisé = contrôle total mais reste intuitif\n- Pas besoin de lire un manuel, l''interface se suffit à elle-même\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)",
+      "Bash(git pull:*)",
+      "Bash(npm install framer-motion)",
+      "Bash(git reset:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
