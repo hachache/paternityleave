@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar, CheckCircle2, Clock, Trash2 } from 'lucide-react';
 import { LeaveBlock, LeaveScenarioConfig, countCalendarDays } from '../utils/paternityLeave';
-import { SupplementaryLeaveDuration } from '../utils/supplementaryBirthLeave';
+import { SupplementaryLeaveDuration, SupplementaryLeaveMode } from '../utils/supplementaryBirthLeave';
 
 interface SummaryProps {
   birthDate: Date | null;
@@ -12,8 +12,9 @@ interface SummaryProps {
   onRemoveBlock: (index: number) => void;
   totalFractionableDays: number;
   scenario: LeaveScenarioConfig;
-  supplementaryLeavePeriod?: LeaveBlock | null;
+  supplementaryLeavePeriods?: LeaveBlock[];
   supplementaryLeaveDuration?: SupplementaryLeaveDuration;
+  supplementaryLeaveMode?: SupplementaryLeaveMode;
 }
 
 export function Summary({
@@ -24,8 +25,9 @@ export function Summary({
   onRemoveBlock,
   totalFractionableDays,
   scenario,
-  supplementaryLeavePeriod,
-  supplementaryLeaveDuration
+  supplementaryLeavePeriods,
+  supplementaryLeaveDuration,
+  supplementaryLeaveMode
 }: SummaryProps) {
   if (!birthDate) return null;
 
@@ -158,25 +160,43 @@ export function Summary({
             )}
           </div>
 
-          {supplementaryLeavePeriod && (
+          {supplementaryLeavePeriods && supplementaryLeavePeriods.length > 0 && (
             <div className="relative">
               <div className="absolute -left-[21px] top-1 h-4 w-4 rounded-full border-2 border-white bg-slate-900 shadow-sm" />
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Congé supplémentaire 2026
                 </p>
-                <span className="text-xs font-bold px-2 py-1 rounded-full bg-slate-900 text-white">
-                  {supplementaryLeaveDuration ?? 1} mois
-                </span>
-              </div>
-              <div className="flex gap-4 items-start p-4 rounded-xl bg-slate-900 text-white shadow-sm">
-                <div className="w-1 h-full bg-brand-300 rounded-full" />
-                <div>
-                  <p className="font-bold text-sm">Période complémentaire validée</p>
-                  <p className="text-xs text-slate-300 mt-1">
-                    Du {format(supplementaryLeavePeriod.start, 'd MMM', { locale: fr })} au {format(supplementaryLeavePeriod.end, 'd MMM yyyy', { locale: fr })}
-                  </p>
+                <div className="flex items-center gap-2">
+                  {supplementaryLeaveMode === 'split' && (
+                    <span className="text-xs font-bold px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                      2 × 1 mois
+                    </span>
+                  )}
+                  <span className="text-xs font-bold px-2 py-1 rounded-full bg-slate-900 text-white">
+                    {supplementaryLeaveDuration ?? 1} mois
+                  </span>
                 </div>
+              </div>
+              <div className="space-y-2">
+                {supplementaryLeavePeriods.map((entry, index) => (
+                  <div
+                    key={`${entry.start.getTime()}-${index}`}
+                    className="flex gap-4 items-start p-4 rounded-xl bg-slate-900 text-white shadow-sm"
+                  >
+                    <div className="w-1 h-full bg-brand-300 rounded-full" />
+                    <div>
+                      <p className="font-bold text-sm">
+                        {supplementaryLeavePeriods.length > 1
+                          ? `Période ${index + 1} (1 mois)`
+                          : 'Période complémentaire validée'}
+                      </p>
+                      <p className="text-xs text-slate-300 mt-1">
+                        Du {format(entry.start, 'd MMM', { locale: fr })} au {format(entry.end, 'd MMM yyyy', { locale: fr })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

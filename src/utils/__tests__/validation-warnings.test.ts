@@ -1,4 +1,4 @@
-import { addDays, startOfDay } from 'date-fns';
+import { startOfDay } from 'date-fns';
 import { describe, expect, it } from 'vitest';
 import {
   calculateEmployerPeriod,

@@ -60,6 +60,41 @@ const LEGAL_REFERENCES: LegalReference[] = [
   }
 ];
 
+const SUPPLEMENTARY_2026_REFERENCES: LegalReference[] = [
+  {
+    title: 'Création du congé supplémentaire de naissance',
+    article: 'LFSS 2026 - Article 99-V',
+    url: 'https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052832820',
+    description:
+      '1 à 2 mois indemnisés par parent (70% puis 60% du salaire net, dans la limite du plafond SS), pris après les congés mat/pat/adoption. Fractionnable en 2 périodes d\'1 mois.',
+    category: 'code-travail'
+  },
+  {
+    title: 'Encadrement du nouveau congé',
+    article: 'Articles L1225-46-2 à L1225-46-7 du Code du Travail',
+    url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000052832890/',
+    description:
+      'Durée, fractionnement, prise simultanée ou en alternance entre parents, préavis (1 mois ou 15 jours en succession immédiate).',
+    category: 'code-travail'
+  },
+  {
+    title: 'Annonce officielle du dispositif',
+    article: 'Service-Public.gouv.fr',
+    url: 'https://www.service-public.gouv.fr/particuliers/actualites/A18750',
+    description:
+      'Bénéficiaires : salariés, indépendants, non-salariés agricoles, fonctionnaires, militaires. Enfants nés/adoptés à partir du 1 janvier 2026.',
+    category: 'service-public'
+  },
+  {
+    title: 'Synthèse au 1er juillet 2026',
+    article: 'Code du travail numérique',
+    url: 'https://code.travail.gouv.fr/actualite/conge-de-naissance-supplementaire-ce-qui-change-au-1er-juillet-2026',
+    description:
+      'Délais de prise : jusqu\'au 31 mars 2027 pour les naissances de janvier à juin 2026, 9 mois pour les naissances à partir de juillet 2026.',
+    category: 'service-public'
+  }
+];
+
 const DEFINITIONS = [
   {
     term: 'Jours ouvrables',
@@ -156,11 +191,86 @@ export function LegalReferences() {
         </div>
       </div>
 
+      {/* LFSS 2026 Notice */}
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+        <div className="flex gap-4">
+          <div className="flex-shrink-0">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-2xl">🆕</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-semibold text-blue-900">
+              Nouveauté LFSS 2026 — Congé supplémentaire de naissance
+            </h3>
+            <p className="text-sm text-blue-900 leading-relaxed">
+              La <strong>LFSS pour 2026 (article 99-V)</strong> crée un congé supplémentaire de naissance
+              <strong> applicable au 1er juillet 2026</strong> pour les enfants nés ou adoptés à partir du
+              1 janvier 2026. Durée : 1 à 2 mois par parent, fractionnable en 2 périodes d&apos;1 mois,
+              indemnisé à 70% du salaire net le premier mois et 60% le second, dans la limite du plafond
+              de la Sécurité sociale.
+            </p>
+            <p className="text-xs text-blue-800 font-medium">
+              Sous réserve de la publication des décrets d&apos;application. Codifié aux articles L1225-46-2
+              à L1225-46-7 du Code du Travail.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Supplementary leave 2026 references */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+          <BookOpen className="w-6 h-6 text-blue-600" />
+          Congé supplémentaire de naissance 2026
+        </h2>
+
+        <div className="grid gap-4">
+          {SUPPLEMENTARY_2026_REFERENCES.map((ref, index) => (
+            <a
+              key={index}
+              href={ref.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`block p-5 border-2 rounded-xl hover:shadow-md transition-all ${getCategoryColor(ref.category)}`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">
+                  {getCategoryIcon(ref.category)}
+                </div>
+
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">
+                        {ref.title}
+                      </h3>
+                      <p className="text-sm font-medium opacity-75">
+                        {ref.article}
+                      </p>
+                    </div>
+                    <ExternalLink className="w-4 h-4 flex-shrink-0 opacity-50" />
+                  </div>
+
+                  <p className="text-sm leading-relaxed">
+                    {ref.description}
+                  </p>
+
+                  <div className="flex items-center gap-2 text-xs font-medium opacity-60">
+                    <span>{getCategoryLabel(ref.category)}</span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* Legal References */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
           <BookOpen className="w-6 h-6 text-blue-600" />
-          Textes de Loi
+          Congé de paternité (Loi 2021-953)
         </h2>
         
         <div className="grid gap-4">

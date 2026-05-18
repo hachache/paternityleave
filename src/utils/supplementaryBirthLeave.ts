@@ -1,7 +1,18 @@
 import { addDays, addMonths, isAfter, isBefore, startOfDay } from 'date-fns';
-import { LeaveBlock, LeaveScenarioConfig, countCalendarDays } from './paternityLeave';
+import { LeaveBlock, LeaveScenarioConfig, countCalendarDays, hasOverlap } from './paternityLeave';
 
 export type SupplementaryLeaveDuration = 1 | 2;
+
+/**
+ * Mode de prise du congé supplémentaire de naissance (LFSS 2026, art. 99-V).
+ *
+ * - 'consecutive' : 1 ou 2 mois pris de manière continue à compter du jour
+ *   suivant la fin du congé paternité.
+ * - 'split' : 2 périodes d'un mois calendaire prises de manière disjointe,
+ *   chacune dans le délai légal de prise. Cas explicitement autorisé par
+ *   les articles L1225-46-2 et suivants du Code du Travail.
+ */
+export type SupplementaryLeaveMode = 'consecutive' | 'split';
 
 export interface SupplementaryLeaveEligibility {
   isEligibleBirthDate: boolean;
@@ -124,4 +135,65 @@ export function calculateSupplementaryLeavePeriod(
     days,
     type: 'supplementary'
   };
+}
+
+export interface SupplementaryLeaveSplitValidation {
+  valid: boolean;
+  blocks: LeaveBlock[];
+  error: string | null;
+}
+
+/**
+ * Calcule et valide les deux périodes d'1 mois prises de manière disjointe.
+ *
+ * LÉGISLATION : Articles L1225-46-2 et suivants du Code du Travail (LFSS 2026).
+ * Chaque période fait 1 mois calendaire, ne peut pas chevaucher l'autre, et
+ * doit rester comprise entre la fin du congé paternité et la date limite légale.
+ *
+ * @returns blocs valides triés par date de début, accompagnés d'une erreur
+ *          contextuelle si la validation échoue.
+ */
+export function calculateSupplementaryLeaveSplitBlocks(
+  firstStartDate: Date,
+  secondStartDate: Date,
+  earliestStartDate: Date,
+  limitDate: Date
+): SupplementaryLeaveSplitValidation {
+  const normalizedFirst = startOfDay(firstStartDate);
+  const normalizedSecond = startOfDay(secondStartDate);
+  const normalizedEarliest = startOfDay(earliestStartDate);
+  const normalizedLimit = startOfDay(limitDate);
+
+  if (isBefore(normalizedFirst, normalizedEarliest) || isBefore(normalizedSecond, normalizedEarliest)) {
+    return {
+      valid: false,
+      blocks: [],
+      error: 'Chaque période doit débuter après la fin du congé paternité.'
+    };
+  }
+
+  const firstBlock = calculateSupplementaryLeavePeriod(normalizedFirst, 1);
+  const secondBlock = calculateSupplementaryLeavePeriod(normalizedSecond, 1);
+
+  if (isAfter(firstBlock.end, normalizedLimit) || isAfter(secondBlock.end, normalizedLimit)) {
+    return {
+      valid: false,
+      blocks: [],
+      error: 'Une des périodes dépasse la date limite légale de prise.'
+    };
+  }
+
+  if (hasOverlap(firstBlock.start, firstBlock.end, secondBlock.start, secondBlock.end)) {
+    return {
+      valid: false,
+      blocks: [],
+      error: 'Les deux périodes d\'1 mois ne peuvent pas se chevaucher.'
+    };
+  }
+
+  const ordered = [firstBlock, secondBlock].sort(
+    (a, b) => a.start.getTime() - b.start.getTime()
+  );
+
+  return { valid: true, blocks: ordered, error: null };
 }

@@ -21,17 +21,24 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
         <span className="text-base font-bold text-slate-800">Cadre légal</span>
       </summary>
       <div className="px-6 pb-6 animate-slide-in space-y-4">
-        {/* Avertissement secteur public */}
+        {/* Avertissement perimetre de l'application */}
         <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-xl flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-amber-900 mb-1">
-              ⚠️ Secteur privé uniquement
+          <div className="flex-1 space-y-2">
+            <p className="text-sm font-semibold text-amber-900">
+              ⚠️ Périmètre du calcul
             </p>
             <p className="text-xs text-amber-800 leading-relaxed">
-              Cette application s'applique au <strong>secteur privé</strong> selon le Code du Travail (articles L1225-35 et suivants).
-              Les agents de la <strong>fonction publique</strong> (État, territoriale, hospitalière) sont soumis à des règles différentes.
-              Certaines <strong>conventions collectives</strong> peuvent prévoir des jours supplémentaires.
+              Le <strong>congé de paternité</strong> calculé ci-dessous suit le Code du Travail
+              (articles L1225-35 et suivants), donc le <strong>secteur privé</strong>. Les agents de la
+              <strong> fonction publique</strong> et certains régimes spéciaux relèvent de règles
+              propres ; les <strong>conventions collectives</strong> peuvent prévoir des jours
+              supplémentaires.
+            </p>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              Le <strong>congé supplémentaire de naissance 2026</strong> (LFSS 2026, art. 99-V) est plus
+              large : il couvre <strong>tous les actifs</strong> (salariés, indépendants, non-salariés
+              agricoles, fonctionnaires, militaires).
             </p>
           </div>
         </div>
@@ -79,6 +86,19 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">Adoption</span>
             <span className="font-medium">{adoption.fractionableDays} jours calendaires fractionnables à prendre dans les {adoption.limitMonthsAfterBirth} mois suivant l'arrivée</span>
+          </li>
+          <li className="flex gap-3 items-start p-3 bg-blue-50/60 rounded-xl hover:bg-blue-50 transition-apple-smooth border border-blue-100">
+            <span className="font-bold text-blue-700 min-w-[4rem] text-base">+1 à 2 mois</span>
+            <div className="flex-1">
+              <span className="font-medium text-blue-900">
+                Congé supplémentaire de naissance 2026 (LFSS 2026, art. 99-V)
+              </span>
+              <p className="text-xs text-blue-800 mt-1 leading-relaxed">
+                Applicable au 1 juillet 2026, pour les enfants nés/adoptés à partir du 1 janvier 2026.
+                Indemnisation : 70% du salaire net le premier mois, 60% le second (plafond SS).
+                Fractionnable en 2 périodes d&apos;1 mois.
+              </p>
+            </div>
           </li>
         </ul>
 

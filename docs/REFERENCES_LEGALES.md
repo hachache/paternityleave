@@ -77,6 +77,8 @@ export function isWorkingDay(date: Date): boolean {
 
 ## 📖 Textes de Loi Principaux
 
+### Congé de paternité et d'accueil de l'enfant (Loi 2021-953)
+
 | Article | Objet | URL |
 |---------|-------|-----|
 | **L1225-35** | Durée du congé (25 jours) | [Légifrance](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923150) |
@@ -84,6 +86,27 @@ export function isWorkingDay(date: Date): boolean {
 | **L1225-35-2** | Délai de prise (6 mois) | [Légifrance](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923132) |
 | **L1225-35-3** | Congé naissance (3j) | [Légifrance](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923122) |
 | **L331-8** | Indemnisation CPAM | [Légifrance](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923074) |
+
+### Congé supplémentaire de naissance (LFSS 2026)
+
+| Référence | Objet | URL |
+|-----------|-------|-----|
+| **LFSS 2026, art. 99-V** | Création du dispositif | [Légifrance](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052832820) |
+| **L1225-46-2 à L1225-46-7** | Régime applicable (Code du Travail) | [Légifrance](https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000052832890/) |
+| **Service-Public.gouv.fr** | Annonce officielle | [service-public.gouv.fr](https://www.service-public.gouv.fr/particuliers/actualites/A18750) |
+| **Code du travail numérique** | Synthèse au 1er juillet 2026 | [code.travail.gouv.fr](https://code.travail.gouv.fr/actualite/conge-de-naissance-supplementaire-ce-qui-change-au-1er-juillet-2026) |
+
+#### Caractéristiques retenues par l'application
+- **Bénéficiaires** : salariés, indépendants, non-salariés agricoles, fonctionnaires, militaires.
+- **Enfants concernés** : nés ou adoptés à partir du **1 janvier 2026**.
+- **Entrée en vigueur** : **1 juillet 2026**, sous réserve des décrets d'application.
+- **Durée** : 1 à 2 mois par parent.
+- **Fractionnement** : 2 périodes d'1 mois disjointes possibles.
+- **Indemnisation** : 70% du salaire net le premier mois, 60% le second, dans la limite du plafond de la Sécurité sociale.
+- **Délai de prise** :
+  - Naissances entre janvier et juin 2026 → jusqu'au **31 mars 2027**.
+  - Naissances à partir de juillet 2026 → **9 mois** suivant la naissance (prolongé pour naissances multiples).
+- **Préavis** : 1 mois avant le début du congé, ramené à 15 jours en cas de succession immédiate.
 
 ## 🎯 Méthode de Validation
 
@@ -122,7 +145,8 @@ Exemple : Le samedi est bien un jour ouvrable selon Service-Public.fr, donc incl
 ### Historique des Versions Législatives
 - **Avant 1er juillet 2021** : Congé de 11 jours (ancienne loi)
 - **Depuis 1er juillet 2021** : Congé de 25 jours (Loi 2021-953)
-  - Application actuelle : **version 2021**
+- **À partir du 1er juillet 2026** : Création du congé supplémentaire de naissance (LFSS 2026, art. 99-V) — 1 à 2 mois indemnisés par parent, ouvert aux salariés du privé, indépendants, agricoles, fonctionnaires et militaires
+  - Application actuelle : **version 2026 (paternité 2021 + supplémentaire 2026)**
 
 ## ⚠️ Limitations Connues
 
@@ -164,7 +188,7 @@ Merci de créer une issue sur le dépôt avec :
 
 ---
 
-**Dernière révision** : Octobre 2024  
-**Version législation** : Loi n° 2021-953 (applicable depuis 1er juillet 2021)  
-**Prochaine révision prévue** : Avril 2025
+**Dernière révision** : Mai 2026  
+**Version législation** : Loi n° 2021-953 (1er juillet 2021) + LFSS 2026, art. 99-V (entrée en vigueur 1er juillet 2026)  
+**Prochaine révision prévue** : à la publication des décrets d'application du congé supplémentaire de naissance
 

@@ -124,6 +124,60 @@ export const DECRET_2021_574: LegalSource = {
 };
 
 /**
+ * Loi de financement de la Sécurité sociale pour 2026 (article 99-V)
+ *
+ * Institue le congé supplémentaire de naissance, ouvert aux deux parents pour
+ * tout enfant né ou adopté à partir du 1er janvier 2026, applicable au 1er juillet 2026.
+ */
+export const LFSS_2026: LegalSource = {
+  type: 'loi',
+  title: 'Création du congé supplémentaire de naissance',
+  article: 'LFSS 2026 - Article 99-V',
+  url: 'https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052832820',
+  description:
+    '1 à 2 mois indemnisés par parent (70% puis 60% du salaire net, dans la limite du plafond SS), pris après les congés de maternité, paternité ou adoption. Fractionnable en deux périodes d\'un mois.',
+  dateApplication: '1er juillet 2026'
+};
+
+/**
+ * Articles L1225-46-2 à L1225-46-7 du Code du Travail
+ *
+ * Encadrent le congé supplémentaire de naissance créé par la LFSS 2026 :
+ * durée, fractionnement, conditions de prise, préavis, succession des congés.
+ */
+export const ARTICLE_L1225_46_2: LegalSource = {
+  type: 'code-travail',
+  title: 'Congé supplémentaire de naissance',
+  article: 'Articles L1225-46-2 à L1225-46-7',
+  url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000052832890/',
+  description:
+    'Régime du congé supplémentaire de naissance : 1 à 2 mois par parent, fractionnable en 2 périodes d\'1 mois, pris simultanément ou en alternance, après les congés mat/pat/adoption.',
+  dateApplication: '1er juillet 2026'
+};
+
+/**
+ * Service-Public.gouv.fr - Annonce officielle du congé supplémentaire 2026.
+ */
+export const SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE: LegalSource = {
+  type: 'service-public',
+  title: 'Annonce officielle du congé supplémentaire de naissance',
+  url: 'https://www.service-public.gouv.fr/particuliers/actualites/A18750',
+  description:
+    'Présentation officielle du nouveau dispositif, des bénéficiaires (salariés, indépendants, agricoles, fonctionnaires, militaires) et des délais de prise.'
+};
+
+/**
+ * Code du travail numérique - Synthèse du congé supplémentaire 2026.
+ */
+export const CODE_TRAVAIL_NUMERIQUE_CONGE_SUPPLEMENTAIRE: LegalSource = {
+  type: 'service-public',
+  title: 'Synthèse du congé supplémentaire au 1er juillet 2026',
+  url: 'https://code.travail.gouv.fr/actualite/conge-de-naissance-supplementaire-ce-qui-change-au-1er-juillet-2026',
+  description:
+    'Délais de prise : 31 mars 2027 pour les naissances de janvier à juin 2026, 9 mois pour les naissances à partir de juillet 2026. Préavis 1 mois (15 jours en cas de succession immédiate).'
+};
+
+/**
  * Service-Public.fr - Congé de paternité
  * 
  * Guide pratique officiel sur le congé de paternité.
@@ -170,7 +224,11 @@ export const ALL_LEGAL_SOURCES: LegalSource[] = [
   ARTICLE_L331_8,
   LOI_2021_953,
   DECRET_2021_574,
+  LFSS_2026,
+  ARTICLE_L1225_46_2,
   SERVICE_PUBLIC_CONGE_PATERNITE,
+  SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE,
+  CODE_TRAVAIL_NUMERIQUE_CONGE_SUPPLEMENTAIRE,
   SERVICE_PUBLIC_JOURS,
   AMELI_CONGE_PATERNITE
 ];

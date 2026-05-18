@@ -179,7 +179,7 @@ export function Calendar({
 
       return { type: null, selectable: true, action: 'select' };
     },
-    [birthDate, getDayType, scenario.limitMonthsAfterBirth, usageLimit, today]
+    [birthDate, getDayType, usageLimit, today]
   );
 
   const focusDate = useCallback(

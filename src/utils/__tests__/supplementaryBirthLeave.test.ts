@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { LEAVE_SCENARIOS } from '../paternityLeave';
 import {
   calculateSupplementaryLeavePeriod,
+  calculateSupplementaryLeaveSplitBlocks,
   getSupplementaryLeaveEligibility,
   getSupplementaryLeaveLimitDate
 } from '../supplementaryBirthLeave';
@@ -103,5 +104,64 @@ describe('calculateSupplementaryLeavePeriod', () => {
     expect(dateKey(result.end)).toBe('2026-08-31');
     expect(result.days).toBe(62);
     expect(result.type).toBe('supplementary');
+  });
+});
+
+describe('calculateSupplementaryLeaveSplitBlocks', () => {
+  const earliest = new Date(2026, 6, 1);
+  const limit = new Date(2027, 2, 31);
+
+  it('produit deux blocs disjoints valides tries par date de debut', () => {
+    const result = calculateSupplementaryLeaveSplitBlocks(
+      new Date(2026, 8, 1),
+      new Date(2026, 6, 1),
+      earliest,
+      limit
+    );
+
+    expect(result.valid).toBe(true);
+    expect(result.error).toBeNull();
+    expect(result.blocks).toHaveLength(2);
+    expect(dateKey(result.blocks[0].start)).toBe('2026-07-01');
+    expect(dateKey(result.blocks[0].end)).toBe('2026-07-31');
+    expect(dateKey(result.blocks[1].start)).toBe('2026-09-01');
+    expect(dateKey(result.blocks[1].end)).toBe('2026-09-30');
+  });
+
+  it('refuse une periode debutant avant la fin du conge paternite', () => {
+    const result = calculateSupplementaryLeaveSplitBlocks(
+      new Date(2026, 5, 15),
+      new Date(2026, 8, 1),
+      earliest,
+      limit
+    );
+
+    expect(result.valid).toBe(false);
+    expect(result.blocks).toEqual([]);
+    expect(result.error).toContain('fin du congé paternité');
+  });
+
+  it('refuse une periode depassant la date limite legale', () => {
+    const result = calculateSupplementaryLeaveSplitBlocks(
+      new Date(2026, 6, 1),
+      new Date(2027, 2, 15),
+      earliest,
+      limit
+    );
+
+    expect(result.valid).toBe(false);
+    expect(result.error).toContain('date limite légale');
+  });
+
+  it('refuse un chevauchement entre les deux periodes', () => {
+    const result = calculateSupplementaryLeaveSplitBlocks(
+      new Date(2026, 6, 1),
+      new Date(2026, 6, 20),
+      earliest,
+      limit
+    );
+
+    expect(result.valid).toBe(false);
+    expect(result.error).toContain('chevaucher');
   });
 });

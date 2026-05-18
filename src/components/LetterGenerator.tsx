@@ -8,14 +8,14 @@ interface LetterGeneratorProps {
   birthDate: Date;
   mandatoryPeriod: LeaveBlock | null;
   remainingBlocks: LeaveBlock[];
-  supplementaryLeavePeriod?: LeaveBlock | null;
+  supplementaryLeavePeriods?: LeaveBlock[];
 }
 
 export function LetterGenerator({
   birthDate,
   mandatoryPeriod,
   remainingBlocks,
-  supplementaryLeavePeriod
+  supplementaryLeavePeriods
 }: LetterGeneratorProps) {
   const [lieu, setLieu] = useState('');
   const [dateRedaction, setDateRedaction] = useState(format(new Date(), 'dd/MM/yyyy'));
@@ -51,12 +51,14 @@ export function LetterGenerator({
       });
     }
 
-    if (supplementaryLeavePeriod) {
-      const startDate = format(supplementaryLeavePeriod.start, 'dd/MM/yyyy');
-      const endDate = format(supplementaryLeavePeriod.end, 'dd/MM/yyyy');
-      letter += `\n\nJe souhaite également bénéficier du congé supplémentaire de naissance du ${startDate} au ${endDate}.`;
+    if (supplementaryLeavePeriods && supplementaryLeavePeriods.length > 0) {
+      const periodsText = supplementaryLeavePeriods
+        .map((entry) => `du ${format(entry.start, 'dd/MM/yyyy')} au ${format(entry.end, 'dd/MM/yyyy')}`)
+        .join(' puis ');
+      letter += `\n\nConformément aux articles L1225-46-2 et suivants du Code du Travail (LFSS 2026, art. 99-V), je souhaite également bénéficier du congé supplémentaire de naissance ${periodsText}.`;
     }
 
+    letter += '\n\nConformément aux dispositions du Code du Travail, je vous informe au moins un mois avant le début du congé (délai ramené à 15 jours lorsque ce congé suit immédiatement le congé de paternité et d\'accueil de l\'enfant).';
     letter += '\n\nVous trouverez ci-joint le certificat médical attestant la date prévue de la naissance.\n\nJe vous prie d\'agréer, Madame, Monsieur, l\'expression de ma considération distinguée.';
 
     return letter;
@@ -70,7 +72,7 @@ export function LetterGenerator({
     nom,
     prenom,
     remainingBlocks,
-    supplementaryLeavePeriod
+    supplementaryLeavePeriods
   ]);
 
   useEffect(() => {
@@ -90,7 +92,7 @@ export function LetterGenerator({
       await navigator.clipboard.writeText(baseLetter);
       setCopied(true);
       setCopyError(false);
-    } catch (err) {
+    } catch {
       setCopyError(true);
       setCopied(false);
     }

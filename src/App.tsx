@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Linkedin } from 'lucide-react';
 import { useMediaQuery } from './hooks/useMediaQuery';
-import { Calendar as CalendarIcon, RotateCcw, Linkedin } from 'lucide-react';
+import { useScrollOrchestrator } from './hooks/useScrollOrchestrator';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
 import { LegalInfo } from './components/LegalInfo';
@@ -17,11 +18,13 @@ import { NavigationAnchor } from './components/NavigationAnchor';
 import { ScenarioSelector } from './components/ScenarioSelector';
 import { SupplementaryLeaveCard } from './components/SupplementaryLeaveCard';
 import { Button } from './components/Button';
+import { AuroraBackground } from './components/AuroraBackground';
+import { ResetConfirmDialog } from './components/ResetConfirmDialog';
+import { HeroHeader } from './components/HeroHeader';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
   const [showLegalReferences, setShowLegalReferences] = useState(false);
-  const [hasScrolledPastStart, setHasScrolledPastStart] = useState(false);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const {
     birthDate,
@@ -45,9 +48,11 @@ function App() {
     isPaternityPlanComplete,
     supplementaryLeaveEnabled,
     supplementaryLeaveDuration,
+    supplementaryLeaveMode,
+    supplementaryLeaveSecondStartDate,
     supplementaryLeaveEligibility,
     supplementaryLeaveStartDate,
-    supplementaryLeavePeriod,
+    supplementaryLeavePeriods,
     supplementaryLeaveError,
     selectBirthDate,
     selectRemainingDay,
@@ -63,7 +68,9 @@ function App() {
     setCustomMode,
     setCustomFirstBlockDays,
     setSupplementaryLeaveEnabled,
-    setSupplementaryLeaveDuration
+    setSupplementaryLeaveDuration,
+    setSupplementaryLeaveMode,
+    setSupplementaryLeaveSecondStartDate
   } = usePaternityPlanning();
 
   const mainContentId = 'contenu-principal';
@@ -71,55 +78,22 @@ function App() {
   const secondBlockDays = Math.max(totalFractionableDays - customFirstBlockDays, 0);
   const sliderMax = Math.max(5, totalFractionableDays - 5);
 
-  // Refs for smooth scrolling
-  const calendarRef = useRef<HTMLDivElement>(null);
-  const planningRef = useRef<HTMLDivElement>(null);
-  const customModeRef = useRef<HTMLDivElement>(null);
-  const letterRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setHasScrolledPastStart(window.scrollY > 200);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-
-  // Smooth scroll utility - STABLE (pas de dépendances)
-  const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>) => {
-    const node = ref.current;
-    if (!node) return;
-    node.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, []);
-
-  // Schedule scroll after RAF to avoid race conditions;
-  // rely on CSS scroll-padding/scroll-margin for alignment to reduce jank
-  const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>, _offset: number = -20) => {
-    requestAnimationFrame(() => {
-      const node = ref.current;
-      if (!node) return;
-      // Always use smooth behavior (desktop and mobile) for a léger auto-scroll
-      const behavior: ScrollBehavior = 'smooth';
-      node.scrollIntoView({ behavior, block: 'start' });
-    });
-  }, []);
-
-  const scrollIntoViewIfNeeded = useCallback(
-    (ref: React.RefObject<HTMLDivElement>) => {
-      const node = ref.current;
-      if (!node) return;
-
-      const rect = node.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-      const fullyVisible = rect.top >= 0 && rect.bottom <= viewportHeight;
-
-      if (!fullyVisible) {
-        smoothScrollTo(ref);
-      }
-    },
-    [smoothScrollTo]
-  );
+  const {
+    calendarRef,
+    planningRef,
+    customModeRef,
+    letterRef,
+    hasScrolledPastStart,
+    scheduleSmoothScroll
+  } = useScrollOrchestrator({
+    birthDate,
+    mandatoryPeriodPresent: Boolean(mandatoryPeriod),
+    remainingBlocksCount: remainingBlocks.length,
+    customMode,
+    scenarioId,
+    totalPlannedDays,
+    totalFractionableDays
+  });
 
   const handleSelectBirthDate = (date: Date) => {
     selectBirthDate(date);
@@ -152,7 +126,7 @@ function App() {
 
   const handleStartVisualSelection = () => {
     startVisualSelection();
-    scheduleSmoothScroll(calendarRef, -100);
+    scheduleSmoothScroll(calendarRef);
   };
 
   const handleCancelVisualSelection = () => {
@@ -169,42 +143,9 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Scroll to top on initial page load and when toggling legal references
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [showLegalReferences]);
-
-  // Auto-scroll to calendar after scenario selection
-  const previousScenarioId = useRef(scenarioId);
-  useEffect(() => {
-    if (previousScenarioId.current !== scenarioId && !birthDate) {
-      scheduleSmoothScroll(calendarRef, -100);
-    }
-    previousScenarioId.current = scenarioId;
-  }, [scenarioId, birthDate, scheduleSmoothScroll]);
-
-  // After selecting birth date, scroll to the planning section once it is mounted
-  const previousBirthDateTs = useRef<number | null>(null);
-  useEffect(() => {
-    const planningIntroVisible = Boolean(birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode);
-    if (!planningIntroVisible) return;
-    const ts = birthDate ? birthDate.getTime() : null;
-    if (ts && previousBirthDateTs.current !== ts) {
-      previousBirthDateTs.current = ts;
-      scheduleSmoothScroll(planningRef, -100);
-    }
-  }, [birthDate, mandatoryPeriod, remainingBlocks.length, customMode, scheduleSmoothScroll]);
-
-  const previousPlannedDays = useRef(totalPlannedDays);
-  useEffect(() => {
-    if (
-      previousPlannedDays.current < totalFractionableDays &&
-      totalPlannedDays === totalFractionableDays
-    ) {
-      scrollIntoViewIfNeeded(letterRef);
-    }
-    previousPlannedDays.current = totalPlannedDays;
-  }, [scrollIntoViewIfNeeded, totalFractionableDays, totalPlannedDays]);
 
   // If showing legal references, render that view instead
   if (showLegalReferences) {
@@ -235,20 +176,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900 overflow-x-hidden">
-      {/* Animated Aurora Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="aurora-blob aurora-1 rounded-full mix-blend-multiply blur-3xl opacity-40"></div>
-        <div className="aurora-blob aurora-2 rounded-full mix-blend-multiply blur-3xl opacity-40"></div>
-        <div className="aurora-blob aurora-3 rounded-full mix-blend-multiply blur-3xl opacity-40"></div>
-        <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]"></div>
-        
-        {/* Floating Thematic Particles */}
-        <div className="absolute top-[15%] left-[10%] text-4xl opacity-[0.08] animate-float blur-[1px] select-none" style={{ animationDelay: '0s' }}>🍼</div>
-        <div className="absolute top-[25%] right-[15%] text-3xl opacity-[0.06] animate-float blur-[1px] select-none" style={{ animationDelay: '2.5s' }}>🧸</div>
-        <div className="absolute bottom-[20%] left-[20%] text-5xl opacity-[0.05] animate-float blur-[2px] select-none" style={{ animationDelay: '4s' }}>✨</div>
-        <div className="absolute bottom-[30%] right-[10%] text-4xl opacity-[0.07] animate-float blur-[1px] select-none" style={{ animationDelay: '1.5s' }}>👶</div>
-        <div className="absolute top-[40%] left-[50%] text-2xl opacity-[0.06] animate-float blur-[1px] select-none" style={{ animationDelay: '3s' }}>📅</div>
-      </div>
+      <AuroraBackground />
 
       <a
         href={`#${mainContentId}`}
@@ -256,64 +184,10 @@ function App() {
       >
         Aller directement au contenu principal
       </a>
-      
+
       <main id={mainContentId} className="flex-1 relative z-10">
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl pt-20 sm:pt-24 pb-20 md:pb-12">
-          <header className="mb-12 sm:mb-16 text-center animate-fade-in-up relative">
-            <div className="absolute top-0 right-2 sm:right-0">
-               <button
-                onClick={handleResetRequest}
-                className={`px-4 py-2 bg-white/80 backdrop-blur-md text-slate-600 rounded-xl hover:bg-white hover:text-brand-600 hover:shadow-lg transition-all duration-300 text-sm font-medium active:scale-95 border border-white shadow-sm flex items-center gap-2 group ${!birthDate ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-              >
-                <RotateCcw className="w-4 h-4 group-hover:-rotate-180 transition-transform duration-500" />
-                <span className="hidden sm:inline">Réinitialiser</span>
-              </button>
-            </div>
-
-            {/* Logo avec animation de construction */}
-            <div className="flex justify-center mb-6 relative group">
-              <div className="absolute inset-0 bg-brand-400 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-              <button
-                onClick={handleResetRequest}
-                className={`relative inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-2xl shadow-brand-500/30 transition-transform duration-500 hover:scale-105 active:scale-95 animate-logo-appear ${birthDate ? 'cursor-pointer animate-logo-glow' : 'cursor-default'}`}
-                title={birthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
-              >
-                <div className="logo-icon-container w-12 h-12 relative drop-shadow-md">
-                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(0 0, 50% 0, 50% 50%, 0 50%)' }} />
-                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)' }} />
-                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(0 50%, 50% 50%, 50% 100%, 0 100%)' }} />
-                  <CalendarIcon className="logo-icon-part w-full h-full text-white" strokeWidth={1.5} style={{ clipPath: 'polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%)' }} />
-                </div>
-              </button>
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight font-display leading-[1.1] relative inline-block max-w-full">
-              Congé <span className="text-gradient-animate">Paternité</span>
-              <span className="absolute -top-8 -right-10 rotate-12 bg-brand-100 text-brand-700 text-sm font-bold px-3 py-1.5 rounded-xl border border-brand-200 shadow-sm animate-bounce-subtle hidden sm:inline-block">
-                2026 Ready ✨
-              </span>
-            </h1>
-            <p className="text-slate-600 text-lg sm:text-3xl font-hand -rotate-1 mb-8 px-4 max-w-xs sm:max-w-2xl mx-auto leading-relaxed text-brand-900/80">
-              L'outil moderne pour planifier simplement votre congé paternité.
-            </p>
-
-            {/* Made by badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-md rounded-full border border-white/60 shadow-lg shadow-brand-900/5 hover:shadow-xl hover:scale-105 transition-all duration-300 mt-2">
-              <span className="text-xs text-slate-500 font-medium">Made with</span>
-              <span className="text-red-500 animate-pulse-heart text-base" aria-label="amour">❤️</span>
-              <span className="text-xs text-slate-500 font-medium">by</span>
-              <a
-                href="https://www.linkedin.com/in/hedi-a-2382551a1/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-bold text-slate-800 hover:text-brand-600 transition-colors flex items-center gap-1.5"
-                aria-label="Profil LinkedIn de Hedi ACHACHE"
-              >
-                <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" aria-hidden="true" />
-                Hedi ACHACHE
-              </a>
-            </div>
-          </header>
+          <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
           <ScrollIndicator show={birthDate !== null} />
 
@@ -355,53 +229,20 @@ function App() {
           </SectionCard>
         </div>
 
-        {/* Celebration Modal */}
         <CelebrationModal
           show={showCelebration}
           onClose={() => {
             hideCelebration();
-            scheduleSmoothScroll(letterRef, -100);
+            scheduleSmoothScroll(letterRef);
           }}
           totalFractionableDays={totalFractionableDays}
         />
 
-        {/* Modal de confirmation de réinitialisation */}
-        {showResetConfirm && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 px-4 animate-fade-in">
-            <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-brand-900/20 max-w-md w-full p-8 animate-pop transform transition-all border border-white/50">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-5 shadow-inner">
-                  <RotateCcw className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl font-bold font-display text-slate-900 mb-3">
-                  Réinitialiser le planning ?
-                </h3>
-                <p className="text-slate-600 text-base leading-relaxed">
-                  Toute votre progression actuelle sera perdue. Cette action est irréversible.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={handleResetCancel}
-                  variant="secondary"
-                  size="lg"
-                  className="w-full"
-                >
-                  Annuler
-                </Button>
-                <Button
-                  onClick={handleResetConfirm}
-                  variant="danger"
-                  size="lg"
-                  className="w-full"
-                >
-                  Confirmer
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ResetConfirmDialog
+          open={showResetConfirm}
+          onCancel={handleResetCancel}
+          onConfirm={handleResetConfirm}
+        />
 
         {(error || (successMessage && !visualSelectionMode)) && (
           <div className={`max-w-3xl mx-auto space-y-4 mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
@@ -508,7 +349,7 @@ function App() {
                   <Button
                     onClick={() => {
                       setCustomMode(true);
-                      scheduleSmoothScroll(customModeRef, -100);
+                      scheduleSmoothScroll(customModeRef);
                     }}
                     variant="primary"
                     size="md"
@@ -727,12 +568,16 @@ function App() {
             <SupplementaryLeaveCard
               enabled={supplementaryLeaveEnabled}
               duration={supplementaryLeaveDuration}
+              mode={supplementaryLeaveMode}
+              secondStartDate={supplementaryLeaveSecondStartDate}
               eligibility={supplementaryLeaveEligibility}
               startDate={supplementaryLeaveStartDate}
-              period={supplementaryLeavePeriod}
+              periods={supplementaryLeavePeriods}
               error={supplementaryLeaveError}
               onEnabledChange={setSupplementaryLeaveEnabled}
               onDurationChange={setSupplementaryLeaveDuration}
+              onModeChange={setSupplementaryLeaveMode}
+              onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
             />
           </div>
         )}
@@ -748,8 +593,9 @@ function App() {
                 onRemoveBlock={handleRemoveBlock}
                 totalFractionableDays={totalFractionableDays}
                 scenario={scenario}
-                supplementaryLeavePeriod={supplementaryLeavePeriod}
+                supplementaryLeavePeriods={supplementaryLeavePeriods}
                 supplementaryLeaveDuration={supplementaryLeaveDuration}
+                supplementaryLeaveMode={supplementaryLeaveMode}
               />
             </div>
 
@@ -759,7 +605,7 @@ function App() {
                   birthDate={birthDate}
                   mandatoryPeriod={mandatoryPeriod}
                   remainingBlocks={remainingBlocks}
-                  supplementaryLeavePeriod={supplementaryLeavePeriod}
+                  supplementaryLeavePeriods={supplementaryLeavePeriods}
                 />
               </div>
             )}

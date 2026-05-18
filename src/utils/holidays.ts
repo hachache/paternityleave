@@ -96,16 +96,16 @@ export function isWorkableDay(date: Date): boolean {
  */
 export function countWorkingDaysInRange(startDate: Date, endDate: Date): number {
   let count = 0;
-  let current = new Date(startDate);
+  const current = new Date(startDate);
   const end = new Date(endDate);
-  
+
   while (current <= end) {
     if (isWorkingDay(current)) {
       count++;
     }
     current.setDate(current.getDate() + 1);
   }
-  
+
   return count;
 }
 
@@ -118,16 +118,16 @@ export function countWorkingDaysInRange(startDate: Date, endDate: Date): number 
  */
 export function countWeekendsInRange(startDate: Date, endDate: Date): number {
   let count = 0;
-  let current = new Date(startDate);
+  const current = new Date(startDate);
   const end = new Date(endDate);
-  
+
   while (current <= end) {
     if (isWeekend(current)) {
       count++;
     }
     current.setDate(current.getDate() + 1);
   }
-  
+
   return count;
 }
 
