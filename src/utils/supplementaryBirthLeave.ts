@@ -1,4 +1,4 @@
-import { addDays, addMonths, isAfter, isBefore, startOfDay } from 'date-fns';
+import { addDays, addMonths, differenceInCalendarDays, isAfter, isBefore, startOfDay } from 'date-fns';
 import { LeaveBlock, LeaveScenarioConfig, countCalendarDays, hasOverlap } from './paternityLeave';
 
 export type SupplementaryLeaveDuration = 1 | 2;
@@ -18,6 +18,8 @@ export interface SupplementaryLeaveEligibility {
   isEligibleBirthDate: boolean;
   isAvailableNow: boolean;
   canActivate: boolean;
+  /** Jours restants avant le 1er juillet 2026 (affichage informatif uniquement). */
+  daysUntilActivation: number | null;
   minBirthDate: Date;
   activationDate: Date;
   limitDate: Date | null;
@@ -58,6 +60,29 @@ export function getSupplementaryLeaveLimitDate(
   return addDays(addMonths(normalizedBirth, 9), extensionDays);
 }
 
+function getDaysUntilActivation(today: Date, activationDate: Date): number | null {
+  if (!isBefore(today, activationDate)) {
+    return null;
+  }
+  return differenceInCalendarDays(activationDate, today);
+}
+
+/** Libellé informatif ; ne modifie pas les droits d’activation (`canActivate`). */
+export function formatSupplementaryActivationCountdown(
+  daysUntilActivation: number | null
+): string | null {
+  if (daysUntilActivation === null || daysUntilActivation < 0) {
+    return null;
+  }
+  if (daysUntilActivation === 0) {
+    return 'Activation prévue aujourd’hui (1er juillet 2026)';
+  }
+  if (daysUntilActivation === 1) {
+    return 'Activation demain (1er juillet 2026)';
+  }
+  return `Activation dans ${daysUntilActivation} jours (1er juillet 2026)`;
+}
+
 export function getSupplementaryLeaveEligibility(
   birthDate: Date | null,
   scenario?: LeaveScenarioConfig,
@@ -65,12 +90,17 @@ export function getSupplementaryLeaveEligibility(
 ): SupplementaryLeaveEligibility {
   const normalizedToday = startOfDay(today);
   const isAvailableNow = !isBefore(normalizedToday, SUPPLEMENTARY_LEAVE_ACTIVATION_DATE);
+  const daysUntilActivation = getDaysUntilActivation(
+    normalizedToday,
+    SUPPLEMENTARY_LEAVE_ACTIVATION_DATE
+  );
 
   if (!birthDate) {
     return {
       isEligibleBirthDate: false,
       isAvailableNow,
       canActivate: false,
+      daysUntilActivation,
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
@@ -89,6 +119,7 @@ export function getSupplementaryLeaveEligibility(
       isEligibleBirthDate: false,
       isAvailableNow,
       canActivate: false,
+      daysUntilActivation,
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
@@ -102,6 +133,7 @@ export function getSupplementaryLeaveEligibility(
       isEligibleBirthDate: true,
       isAvailableNow,
       canActivate: false,
+      daysUntilActivation,
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario),
@@ -114,6 +146,7 @@ export function getSupplementaryLeaveEligibility(
     isEligibleBirthDate: true,
     isAvailableNow: true,
     canActivate: true,
+    daysUntilActivation: null,
     minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
     activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
     limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario),

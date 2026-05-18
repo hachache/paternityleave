@@ -1,3 +1,5 @@
+import { formatSupplementaryActivationCountdown } from '../utils/supplementaryBirthLeave';
+
 interface NextStepsCardProps {
   planningStep: number;
   totalPlannedDays: number;
@@ -8,6 +10,7 @@ interface NextStepsCardProps {
   isEligibleForSupplementaryLeave: boolean;
   supplementaryLeaveConfigured: boolean;
   supplementaryLeaveActivationHint: string | null;
+  supplementaryLeaveDaysUntilActivation: number | null;
 }
 
 type ChecklistItem = {
@@ -27,7 +30,8 @@ export function NextStepsCard({
   fractionableDays,
   isEligibleForSupplementaryLeave,
   supplementaryLeaveConfigured,
-  supplementaryLeaveActivationHint
+  supplementaryLeaveActivationHint,
+  supplementaryLeaveDaysUntilActivation
 }: NextStepsCardProps) {
   const checklist = buildChecklist({
     planningStep,
@@ -38,7 +42,8 @@ export function NextStepsCard({
     fractionableDays,
     isEligibleForSupplementaryLeave,
     supplementaryLeaveConfigured,
-    supplementaryLeaveActivationHint
+    supplementaryLeaveActivationHint,
+    supplementaryLeaveDaysUntilActivation
   });
 
   return (
@@ -100,6 +105,7 @@ type ChecklistArgs = Required<
     | 'isEligibleForSupplementaryLeave'
     | 'supplementaryLeaveConfigured'
     | 'supplementaryLeaveActivationHint'
+    | 'supplementaryLeaveDaysUntilActivation'
   >
 >;
 
@@ -112,7 +118,8 @@ function buildChecklist({
   fractionableDays,
   isEligibleForSupplementaryLeave,
   supplementaryLeaveConfigured,
-  supplementaryLeaveActivationHint
+  supplementaryLeaveActivationHint,
+  supplementaryLeaveDaysUntilActivation
 }: ChecklistArgs): ChecklistItem[] {
   const steps: ChecklistItem[] = [];
   let index = 1;
@@ -149,11 +156,16 @@ function buildChecklist({
   });
 
   if (isEligibleForSupplementaryLeave) {
+    const activationCountdown = formatSupplementaryActivationCountdown(
+      supplementaryLeaveDaysUntilActivation
+    );
     const supplementaryHint = !hasAllBlocks
       ? 'Disponible une fois le planning terminé'
       : supplementaryLeaveConfigured
         ? 'Option enregistrée dans votre récapitulatif'
-        : supplementaryLeaveActivationHint ??
+        : [activationCountdown, supplementaryLeaveActivationHint]
+            .filter(Boolean)
+            .join(' — ') ||
           '1 ou 2 mois calendaires après le congé paternité (optionnel)';
 
     steps.push({

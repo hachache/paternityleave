@@ -3,6 +3,7 @@ import { fr } from 'date-fns/locale';
 import { CalendarDays, CheckCircle2, Clock3, Info, Wallet, Users, Split } from 'lucide-react';
 import { LeaveBlock } from '../utils/paternityLeave';
 import {
+  formatSupplementaryActivationCountdown,
   SupplementaryLeaveDuration,
   SupplementaryLeaveEligibility,
   SupplementaryLeaveMode
@@ -48,6 +49,9 @@ export function SupplementaryLeaveCard({
 }: SupplementaryLeaveCardProps) {
   const canActivate = eligibility.canActivate;
   const disabledReason = !canActivate ? eligibility.reason : null;
+  const activationCountdown = formatSupplementaryActivationCountdown(
+    eligibility.daysUntilActivation
+  );
   const isSplitAvailable = duration === 2;
   const isSplitActive = mode === 'split' && isSplitAvailable;
   const hasPeriods = periods.length > 0;
@@ -85,6 +89,11 @@ export function SupplementaryLeaveCard({
             <p className="max-w-xl text-sm font-medium leading-relaxed text-slate-600">
               Module secondaire pour projeter le nouveau congé de naissance applicable à partir du 1 juillet 2026.
             </p>
+            {activationCountdown && (
+              <p className="mt-2 inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">
+                {activationCountdown}
+              </p>
+            )}
           </div>
         </div>
 

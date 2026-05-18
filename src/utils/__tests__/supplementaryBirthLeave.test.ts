@@ -5,6 +5,7 @@ import { LEAVE_SCENARIOS } from '../paternityLeave';
 import {
   calculateSupplementaryLeavePeriod,
   calculateSupplementaryLeaveSplitBlocks,
+  formatSupplementaryActivationCountdown,
   getSupplementaryLeaveEligibility,
   getSupplementaryLeaveLimitDate
 } from '../supplementaryBirthLeave';
@@ -40,6 +41,10 @@ describe('getSupplementaryLeaveEligibility', () => {
     expect(result.isEligibleBirthDate).toBe(true);
     expect(result.isAvailableNow).toBe(false);
     expect(result.canActivate).toBe(false);
+    expect(result.daysUntilActivation).toBe(1);
+    expect(formatSupplementaryActivationCountdown(result.daysUntilActivation)).toBe(
+      'Activation demain (1er juillet 2026)'
+    );
     expect(dateKey(result.limitDate)).toBe('2027-03-31');
     expect(result.reason).toContain('1 juillet 2026');
   });
@@ -54,7 +59,21 @@ describe('getSupplementaryLeaveEligibility', () => {
     expect(result.isEligibleBirthDate).toBe(true);
     expect(result.isAvailableNow).toBe(true);
     expect(result.canActivate).toBe(true);
+    expect(result.daysUntilActivation).toBeNull();
     expect(result.reason).toBeNull();
+  });
+
+  it('calcule le nombre de jours avant activation pour une date intermediaire', () => {
+    const result = getSupplementaryLeaveEligibility(
+      new Date(2026, 0, 1),
+      standardScenario,
+      new Date(2026, 5, 1)
+    );
+
+    expect(result.daysUntilActivation).toBe(30);
+    expect(formatSupplementaryActivationCountdown(result.daysUntilActivation)).toBe(
+      'Activation dans 30 jours (1er juillet 2026)'
+    );
   });
 });
 

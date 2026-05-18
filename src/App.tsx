@@ -273,6 +273,9 @@ function App() {
                 isEligibleForSupplementaryLeave={isEligibleForSupplementaryLeave}
                 supplementaryLeaveConfigured={supplementaryLeaveConfigured}
                 supplementaryLeaveActivationHint={supplementaryLeaveEligibility.reason}
+                supplementaryLeaveDaysUntilActivation={
+                  supplementaryLeaveEligibility.daysUntilActivation
+                }
               />
           </SectionCard>
         </div>
