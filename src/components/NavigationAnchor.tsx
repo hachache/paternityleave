@@ -38,14 +38,14 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
   // IntersectionObserver for active section tracking
   useEffect(() => {
     if (!show || isMobile) return; // Skip observer on mobile for performance
-    if (typeof IntersectionObserver !== 'undefined') {
+    if ('IntersectionObserver' in window) {
       const targets = sections
         .map(s => document.getElementById(s.id))
         .filter((el): el is HTMLElement => Boolean(el));
       if (targets.length === 0) return;
 
       const ratios = new Map<string, number>();
-      const debounceTimerRef = { current: null as ReturnType<typeof setTimeout> | null };
+      const debounceTimerRef = { current: null as NodeJS.Timeout | null };
 
       const io = new IntersectionObserver(
         (entries) => {
@@ -94,9 +94,9 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
   useEffect(() => {
     if (!show) return;
     // Initial detection seulement si IntersectionObserver n'est pas supporté
-    if (typeof IntersectionObserver === 'undefined') {
-      const id = window.setTimeout(() => detectActiveSection(), 100);
-      return () => window.clearTimeout(id);
+    if (!('IntersectionObserver' in window)) {
+      const id = globalThis.setTimeout(() => detectActiveSection(), 100);
+      return () => globalThis.clearTimeout(id);
     }
   }, [show, detectActiveSection]);
 
@@ -116,8 +116,8 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
               font-semibold whitespace-nowrap
               ${
                 isActive
-                  ? 'text-white bg-gradient-to-b from-brand-600 to-brand-500 shadow-lg'
-                  : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-white/10'
+                  ? 'text-white bg-gradient-to-b from-teal-500 to-teal-600 shadow-lg'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
               }
             `}
             style={{
@@ -150,7 +150,7 @@ export function NavigationAnchor({ show }: NavigationAnchorProps) {
   return (
     <div className="fixed top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-3 sm:py-4 pointer-events-none">
       <nav
-        className="pointer-events-auto flex gap-1.5 px-3 py-2.5 rounded-2xl bg-surface-100/95 backdrop-blur-lg border border-white/15 shadow-md"
+        className="pointer-events-auto flex gap-1.5 px-3 py-2.5 rounded-2xl bg-white/95 dark:bg-slate-800/90 backdrop-blur-lg border border-slate-200/80 dark:border-slate-600 shadow-md"
         style={{
           transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }}

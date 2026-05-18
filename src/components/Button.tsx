@@ -13,11 +13,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-black hover:opacity-85 text-white border-black shadow-sm',
-  secondary: 'bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border-black/10 shadow-sm',
-  outline: 'bg-transparent hover:bg-[#f5f5f7] text-[#1d1d1f] border-black/15',
-  danger: 'bg-[#ff3b30] hover:opacity-90 text-white border-transparent shadow-sm',
-  ghost: 'bg-transparent hover:bg-[#f5f5f7] text-[#424245] border-transparent'
+  primary: 'bg-brand-600 hover:bg-brand-700 text-white border-transparent shadow-lg shadow-brand-500/30 hover:shadow-brand-600/40',
+  secondary: 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 shadow-sm',
+  outline: 'bg-transparent hover:bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:text-slate-900',
+  danger: 'bg-red-600 hover:bg-red-700 text-white border-transparent shadow-lg shadow-red-500/30',
+  ghost: 'bg-transparent hover:bg-slate-100/50 text-slate-600 hover:text-brand-700 border-transparent'
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -48,7 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center gap-2.5 rounded-full font-medium tracking-tight transition-all duration-300 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071e3] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center gap-2.5 rounded-xl font-medium tracking-wide transition-all duration-300 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:scale-[0.98] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:translate-y-0 disabled:shadow-none';
 
     const widthStyle = fullWidth ? 'w-full' : '';
 
@@ -56,9 +56,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button ref={ref} className={combinedClassName} disabled={disabled} {...props}>
-        {Icon && iconPosition === 'left' && <Icon className={iconSizeStyles[size]} strokeWidth={2.2} />}
+        {Icon && iconPosition === 'left' && <Icon className={iconSizeStyles[size]} strokeWidth={2.5} />}
         {children}
-        {Icon && iconPosition === 'right' && <Icon className={iconSizeStyles[size]} strokeWidth={2.2} />}
+        {Icon && iconPosition === 'right' && <Icon className={iconSizeStyles[size]} strokeWidth={2.5} />}
       </button>
     );
   }

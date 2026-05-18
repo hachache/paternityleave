@@ -8,10 +8,15 @@ interface LetterGeneratorProps {
   birthDate: Date;
   mandatoryPeriod: LeaveBlock | null;
   remainingBlocks: LeaveBlock[];
-  supplementaryPeriod: LeaveBlock | null;
+  supplementaryLeavePeriod?: LeaveBlock | null;
 }
 
-export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, supplementaryPeriod }: LetterGeneratorProps) {
+export function LetterGenerator({
+  birthDate,
+  mandatoryPeriod,
+  remainingBlocks,
+  supplementaryLeavePeriod
+}: LetterGeneratorProps) {
   const [lieu, setLieu] = useState('');
   const [dateRedaction, setDateRedaction] = useState(format(new Date(), 'dd/MM/yyyy'));
   const [nom, setNom] = useState('');
@@ -46,16 +51,27 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
       });
     }
 
-    if (supplementaryPeriod) {
-      const startDate = format(supplementaryPeriod.start, 'dd/MM/yyyy');
-      const endDate = format(supplementaryPeriod.end, 'dd/MM/yyyy');
+    if (supplementaryLeavePeriod) {
+      const startDate = format(supplementaryLeavePeriod.start, 'dd/MM/yyyy');
+      const endDate = format(supplementaryLeavePeriod.end, 'dd/MM/yyyy');
       letter += `\n\nJe souhaite également bénéficier du congé supplémentaire de naissance du ${startDate} au ${endDate}.`;
     }
 
     letter += '\n\nVous trouverez ci-joint le certificat médical attestant la date prévue de la naissance.\n\nJe vous prie d\'agréer, Madame, Monsieur, l\'expression de ma considération distinguée.';
 
     return letter;
-  }, [adresse, birthDate, dateRedaction, fonction, lieu, mandatoryPeriod, nom, prenom, remainingBlocks, supplementaryPeriod]);
+  }, [
+    adresse,
+    birthDate,
+    dateRedaction,
+    fonction,
+    lieu,
+    mandatoryPeriod,
+    nom,
+    prenom,
+    remainingBlocks,
+    supplementaryLeavePeriod
+  ]);
 
   useEffect(() => {
     if (!copied) return;
@@ -81,9 +97,9 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
   };
 
   return (
-    <div className="rounded-[2rem] border border-white/10 bg-surface-100 p-6 sm:p-8 shadow-soft transition-all duration-300">
-      <h2 className="text-2xl font-bold font-display text-[var(--text)] mb-8 flex items-center gap-4">
-        <div className="p-3 rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-600/20">
+    <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-soft transition-all duration-300">
+      <h2 className="text-2xl font-bold font-display text-slate-900 mb-8 flex items-center gap-4">
+        <div className="p-3 rounded-2xl bg-slate-900 text-white shadow-lg shadow-slate-900/20">
           <Mail className="w-6 h-6" />
         </div>
         Courrier de demande
@@ -92,11 +108,11 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
       <div className="space-y-8">
         {/* Formulaire */}
         <div className="space-y-6">
-          <p className="text-sm text-[var(--muted)] font-medium">* Remplissez ces champs pour personnaliser le modèle</p>
+          <p className="text-sm text-slate-500 font-medium">* Remplissez ces champs pour personnaliser le modèle</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[var(--muted)] mb-1.5 uppercase tracking-wide">Lieu</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Lieu</label>
               <input
                 type="text"
                 value={lieu}
@@ -106,7 +122,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[var(--muted)] mb-1.5 uppercase tracking-wide">Date de rédaction</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Date de rédaction</label>
               <input
                 type="text"
                 value={dateRedaction}
@@ -119,7 +135,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[var(--muted)] mb-1.5 uppercase tracking-wide">Prénom</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Prénom</label>
               <input
                 type="text"
                 value={prenom}
@@ -129,7 +145,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[var(--muted)] mb-1.5 uppercase tracking-wide">Nom</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nom</label>
               <input
                 type="text"
                 value={nom}
@@ -141,7 +157,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[var(--muted)] mb-1.5 uppercase tracking-wide">Adresse</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Adresse</label>
             <input
               type="text"
               value={adresse}
@@ -152,7 +168,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[var(--muted)] mb-1.5 uppercase tracking-wide">Fonction</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Fonction</label>
             <input
               type="text"
               value={fonction}
@@ -165,10 +181,10 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
 
         {/* Prévisualisation "Papier" */}
         <div className="mt-8">
-          <div className="bg-surface-50 rounded-3xl p-4 sm:p-8 border border-white/10 shadow-inner">
-            <div className="bg-[#f8f5ef] rounded-xl shadow-xl shadow-slate-950/25 p-8 sm:p-12 min-h-[400px] flex flex-col text-[#2d2b28] text-sm sm:text-base font-serif leading-relaxed relative overflow-hidden max-w-3xl mx-auto">
+          <div className="bg-slate-100 rounded-3xl p-4 sm:p-8 border border-slate-200/60 shadow-inner">
+            <div className="bg-white rounded-xl shadow-xl shadow-slate-300/20 p-8 sm:p-12 min-h-[400px] flex flex-col text-slate-800 text-sm sm:text-base font-serif leading-relaxed relative overflow-hidden max-w-3xl mx-auto">
               {/* Grain texture overlay (subtle) */}
-              <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")' }}></div>
+              <div className="absolute inset-0 bg-slate-50 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")' }}></div>
               
               <div className="relative z-10 whitespace-pre-line">
                 {baseLetter}
@@ -178,8 +194,8 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
         </div>
 
         {copyError && (
-          <div className="p-4 rounded-xl border border-red-500/30 bg-red-950/30 animate-fade-in">
-            <p className="text-sm text-red-100 font-medium">
+          <div className="p-4 rounded-xl border border-red-300 bg-red-50 animate-fade-in">
+            <p className="text-sm text-red-800 font-medium">
               ❌ Impossible de copier. Sélectionnez le texte manuellement.
             </p>
           </div>
@@ -193,7 +209,7 @@ export function LetterGenerator({ birthDate, mandatoryPeriod, remainingBlocks, s
             fullWidth
             icon={copied ? Check : Copy}
             iconPosition="left"
-            className={`shadow-xl transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-500' : 'hover:-translate-y-1'}`}
+            className={`shadow-xl transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-1'}`}
           >
             {copied ? 'Courrier copié !' : 'Copier le courrier'}
           </Button>

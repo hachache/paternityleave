@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { CalendarClock, Clock3, ShieldCheck } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Clock3, Info } from 'lucide-react';
 import { LeaveBlock } from '../utils/paternityLeave';
 import {
   SupplementaryLeaveDuration,
@@ -8,189 +8,161 @@ import {
 } from '../utils/supplementaryBirthLeave';
 
 interface SupplementaryLeaveCardProps {
-  birthDate: Date | null;
-  isPaternityPlanComplete: boolean;
-  supplementaryLeaveEnabled: boolean;
-  supplementaryLeaveDuration: SupplementaryLeaveDuration;
-  supplementaryLeaveEligibility: SupplementaryLeaveEligibility;
-  supplementaryLeaveStartDate: Date | null;
-  supplementaryLeavePeriod: LeaveBlock | null;
-  supplementaryLeaveError: string | null;
-  onToggle: (enabled: boolean) => void;
+  enabled: boolean;
+  duration: SupplementaryLeaveDuration;
+  eligibility: SupplementaryLeaveEligibility;
+  startDate: Date | null;
+  period: LeaveBlock | null;
+  error: string | null;
+  onEnabledChange: (enabled: boolean) => void;
   onDurationChange: (duration: SupplementaryLeaveDuration) => void;
 }
 
-function formatDate(value: Date) {
-  return format(value, 'd MMMM yyyy', { locale: fr });
+function formatDate(date: Date): string {
+  return format(date, 'd MMMM yyyy', { locale: fr });
 }
 
 export function SupplementaryLeaveCard({
-  birthDate,
-  isPaternityPlanComplete,
-  supplementaryLeaveEnabled,
-  supplementaryLeaveDuration,
-  supplementaryLeaveEligibility,
-  supplementaryLeaveStartDate,
-  supplementaryLeavePeriod,
-  supplementaryLeaveError,
-  onToggle,
+  enabled,
+  duration,
+  eligibility,
+  startDate,
+  period,
+  error,
+  onEnabledChange,
   onDurationChange
 }: SupplementaryLeaveCardProps) {
-  const canConfigure =
-    supplementaryLeaveEligibility.canActivate &&
-    isPaternityPlanComplete &&
-    Boolean(supplementaryLeaveStartDate);
+  const canActivate = eligibility.canActivate;
+  const disabledReason = !canActivate ? eligibility.reason : null;
+
+  const handleToggle = () => {
+    if (!canActivate) return;
+    onEnabledChange(!enabled);
+  };
+
+  const statusLabel = period
+    ? 'Activé'
+    : canActivate
+      ? 'Optionnel'
+      : 'À venir';
 
   return (
-    <div className="rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-soft">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#6e6e73]">
-            Mise à jour 2026
-          </p>
-          <h3 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] mt-2">
-            Congé supplémentaire de naissance
-          </h3>
-          <p className="text-sm text-[#424245] mt-2 max-w-2xl">
-            Option de 1 ou 2 mois, à ajouter après le congé maternité/paternité/adoption.
-          </p>
-        </div>
-        <div className="rounded-full border border-black/10 bg-[#f5f5f7] px-3 py-1 text-xs font-semibold text-[#1d1d1f]">
-          1 ou 2 mois
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-black/10 bg-[#f5f5f7] p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[#6e6e73]">Activation</p>
-          <p className="mt-1 text-sm font-semibold text-[#1d1d1f]">
-            {formatDate(supplementaryLeaveEligibility.activationDate)}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-black/10 bg-[#f5f5f7] p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[#6e6e73]">Éligibilité</p>
-          <p className="mt-1 text-sm font-semibold text-[#1d1d1f]">
-            Naissance dès {formatDate(supplementaryLeaveEligibility.minBirthDate)}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-black/10 bg-[#f5f5f7] p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[#6e6e73]">Date limite</p>
-          <p className="mt-1 text-sm font-semibold text-[#1d1d1f]">
-            {supplementaryLeaveEligibility.limitDate
-              ? formatDate(supplementaryLeaveEligibility.limitDate)
-              : 'À calculer'}
-          </p>
-        </div>
-      </div>
-
-      {!birthDate && (
-        <div className="mt-6 rounded-2xl border border-black/10 bg-[#f5f5f7] p-4 text-sm text-[#424245]">
-          Définissez d’abord la date de naissance pour activer cette simulation.
-        </div>
-      )}
-
-      {birthDate && supplementaryLeaveEligibility.reason && (
-        <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          {supplementaryLeaveEligibility.reason}
-        </div>
-      )}
-
-      <div className="mt-6 rounded-2xl border border-black/10 bg-white p-4 sm:p-5">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#1d1d1f]">Intégrer dans le planning</p>
-              <p className="text-xs text-[#6e6e73]">
-                Active la projection de la période supplémentaire
-              </p>
-            </div>
+    <section className="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-lg shadow-slate-200/30">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-sm">
+            <CalendarDays className="h-6 w-6" aria-hidden="true" />
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={supplementaryLeaveEnabled}
-            onClick={() => onToggle(!supplementaryLeaveEnabled)}
-            disabled={!canConfigure}
-            className={`relative inline-flex h-7 w-12 items-center rounded-full border transition-all duration-300 ${
-              supplementaryLeaveEnabled
-                ? 'bg-black border-black'
-                : 'bg-white border-black/20'
-            } ${!canConfigure ? 'opacity-40 cursor-not-allowed' : ''}`}
-          >
-            <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${
-                supplementaryLeaveEnabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
+          <div>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <h2 className="text-xl font-bold font-display text-slate-900">
+                Congé supplémentaire 2026
+              </h2>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-600">
+                {statusLabel}
+              </span>
+            </div>
+            <p className="max-w-xl text-sm font-medium leading-relaxed text-slate-600">
+              Module secondaire pour projeter le nouveau congé de naissance applicable à partir du 1 juillet 2026.
+            </p>
+          </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => onDurationChange(1)}
-            disabled={!canConfigure}
-            className={`rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-              supplementaryLeaveDuration === 1
-                ? 'border-black bg-black text-white'
-                : 'border-black/10 bg-[#f5f5f7] text-[#1d1d1f]'
-            } ${!canConfigure ? 'opacity-40 cursor-not-allowed' : ''}`}
-          >
-            1 mois
-          </button>
-          <button
-            type="button"
-            onClick={() => onDurationChange(2)}
-            disabled={!canConfigure}
-            className={`rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-              supplementaryLeaveDuration === 2
-                ? 'border-black bg-black text-white'
-                : 'border-black/10 bg-[#f5f5f7] text-[#1d1d1f]'
-            } ${!canConfigure ? 'opacity-40 cursor-not-allowed' : ''}`}
-          >
-            2 mois
-          </button>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={enabled}
+          disabled={!canActivate}
+          onClick={handleToggle}
+          className={`inline-flex h-8 w-14 shrink-0 items-center rounded-full border p-1 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+            enabled
+              ? 'border-brand-600 bg-brand-600'
+              : 'border-slate-200 bg-slate-100'
+          }`}
+        >
+          <span
+            className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+              enabled ? 'translate-x-6' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+          <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+            <Clock3 className="h-4 w-4" aria-hidden="true" />
+            Délai légal
+          </div>
+          <p className="text-sm font-bold text-slate-900">
+            {eligibility.limitDate ? `Jusqu'au ${formatDate(eligibility.limitDate)}` : 'Date de naissance requise'}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+          <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+            <CalendarDays className="h-4 w-4" aria-hidden="true" />
+            Début projeté
+          </div>
+          <p className="text-sm font-bold text-slate-900">
+            {startDate ? formatDate(startDate) : 'Après le planning paternité'}
+          </p>
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-black/10 bg-[#f5f5f7] p-4 sm:p-5">
-        <div className="flex items-start gap-3">
-          <CalendarClock className="h-5 w-5 text-[#0071e3] mt-0.5" />
-          <div className="space-y-2">
-            <p className="text-sm font-semibold text-[#1d1d1f]">Projection calendrier</p>
-            {supplementaryLeaveStartDate ? (
-              <p className="text-sm text-[#424245]">
-                Début estimé: <span className="font-semibold text-[#1d1d1f]">{formatDate(supplementaryLeaveStartDate)}</span>
-              </p>
+      <div className="mt-5">
+        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+          Durée à projeter
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          {[1, 2].map((value) => {
+            const typedValue = value as SupplementaryLeaveDuration;
+            const selected = duration === typedValue;
+
+            return (
+              <button
+                key={value}
+                type="button"
+                disabled={!canActivate}
+                onClick={() => onDurationChange(typedValue)}
+                className={`rounded-2xl border px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                  selected
+                    ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                <span className="block text-base font-bold">{value} mois</span>
+                <span className={`mt-1 block text-xs font-medium ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
+                  {value === 1 ? 'Projection courte' : 'Projection complète'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {(disabledReason || error || period) && (
+        <div
+          className={`mt-5 rounded-2xl border p-4 ${
+            period
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+              : 'border-amber-200 bg-amber-50 text-amber-900'
+          }`}
+        >
+          <div className="flex gap-3">
+            {period ? (
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
             ) : (
-              <p className="text-sm text-[#424245]">
-                Le début sera calculé dès que les périodes obligatoires sont définies.
-              </p>
+              <Info className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
             )}
-            {supplementaryLeavePeriod && (
-              <p className="text-sm text-[#1d1d1f] font-medium">
-                Du {format(supplementaryLeavePeriod.start, 'd MMM yyyy', { locale: fr })} au{' '}
-                {format(supplementaryLeavePeriod.end, 'd MMM yyyy', { locale: fr })}{' '}
-                ({supplementaryLeavePeriod.days} jours calendaires)
-              </p>
-            )}
-            {supplementaryLeaveError && (
-              <p className="text-sm text-amber-900 bg-amber-50 border border-amber-300 rounded-xl px-3 py-2">
-                {supplementaryLeaveError}
-              </p>
-            )}
-            {!supplementaryLeaveError && supplementaryLeaveEnabled && supplementaryLeavePeriod && (
-              <p className="text-sm text-emerald-700 flex items-center gap-2">
-                <Clock3 className="h-4 w-4" />
-                Période conforme au délai légal calculé.
-              </p>
-            )}
+            <p className="text-sm font-medium leading-relaxed">
+              {period
+                ? `Période ajoutée au résumé : du ${formatDate(period.start)} au ${formatDate(period.end)}.`
+                : error || disabledReason}
+            </p>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </section>
   );
 }
