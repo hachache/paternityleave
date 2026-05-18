@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Linkedin } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUp, Linkedin } from 'lucide-react';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { useScrollOrchestrator } from './hooks/useScrollOrchestrator';
 import { Calendar } from './components/Calendar';
@@ -25,6 +25,8 @@ import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 
 function App() {
   const [showLegalReferences, setShowLegalReferences] = useState(false);
+  const [calendarHighlight, setCalendarHighlight] = useState(false);
+  const calendarHighlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const {
     birthDate,
@@ -128,6 +130,26 @@ function App() {
     startVisualSelection();
     scheduleSmoothScroll(calendarRef);
   };
+
+  const handleFocusCalendar = () => {
+    scheduleSmoothScroll(calendarRef);
+    setCalendarHighlight(true);
+    if (calendarHighlightTimer.current) {
+      clearTimeout(calendarHighlightTimer.current);
+    }
+    calendarHighlightTimer.current = setTimeout(() => {
+      setCalendarHighlight(false);
+      calendarHighlightTimer.current = null;
+    }, 2500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (calendarHighlightTimer.current) {
+        clearTimeout(calendarHighlightTimer.current);
+      }
+    };
+  }, []);
 
   const handleCancelVisualSelection = () => {
     cancelVisualSelection();
@@ -304,7 +326,11 @@ function App() {
           </div>
         )}
 
-        <div ref={calendarRef} className="mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20" id="calendar">
+        <div
+          ref={calendarRef}
+          id="calendar"
+          className={`mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-[3rem] transition-shadow duration-500 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_60px_-10px_rgba(2,132,199,0.45)]' : ''}`}
+        >
            {/* Glow effect behind calendar */}
            <div className="absolute inset-0 -z-10 bg-brand-500/5 blur-3xl rounded-[3rem] transform scale-105"></div>
           <Calendar
@@ -331,56 +357,101 @@ function App() {
                   Planifiez vos {totalFractionableDays} jours
                 </h3>
                 <p className="text-slate-500 text-lg max-w-md mx-auto leading-relaxed">
-                  Cliquez sur une date pour placer vos jours automatiquement, ou choisissez une méthode personnalisée.
+                  Deux modes au choix selon vos préférences.
                 </p>
               </div>
 
-              {/* Mode personnalisé toggle */}
-              <div className="group bg-slate-50/50 hover:bg-brand-50/30 border border-slate-200/60 hover:border-brand-200/60 rounded-2xl p-6 mb-6 transition-all duration-300 backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex-1">
-                    <h4 className="text-lg font-bold text-slate-900 group-hover:text-brand-900 mb-1 font-display">
-                      Mode personnalisé
-                    </h4>
-                    <p className="text-sm text-slate-600 group-hover:text-brand-700 leading-relaxed">
-                      Définissez vous-même la durée de vos périodes (min. 5j)
-                    </p>
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
+                {/* Mode simple (recommandé) */}
+                <div className="relative flex flex-col rounded-2xl border-2 border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-6 shadow-lg shadow-brand-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-500/20">
+                  <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md shadow-brand-500/30">
+                    <span aria-hidden="true">★</span>
+                    Recommandé
+                  </span>
+
+                  <div className="mb-5 flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-2xl text-white shadow-md shadow-brand-500/30">
+                      <span aria-hidden="true">⚡</span>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-bold font-display text-slate-900">Mode simple</h4>
+                      <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+                        1 clic = {totalFractionableDays} jours
+                      </p>
+                    </div>
                   </div>
+
+                  <div className="mb-5 rounded-xl border border-brand-100 bg-white/80 p-4 shadow-sm">
+                    <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Période unique
+                    </p>
+                    <div className="flex h-12 items-center justify-center rounded-lg bg-gradient-to-r from-brand-500 to-brand-600 text-sm font-bold text-white shadow-inner">
+                      {totalFractionableDays} jours consécutifs
+                    </div>
+                  </div>
+
+                  <p className="mb-5 flex-1 text-sm leading-relaxed text-slate-600">
+                    Cliquez sur une date dans le calendrier ci-dessus, vos {totalFractionableDays} jours
+                    se placent automatiquement à la suite.
+                  </p>
+
+                  <Button
+                    onClick={handleFocusCalendar}
+                    variant="primary"
+                    size="md"
+                    icon={ArrowUp}
+                    iconPosition="right"
+                    fullWidth
+                  >
+                    Choisir une date sur le calendrier
+                  </Button>
+                </div>
+
+                {/* Mode personnalisé */}
+                <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+                  <div className="mb-5 flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-2xl text-slate-700 shadow-sm">
+                      <span aria-hidden="true">⚙️</span>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-bold font-display text-slate-900">Mode personnalisé</h4>
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        2 périodes ajustables
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mb-5 rounded-xl border border-slate-100 bg-slate-50/80 p-4 shadow-sm">
+                    <div className="mb-2 flex gap-2 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <span className="flex-1">Période 1</span>
+                      <span className="flex-1">Période 2</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700">
+                        {customFirstBlockDays}j
+                      </div>
+                      <div className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700">
+                        {secondBlockDays}j
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="mb-5 flex-1 text-sm leading-relaxed text-slate-600">
+                    Définissez vous-même la durée de chaque période (minimum 5 jours par bloc).
+                  </p>
+
                   <Button
                     onClick={() => {
                       setCustomMode(true);
                       scheduleSmoothScroll(customModeRef);
                     }}
-                    variant="primary"
+                    variant="secondary"
                     size="md"
-                    className="flex-shrink-0 ml-4 shadow-none bg-slate-900 hover:bg-brand-600"
+                    fullWidth
                   >
-                    Activer
+                    Activer le mode personnalisé
                   </Button>
                 </div>
-
-                {/* Prévisualisation */}
-                <div className="bg-white/80 rounded-xl p-4 border border-slate-100 shadow-sm">
-                  <div className="flex gap-3 mb-2 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
-                    <span className="flex-1">Période 1</span>
-                    <span className="flex-1">Période 2</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 font-bold text-sm border border-slate-200">
-                      {customFirstBlockDays} jours
-                    </div>
-                    <div className="flex-1 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 font-bold text-sm border border-slate-200">
-                      {secondBlockDays} jours
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Instructions simples */}
-              <div className="text-center">
-                <p className="text-sm text-slate-400 font-medium">
-                  💡 <span className="text-slate-700">Mode simple</span> : 1 clic = {totalFractionableDays} jours consécutifs
-                </p>
               </div>
             </div>
           </div>
