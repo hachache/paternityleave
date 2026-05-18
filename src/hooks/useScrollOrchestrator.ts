@@ -15,16 +15,21 @@ interface UseScrollOrchestratorOptions {
   scenarioId: string;
   totalPlannedDays: number;
   totalFractionableDays: number;
+  /** Évite un double scroll : la modale de célébration gère le défilement à la fermeture. */
+  skipAutoScrollOnPlanningComplete: boolean;
 }
 
 interface ScrollOrchestrator {
   calendarRef: React.RefObject<HTMLDivElement>;
   planningRef: React.RefObject<HTMLDivElement>;
   customModeRef: React.RefObject<HTMLDivElement>;
+  supplementaryLeaveRef: React.RefObject<HTMLDivElement>;
   letterRef: React.RefObject<HTMLDivElement>;
   hasScrolledPastStart: boolean;
   scheduleSmoothScroll: (ref: React.RefObject<HTMLDivElement>) => void;
   scrollIntoViewIfNeeded: (ref: React.RefObject<HTMLDivElement>) => void;
+  /** Congé supplémentaire si monté, sinon courrier — après fin de planning ou fermeture modale. */
+  schedulePostPlanningScroll: () => void;
 }
 
 export function useScrollOrchestrator({
@@ -34,12 +39,14 @@ export function useScrollOrchestrator({
   customMode,
   scenarioId,
   totalPlannedDays,
-  totalFractionableDays
+  totalFractionableDays,
+  skipAutoScrollOnPlanningComplete
 }: UseScrollOrchestratorOptions): ScrollOrchestrator {
   const [hasScrolledPastStart, setHasScrolledPastStart] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const planningRef = useRef<HTMLDivElement>(null);
   const customModeRef = useRef<HTMLDivElement>(null);
+  const supplementaryLeaveRef = useRef<HTMLDivElement>(null);
   const letterRef = useRef<HTMLDivElement>(null);
   const previousScenarioId = useRef(scenarioId);
   const previousBirthDateTs = useRef<number | null>(null);
@@ -83,6 +90,13 @@ export function useScrollOrchestrator({
     [smoothScrollTo]
   );
 
+  const schedulePostPlanningScroll = useCallback(() => {
+    requestAnimationFrame(() => {
+      const targetRef = supplementaryLeaveRef.current ? supplementaryLeaveRef : letterRef;
+      scrollIntoViewIfNeeded(targetRef);
+    });
+  }, [scrollIntoViewIfNeeded]);
+
   useEffect(() => {
     if (previousScenarioId.current !== scenarioId && !birthDate) {
       scheduleSmoothScroll(calendarRef);
@@ -103,22 +117,45 @@ export function useScrollOrchestrator({
   }, [birthDate, mandatoryPeriodPresent, remainingBlocksCount, customMode, scheduleSmoothScroll]);
 
   useEffect(() => {
-    if (
+    const planningJustCompleted =
+      mandatoryPeriodPresent &&
       previousPlannedDays.current < totalFractionableDays &&
-      totalPlannedDays === totalFractionableDays
-    ) {
-      scrollIntoViewIfNeeded(letterRef);
+      totalPlannedDays === totalFractionableDays;
+
+    if (!planningJustCompleted) {
+      previousPlannedDays.current = totalPlannedDays;
+      return;
     }
-    previousPlannedDays.current = totalPlannedDays;
-  }, [scrollIntoViewIfNeeded, totalFractionableDays, totalPlannedDays]);
+
+    if (skipAutoScrollOnPlanningComplete) {
+      previousPlannedDays.current = totalPlannedDays;
+      return;
+    }
+
+    const frameId = requestAnimationFrame(() => {
+      const targetRef = supplementaryLeaveRef.current ? supplementaryLeaveRef : letterRef;
+      scrollIntoViewIfNeeded(targetRef);
+      previousPlannedDays.current = totalPlannedDays;
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [
+    mandatoryPeriodPresent,
+    skipAutoScrollOnPlanningComplete,
+    scrollIntoViewIfNeeded,
+    totalFractionableDays,
+    totalPlannedDays
+  ]);
 
   return {
     calendarRef,
     planningRef,
     customModeRef,
+    supplementaryLeaveRef,
     letterRef,
     hasScrolledPastStart,
     scheduleSmoothScroll,
-    scrollIntoViewIfNeeded
+    scrollIntoViewIfNeeded,
+    schedulePostPlanningScroll
   };
 }

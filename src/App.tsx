@@ -48,6 +48,7 @@ function App() {
     scenario,
     scenarioId,
     isPaternityPlanComplete,
+    celebrationPendingOnPlanningComplete,
     supplementaryLeaveEnabled,
     supplementaryLeaveDuration,
     supplementaryLeaveMode,
@@ -84,9 +85,11 @@ function App() {
     calendarRef,
     planningRef,
     customModeRef,
+    supplementaryLeaveRef,
     letterRef,
     hasScrolledPastStart,
-    scheduleSmoothScroll
+    scheduleSmoothScroll,
+    schedulePostPlanningScroll
   } = useScrollOrchestrator({
     birthDate,
     mandatoryPeriodPresent: Boolean(mandatoryPeriod),
@@ -94,7 +97,8 @@ function App() {
     customMode,
     scenarioId,
     totalPlannedDays,
-    totalFractionableDays
+    totalFractionableDays,
+    skipAutoScrollOnPlanningComplete: celebrationPendingOnPlanningComplete
   });
 
   const handleSelectBirthDate = (date: Date) => {
@@ -255,7 +259,7 @@ function App() {
           show={showCelebration}
           onClose={() => {
             hideCelebration();
-            scheduleSmoothScroll(letterRef);
+            schedulePostPlanningScroll();
           }}
           totalFractionableDays={totalFractionableDays}
         />
@@ -635,7 +639,11 @@ function App() {
         )}
 
         {birthDate && isPaternityPlanComplete && (
-          <div className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
+          <div
+            ref={supplementaryLeaveRef}
+            id="conge-supplementaire"
+            className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'}`}
+          >
             <SupplementaryLeaveCard
               enabled={supplementaryLeaveEnabled}
               duration={supplementaryLeaveDuration}

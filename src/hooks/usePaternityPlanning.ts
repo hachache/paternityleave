@@ -62,6 +62,14 @@ export function usePaternityPlanning() {
     [mandatoryPeriod, totalPlannedDays, totalFractionableDays]
   );
 
+  const celebrationPendingOnPlanningComplete = useMemo(
+    () =>
+      isPaternityPlanComplete &&
+      Boolean(birthDate && mandatoryPeriod && remainingBlocks.length > 0) &&
+      !hasShownCelebration.current,
+    [birthDate, mandatoryPeriod, remainingBlocks.length, isPaternityPlanComplete]
+  );
+
   const paternityEndDate = useMemo(() => {
     if (!mandatoryPeriod) return null;
     return remainingBlocks.reduce(
@@ -469,6 +477,7 @@ export function usePaternityPlanning() {
     setCustomMode,
     setCustomFirstBlockDays,
     isPaternityPlanComplete,
+    celebrationPendingOnPlanningComplete,
     supplementaryLeaveEnabled: supplementary.enabled,
     supplementaryLeaveDuration: supplementary.duration,
     supplementaryLeaveMode: supplementary.mode,
