@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { differenceInDays, startOfDay } from 'date-fns';
+import { addDays, differenceInDays, isAfter, startOfDay } from 'date-fns';
 import {
   calculateAutomaticRemainingPeriod,
   calculateEmployerPeriod,
@@ -13,6 +13,11 @@ import {
   getLeaveScenarioConfig
 } from '../utils/paternityLeave';
 import { validateBirthDate } from '../utils/dateValidation';
+import {
+  SupplementaryLeaveDuration,
+  calculateSupplementaryLeavePeriod,
+  getSupplementaryLeaveEligibility
+} from '../utils/supplementaryBirthLeave';
 
 export type SelectionStep = 'idle' | 'selecting-start' | 'selecting-end';
 
@@ -26,6 +31,8 @@ export function usePaternityPlanning() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [customMode, setCustomMode] = useState(false);
   const [scenarioId, setScenarioId] = useState<LeaveScenarioId>(DEFAULT_LEAVE_SCENARIO_ID);
+  const [supplementaryLeaveEnabled, setSupplementaryLeaveEnabled] = useState(false);
+  const [supplementaryLeaveDuration, setSupplementaryLeaveDuration] = useState<SupplementaryLeaveDuration>(1);
   const [customFirstBlockDays, setCustomFirstBlockDays] = useState(() => {
     const config = getLeaveScenarioConfig(DEFAULT_LEAVE_SCENARIO_ID);
     return Math.max(5, Math.min(10, config.fractionableDays - 5));
@@ -56,6 +63,81 @@ export function usePaternityPlanning() {
     [remainingBlocks]
   );
 
+  const isPaternityPlanComplete = useMemo(
+    () => Boolean(mandatoryPeriod) && totalPlannedDays === totalFractionableDays,
+    [mandatoryPeriod, totalPlannedDays, totalFractionableDays]
+  );
+
+  const supplementaryLeaveEligibility = useMemo(
+    () => getSupplementaryLeaveEligibility(birthDate, scenario),
+    [birthDate, scenario]
+  );
+
+  const paternityEndDate = useMemo(() => {
+    if (!mandatoryPeriod) return null;
+    return remainingBlocks.reduce(
+      (latestEnd, block) => (isAfter(block.end, latestEnd) ? block.end : latestEnd),
+      mandatoryPeriod.end
+    );
+  }, [mandatoryPeriod, remainingBlocks]);
+
+  const supplementaryLeaveStartDate = useMemo(() => {
+    if (!paternityEndDate) return null;
+    return addDays(startOfDay(paternityEndDate), 1);
+  }, [paternityEndDate]);
+
+  const supplementaryLeavePeriod = useMemo(() => {
+    if (!supplementaryLeaveEnabled) return null;
+    if (!supplementaryLeaveStartDate) return null;
+    if (!isPaternityPlanComplete) return null;
+    const projected = calculateSupplementaryLeavePeriod(
+      supplementaryLeaveStartDate,
+      supplementaryLeaveDuration
+    );
+    const legalLimit = supplementaryLeaveEligibility.limitDate;
+    if (!legalLimit || isAfter(projected.end, legalLimit)) return null;
+    return projected;
+  }, [
+    supplementaryLeaveDuration,
+    supplementaryLeaveEligibility.limitDate,
+    supplementaryLeaveEnabled,
+    supplementaryLeaveStartDate,
+    isPaternityPlanComplete
+  ]);
+
+  const supplementaryLeaveError = useMemo(() => {
+    if (!supplementaryLeaveEnabled) return null;
+    if (!supplementaryLeaveEligibility.canActivate) {
+      return supplementaryLeaveEligibility.reason;
+    }
+    if (!isPaternityPlanComplete) {
+      return 'Planifiez d’abord 100% du congé paternité pour projeter ce congé.';
+    }
+    if (!supplementaryLeaveStartDate) {
+      return 'Date de début indisponible.';
+    }
+    const legalLimit = supplementaryLeaveEligibility.limitDate;
+    if (!legalLimit) {
+      return 'Date limite légale indisponible.';
+    }
+    const projected = calculateSupplementaryLeavePeriod(
+      supplementaryLeaveStartDate,
+      supplementaryLeaveDuration
+    );
+    if (isAfter(projected.end, legalLimit)) {
+      return 'La période projetée dépasse le délai légal de prise.';
+    }
+    return null;
+  }, [
+    supplementaryLeaveDuration,
+    supplementaryLeaveEligibility.canActivate,
+    supplementaryLeaveEligibility.limitDate,
+    supplementaryLeaveEligibility.reason,
+    supplementaryLeaveEnabled,
+    supplementaryLeaveStartDate,
+    isPaternityPlanComplete
+  ]);
+
   useEffect(() => {
     if (birthDate && mandatoryPeriod && remainingBlocks.length > 0) {
       if (totalPlannedDays === totalFractionableDays && !hasShownCelebration.current) {
@@ -66,6 +148,19 @@ export function usePaternityPlanning() {
     }
     return undefined;
   }, [birthDate, mandatoryPeriod, remainingBlocks, totalFractionableDays, totalPlannedDays]);
+
+  useEffect(() => {
+    if (
+      supplementaryLeaveEnabled &&
+      (!isPaternityPlanComplete || !supplementaryLeaveEligibility.canActivate)
+    ) {
+      setSupplementaryLeaveEnabled(false);
+    }
+  }, [
+    isPaternityPlanComplete,
+    supplementaryLeaveEligibility.canActivate,
+    supplementaryLeaveEnabled
+  ]);
 
   useEffect(() => {
     if (previousScenarioRef.current !== scenarioId) {
@@ -79,6 +174,8 @@ export function usePaternityPlanning() {
       setRemainingBlocks([]);
       setSuccessMessage(null);
       setShowCelebration(false);
+      setSupplementaryLeaveEnabled(false);
+      setSupplementaryLeaveDuration(1);
 
       if (totalPlannedDays > totalFractionableDays) {
         setError(
@@ -139,6 +236,8 @@ export function usePaternityPlanning() {
     setSelectionStartDate(null);
     setShowCelebration(false);
     hasShownCelebration.current = false;
+    setSupplementaryLeaveEnabled(false);
+    setSupplementaryLeaveDuration(1);
   };
 
   const selectRemainingDay = (date: Date) => {
@@ -369,6 +468,8 @@ export function usePaternityPlanning() {
     setVisualSelectionMode(false);
     setSelectionStep('idle');
     setSelectionStartDate(null);
+    setSupplementaryLeaveEnabled(false);
+    setSupplementaryLeaveDuration(1);
   };
 
   const cancelReset = () => {
@@ -389,6 +490,8 @@ export function usePaternityPlanning() {
     setSelectionStep('idle');
     setSelectionStartDate(null);
     hasShownCelebration.current = false;
+    setSupplementaryLeaveEnabled(false);
+    setSupplementaryLeaveDuration(1);
   };
 
   const startVisualSelection = () => {
@@ -440,6 +543,15 @@ export function usePaternityPlanning() {
     scenarioId,
     setScenarioId,
     setCustomMode,
-    setCustomFirstBlockDays
+    setCustomFirstBlockDays,
+    isPaternityPlanComplete,
+    supplementaryLeaveEnabled,
+    supplementaryLeaveDuration,
+    supplementaryLeaveEligibility,
+    supplementaryLeaveStartDate,
+    supplementaryLeavePeriod,
+    supplementaryLeaveError,
+    setSupplementaryLeaveEnabled,
+    setSupplementaryLeaveDuration
   };
 }

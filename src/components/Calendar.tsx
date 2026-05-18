@@ -25,7 +25,7 @@ import {
   isDateInRange
 } from '../utils/paternityLeave';
 
-type DayType = 'birth' | 'employer' | 'mandatory' | 'remaining' | null;
+type DayType = 'birth' | 'employer' | 'mandatory' | 'remaining' | 'supplementary' | null;
 type DayAction = 'select' | 'remove' | 'static';
 
 interface DayMetadata {
@@ -41,6 +41,7 @@ interface CalendarProps {
   employerPeriod: LeaveBlock | null;
   mandatoryPeriod: LeaveBlock | null;
   remainingBlocks: LeaveBlock[];
+  supplementaryPeriod: LeaveBlock | null;
   onSelectRemainingDay: (date: Date) => void;
   onRemoveBlock: (index: number) => void;
   scenario: LeaveScenarioConfig;
@@ -54,6 +55,7 @@ export function Calendar({
   employerPeriod,
   mandatoryPeriod,
   remainingBlocks,
+  supplementaryPeriod,
   onSelectRemainingDay,
   onRemoveBlock,
   scenario
@@ -142,9 +144,10 @@ export function Calendar({
       for (const block of remainingBlocks) {
         if (isDateInBlock(date, block)) return 'remaining';
       }
+      if (supplementaryPeriod && isDateInBlock(date, supplementaryPeriod)) return 'supplementary';
       return null;
     },
-    [birthDate, employerPeriod, mandatoryPeriod, remainingBlocks]
+    [birthDate, employerPeriod, mandatoryPeriod, remainingBlocks, supplementaryPeriod]
   );
 
   const describeDay = useCallback(
@@ -168,6 +171,7 @@ export function Calendar({
       if (type === 'employer') return { type, selectable: false, reason: 'Période employeur', action: 'static' };
       if (type === 'mandatory') return { type, selectable: false, reason: 'Période obligatoire', action: 'static' };
       if (type === 'remaining') return { type, selectable: true, reason: 'Bloc planifié', action: 'remove' };
+      if (type === 'supplementary') return { type, selectable: false, reason: 'Congé supplémentaire 2026', action: 'static' };
 
       if (isBefore(date, birthDate)) {
         return { type: null, selectable: false, reason: 'Disponible uniquement après la naissance', action: 'static' };
@@ -302,31 +306,33 @@ export function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation active:scale-90 ';
+      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--green)] border border-transparent transition-all duration-200 touch-manipulation active:scale-90 ';
 
       if (!isCurrentMonthDay) {
         // Make non-current month days much fainter
-        classes += ' text-slate-300 opacity-25';
+        classes += ' text-[var(--muted-2)] opacity-20';
       }
 
-      const hasLeaveType = ['birth', 'employer', 'mandatory', 'remaining'].includes(metadata.type || '');
+      const hasLeaveType = ['birth', 'employer', 'mandatory', 'remaining', 'supplementary'].includes(metadata.type || '');
 
       if (metadata.type === 'birth') {
-        classes += ' bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/30 ring-2 ring-slate-900 ring-offset-2';
+        classes += ' bg-white text-[var(--ink)] font-bold shadow-lg shadow-white/10 ring-2 ring-white/70 ring-offset-2 ring-offset-surface-100';
       } else if (metadata.type === 'employer') {
-        classes += ' bg-brand-300 text-white shadow-sm';
+        classes += ' bg-brand-500 text-white shadow-sm';
       } else if (metadata.type === 'mandatory') {
         classes += ' bg-brand-600 text-white shadow-md shadow-brand-600/30';
       } else if (metadata.type === 'remaining') {
         classes += ' bg-success-500 text-white cursor-pointer hover:bg-success-600 hover:-translate-y-0.5 shadow-md shadow-success-500/30';
+      } else if (metadata.type === 'supplementary') {
+        classes += ' bg-[#0071e3] text-white shadow-md shadow-[#0071e3]/30';
       } else if (metadata.selectable && isCurrentMonthDay) {
-        classes += ' cursor-pointer text-slate-700 hover:bg-brand-50 hover:text-brand-700 active:scale-95';
+        classes += ' cursor-pointer text-[var(--text)] hover:bg-brand-50/40 hover:text-brand-700 active:scale-95';
       } else {
         classes += ' cursor-not-allowed';
-        if (isCurrentMonthDay) classes += ' opacity-40';
+        if (isCurrentMonthDay) classes += ' opacity-35';
       }
 
-      if (!hasLeaveType && (weekend || holiday) && isCurrentMonthDay) classes += ' bg-slate-50 text-slate-400';
+      if (!hasLeaveType && (weekend || holiday) && isCurrentMonthDay) classes += ' bg-white/5 text-[var(--muted)]';
 
       return classes;
     },
@@ -334,19 +340,19 @@ export function Calendar({
   );
 
   return (
-    <div className="rounded-[2rem] border border-white bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft relative">
+    <div className="rounded-[2rem] border border-white/10 bg-surface-100/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft relative">
       {!birthDate && (
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 hidden sm:block animate-bounce-subtle">
-           <div className="relative bg-white px-4 py-2 rounded-full shadow-lg border border-brand-200 text-brand-700 font-hand text-xl font-bold rotate-[-2deg]">
+           <div className="relative bg-surface-50 px-4 py-2 rounded-full shadow-lg border border-brand-400/25 text-brand-700 font-hand text-base font-bold rotate-[-2deg]">
              Commencez ici ! 👇
-             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-brand-200 transform rotate-45"></div>
+             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-surface-50 border-b border-r border-brand-400/25 transform rotate-45"></div>
            </div>
         </div>
       )}
 
       {!birthDate && (
-        <div className="mb-6 rounded-2xl bg-brand-50 p-5 border border-brand-100 animate-fade-in-up">
-          <p className="text-brand-800 text-center font-medium flex items-center justify-center gap-2">
+        <div className="mb-6 rounded-2xl bg-brand-50/35 p-5 border border-brand-400/30 animate-fade-in-up">
+          <p className="text-brand-700 text-center font-medium flex items-center justify-center gap-2">
             <span className="text-xl">👶</span>
             Sélectionnez la date de naissance pour commencer
           </p>
@@ -357,20 +363,20 @@ export function Calendar({
         <button
           type="button"
           onClick={previousMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
+          className="p-2.5 rounded-xl text-[var(--muted)] hover:bg-white/10 hover:text-[var(--text)] transition-all active:scale-95"
           aria-label="Mois précédent"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
 
-        <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900 capitalize tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-display font-bold text-[var(--text)] capitalize tracking-tight">
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
 
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
+          className="p-2.5 rounded-xl text-[var(--muted)] hover:bg-white/10 hover:text-[var(--text)] transition-all active:scale-95"
           aria-label="Mois suivant"
         >
           <ChevronRight className="h-6 w-6" />
@@ -379,7 +385,7 @@ export function Calendar({
 
       <div className="grid grid-cols-7 gap-2 mb-4">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-xs uppercase tracking-wider font-bold text-slate-400 py-2">
+          <div key={day} className="text-center text-xs uppercase tracking-wider font-bold text-[var(--muted-2)] py-2">
             {day}
           </div>
         ))}
@@ -407,10 +413,11 @@ export function Calendar({
               className={getDayClasses(dayStart, metadata)}
               tabIndex={isFocused ? 0 : -1}
               title={metadata.reason}
+              onFocus={handleCellFocus}
             >
               {dayStart.getDate()}
               {isTodayDate && (
-                <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-brand-500"></span>
+                <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-brand-700"></span>
               )}
             </button>
           );
