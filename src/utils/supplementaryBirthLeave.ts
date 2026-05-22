@@ -7,10 +7,10 @@ export type SupplementaryLeaveDuration = 1 | 2;
  * Mode de prise du congé supplémentaire de naissance (LFSS 2026, art. 99-V).
  *
  * - 'consecutive' : 1 ou 2 mois pris de manière continue à compter du jour
- *   suivant la fin du congé paternité.
+ *   suivant la fin du congé initial.
  * - 'split' : 2 périodes d'un mois calendaire prises de manière disjointe,
  *   chacune dans le délai légal de prise. Cas explicitement autorisé par
- *   les articles L1225-46-2 et suivants du Code du Travail.
+ *   les articles L1225-46-2 et suivants du Code du travail.
  */
 export type SupplementaryLeaveMode = 'consecutive' | 'split';
 
@@ -104,7 +104,7 @@ export function getSupplementaryLeaveEligibility(
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
-      reason: 'Définissez d’abord la date de naissance.'
+      reason: 'Définissez d’abord la date de naissance ou d’arrivée au foyer.'
     };
   }
 
@@ -124,7 +124,7 @@ export function getSupplementaryLeaveEligibility(
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
       reason:
-        'Réservé aux enfants nés/adoptés à partir du 1 janvier 2026 (hors cas prématuré non simulé).'
+        'Réservé aux enfants nés/adoptés à partir du 1er janvier 2026 (hors cas prématuré non simulé).'
     };
   }
 
@@ -138,7 +138,7 @@ export function getSupplementaryLeaveEligibility(
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario),
       reason:
-        'Activation prévue au 1 juillet 2026, sous réserve des textes d’application.'
+        'Activation prévue au 1er juillet 2026, sous réserve des décrets d’application.'
     };
   }
 
@@ -179,9 +179,9 @@ export interface SupplementaryLeaveSplitValidation {
 /**
  * Calcule et valide les deux périodes d'1 mois prises de manière disjointe.
  *
- * LÉGISLATION : Articles L1225-46-2 et suivants du Code du Travail (LFSS 2026).
+ * LÉGISLATION : Articles L1225-46-2 et suivants du Code du travail (LFSS 2026).
  * Chaque période fait 1 mois calendaire, ne peut pas chevaucher l'autre, et
- * doit rester comprise entre la fin du congé paternité et la date limite légale.
+ * doit rester comprise entre la fin du congé initial et la date limite légale.
  *
  * @returns blocs valides triés par date de début, accompagnés d'une erreur
  *          contextuelle si la validation échoue.
@@ -201,7 +201,7 @@ export function calculateSupplementaryLeaveSplitBlocks(
     return {
       valid: false,
       blocks: [],
-      error: 'Chaque période doit débuter après la fin du congé paternité.'
+      error: 'Chaque période doit débuter après la fin du congé initial.'
     };
   }
 

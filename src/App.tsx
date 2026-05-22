@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUp, Linkedin } from 'lucide-react';
+import {
+  ArrowUp,
+  CalendarDays as CalendarDaysIcon,
+  Linkedin,
+  MousePointer2,
+  Settings2,
+  SlidersHorizontal,
+  Star,
+  Trash2,
+  Zap
+} from 'lucide-react';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { useScrollOrchestrator } from './hooks/useScrollOrchestrator';
 import { Calendar } from './components/Calendar';
@@ -249,7 +259,11 @@ function App() {
           </div>
 
           <div className="max-w-3xl mx-auto mb-12">
-            <ProgressStepper currentStep={planningStep} fractionableDays={totalFractionableDays} />
+            <ProgressStepper
+              currentStep={planningStep}
+              fractionableDays={totalFractionableDays}
+              scenario={scenario}
+            />
             {birthDate && (
               <p className="mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm backdrop-blur-sm">
                 {totalPlannedDays} / {totalFractionableDays} jours planifiés
@@ -276,6 +290,7 @@ function App() {
                 supplementaryLeaveDaysUntilActivation={
                   supplementaryLeaveEligibility.daysUntilActivation
                 }
+                scenario={scenario}
               />
           </SectionCard>
         </div>
@@ -287,6 +302,7 @@ function App() {
             schedulePostPlanningScroll();
           }}
           totalFractionableDays={totalFractionableDays}
+          scenario={scenario}
           showSupplementaryAction={isEligibleForSupplementaryLeave}
           onGoToSupplementary={handleGoToSupplementaryLeave}
           onGoToLetter={handleGoToLetter}
@@ -375,15 +391,15 @@ function App() {
             onRemoveBlock={handleRemoveBlock}
             scenario={scenario}
           />
-          <CalendarLegend />
+          <CalendarLegend scenario={scenario} />
         </div>
 
         {birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode && (
           <div ref={planningRef} className={`max-w-3xl mx-auto mb-8 sm:mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'} scroll-mt-28`}>
             <div className={`premium-card p-6 sm:p-8 ${isCoarsePointer ? '' : 'transition-all duration-500'}`}>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mb-4 shadow-inner">
-                  <span className="text-3xl">📅</span>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mb-4 shadow-inner">
+                  <CalendarDaysIcon className="h-8 w-8" aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold font-display text-slate-900 mb-2">
                   Planifiez vos {totalFractionableDays} jours
@@ -397,13 +413,13 @@ function App() {
                 {/* Mode simple (recommandé) */}
                 <div className="relative flex flex-col rounded-2xl border-2 border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-6 shadow-lg shadow-brand-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-500/20">
                   <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md shadow-brand-500/30">
-                    <span aria-hidden="true">★</span>
+                    <Star className="h-3 w-3" aria-hidden="true" />
                     Recommandé
                   </span>
 
                   <div className="mb-5 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-2xl text-white shadow-md shadow-brand-500/30">
-                      <span aria-hidden="true">⚡</span>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white shadow-md shadow-brand-500/30">
+                      <Zap className="h-6 w-6" aria-hidden="true" />
                     </div>
                     <div>
                       <h4 className="text-lg font-bold font-display text-slate-900">Mode simple</h4>
@@ -442,8 +458,8 @@ function App() {
                 {/* Mode personnalisé */}
                 <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
                   <div className="mb-5 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-2xl text-slate-700 shadow-sm">
-                      <span aria-hidden="true">⚙️</span>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-sm">
+                      <Settings2 className="h-6 w-6" aria-hidden="true" />
                     </div>
                     <div>
                       <h4 className="text-lg font-bold font-display text-slate-900">Mode personnalisé</h4>
@@ -496,7 +512,7 @@ function App() {
               <div className="flex items-start gap-5 mb-8">
                 <div className="flex-shrink-0">
                   <div className="w-16 h-16 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-brand-600/30">
-                    <span aria-hidden="true">⚙️</span>
+                    <Settings2 className="h-8 w-8" aria-hidden="true" />
                   </div>
                 </div>
                 <div className="flex-1">
@@ -514,7 +530,7 @@ function App() {
                 <div className="bg-slate-50/80 rounded-3xl p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group backdrop-blur-sm">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-white text-slate-700 border border-slate-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                      <span aria-hidden="true">🎚️</span>
+                      <SlidersHorizontal className="h-6 w-6" aria-hidden="true" />
                     </div>
                     <div>
                       <h4 className="text-base font-bold text-slate-900">Curseur</h4>
@@ -531,7 +547,7 @@ function App() {
                   <div className="relative z-10">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                        <span aria-hidden="true">👆</span>
+                        <MousePointer2 className="h-6 w-6" aria-hidden="true" />
                       </div>
                       <div>
                         <h4 className="text-base font-bold text-slate-900">Sélection directe</h4>
@@ -660,7 +676,7 @@ function App() {
               fullWidth
               className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
             >
-              <span className="group-hover:scale-110 transition-transform duration-300 mr-2">🗑️</span>
+              <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
               Recommencer la planification
             </Button>
           </div>
@@ -685,6 +701,7 @@ function App() {
               startDate={supplementaryLeaveStartDate}
               periods={supplementaryLeavePeriods}
               error={supplementaryLeaveError}
+              scenario={scenario}
               onEnabledChange={setSupplementaryLeaveEnabled}
               onDurationChange={setSupplementaryLeaveDuration}
               onModeChange={setSupplementaryLeaveMode}
@@ -747,9 +764,7 @@ function App() {
 
           {/* Signature Badge */}
           <div className="flex items-center gap-2 px-5 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm transition-transform hover:scale-105 hover:bg-white">
-            <span className="text-xs text-slate-500 font-medium">Made with</span>
-            <span className="text-red-500 animate-pulse-heart text-sm">❤️</span>
-            <span className="text-xs text-slate-500 font-medium">by</span>
+            <span className="text-xs text-slate-500 font-medium">Créé par</span>
             <a
               href="https://www.linkedin.com/in/hedi-a-2382551a1/"
               target="_blank"

@@ -43,6 +43,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className = '',
       children,
       disabled,
+      type = 'button',
       ...props
     },
     ref
@@ -55,7 +56,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${className}`.trim();
 
     return (
-      <button ref={ref} className={combinedClassName} disabled={disabled} {...props}>
+      <button ref={ref} className={combinedClassName} disabled={disabled} type={type} {...props}>
         {Icon && iconPosition === 'left' && <Icon className={iconSizeStyles[size]} strokeWidth={2.5} />}
         {children}
         {Icon && iconPosition === 'right' && <Icon className={iconSizeStyles[size]} strokeWidth={2.5} />}

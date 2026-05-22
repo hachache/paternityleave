@@ -24,16 +24,8 @@ import {
   isDateInBlock,
   isDateInRange
 } from '../utils/paternityLeave';
-
-type DayType = 'birth' | 'employer' | 'mandatory' | 'remaining' | null;
-type DayAction = 'select' | 'remove' | 'static';
-
-interface DayMetadata {
-  type: DayType;
-  selectable: boolean;
-  reason?: string;
-  action: DayAction;
-}
+import { CalendarDayMetadata, CalendarDayType, buildCalendarDayAriaLabel, getInitialEventDateMetadata } from '../utils/calendarDay';
+import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
 
 interface CalendarProps {
   birthDate: Date | null;
@@ -63,6 +55,7 @@ export function Calendar({
   const [focusedDate, setFocusedDate] = useState<Date>(() => startOfDay(new Date()));
   const dayRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const today = useMemo(() => startOfDay(new Date()), []);
+  const vocabulary = useMemo(() => getScenarioVocabulary(scenario), [scenario]);
 
   const monthStart = currentMonth;
   const monthEnd = useMemo(() => endOfMonth(currentMonth), [currentMonth]);
@@ -134,7 +127,7 @@ export function Calendar({
   }, [focusedDate, currentMonth, isCoarsePointer]);
 
   const getDayType = useCallback(
-    (date: Date): DayType => {
+    (date: Date): CalendarDayType => {
       if (!birthDate) return null;
       if (isSameDay(date, birthDate)) return 'birth';
       if (employerPeriod && isDateInBlock(date, employerPeriod)) return 'employer';
@@ -148,38 +141,33 @@ export function Calendar({
   );
 
   const describeDay = useCallback(
-    (rawDate: Date): DayMetadata => {
+    (rawDate: Date): CalendarDayMetadata => {
       const date = startOfDay(rawDate);
       const type = getDayType(date);
 
       if (!birthDate) {
-        if (isBefore(date, today)) {
-          return {
-            type,
-            selectable: false,
-            reason: "La date de naissance ne peut pas être antérieure à aujourd'hui",
-            action: 'static'
-          };
-        }
-        return { type, selectable: true, action: 'select' };
+        return getInitialEventDateMetadata(vocabulary.eventDateActionLabel);
       }
 
-      if (type === 'birth') return { type, selectable: false, reason: "Date de naissance", action: 'static' };
+      if (type === 'birth') return { type, selectable: false, reason: vocabulary.eventDateLabel, action: 'static' };
       if (type === 'employer') return { type, selectable: false, reason: 'Période employeur', action: 'static' };
       if (type === 'mandatory') return { type, selectable: false, reason: 'Période obligatoire', action: 'static' };
       if (type === 'remaining') return { type, selectable: true, reason: 'Bloc planifié', action: 'remove' };
+      if (employerPeriod && isDateInRange(date, employerPeriod.start, employerPeriod.end)) {
+        return { type: null, selectable: false, reason: 'Intervalle du congé employeur', action: 'static' };
+      }
 
       if (isBefore(date, birthDate)) {
-        return { type: null, selectable: false, reason: 'Disponible uniquement après la naissance', action: 'static' };
+        return { type: null, selectable: false, reason: vocabulary.afterEventReason, action: 'static' };
       }
 
       if (usageLimit && isAfter(date, usageLimit)) {
-        return { type: null, selectable: false, reason: `Au-delà de la limite`, action: 'static' };
+        return { type: null, selectable: false, reason: 'Au-delà du délai légal', action: 'static' };
       }
 
       return { type: null, selectable: true, action: 'select' };
     },
-    [birthDate, getDayType, usageLimit, today]
+    [birthDate, employerPeriod, getDayType, usageLimit, vocabulary]
   );
 
   const focusDate = useCallback(
@@ -223,7 +211,7 @@ export function Calendar({
   const nextMonth = () => goToMonth(1);
 
   const handleDayInteraction = useCallback(
-    (date: Date, metadata?: DayMetadata) => {
+    (date: Date, metadata?: CalendarDayMetadata) => {
       const detail = metadata ?? describeDay(date);
       if (!birthDate) {
         if (detail.selectable) onSelectBirthDate(date);
@@ -244,7 +232,7 @@ export function Calendar({
   );
 
   const metadataByKey = useMemo(() => {
-    const m = new Map<number, DayMetadata>();
+    const m = new Map<number, CalendarDayMetadata>();
     for (const d of days) {
       const key = startOfDay(d).getTime();
       m.set(key, describeDay(d));
@@ -297,7 +285,7 @@ export function Calendar({
   );
 
   const getDayClasses = useCallback(
-    (date: Date, metadata: DayMetadata) => {
+    (date: Date, metadata: CalendarDayMetadata) => {
       const isCurrentMonthDay = isSameMonth(date, currentMonth);
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
@@ -336,19 +324,9 @@ export function Calendar({
   return (
     <div className="rounded-[2rem] border border-white bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft relative">
       {!birthDate && (
-        <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20 hidden sm:block animate-bounce-subtle">
-           <div className="relative bg-white px-4 py-2 rounded-full shadow-lg border border-brand-200 text-brand-700 font-hand text-xl font-bold rotate-[-2deg]">
-             Commencez ici ! 👇
-             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-brand-200 transform rotate-45"></div>
-           </div>
-        </div>
-      )}
-
-      {!birthDate && (
         <div className="mb-6 rounded-2xl bg-brand-50 p-5 border border-brand-100 animate-fade-in-up">
-          <p className="text-brand-800 text-center font-medium flex items-center justify-center gap-2">
-            <span className="text-xl">👶</span>
-            Sélectionnez la date de naissance pour commencer
+          <p className="text-brand-800 text-center font-medium">
+            Sélectionnez la {vocabulary.eventDateActionLabel} pour démarrer le calcul.
           </p>
         </div>
       )}
@@ -397,6 +375,13 @@ export function Calendar({
           const metadata = metadataByKey.get(dayKey) ?? { type: null, selectable: true, action: 'select' };
           const isFocused = dayKey === startOfDay(focusedDate).getTime();
           const isTodayDate = isSameDay(dayStart, today);
+          const ariaLabel = buildCalendarDayAriaLabel(dayStart, metadata, {
+            eventDateLabel: vocabulary.eventDateLabel,
+            eventDateActionLabel: vocabulary.eventDateActionLabel,
+            selectActionLabel: birthDate
+              ? 'ajouter une période à partir de cette date'
+              : `sélectionner cette date comme ${vocabulary.eventDateActionLabel}`
+          });
           
           return (
             <button
@@ -407,6 +392,9 @@ export function Calendar({
               className={getDayClasses(dayStart, metadata)}
               tabIndex={isFocused ? 0 : -1}
               title={metadata.reason}
+              aria-label={ariaLabel}
+              aria-disabled={!metadata.selectable && metadata.action === 'static'}
+              aria-current={isTodayDate ? 'date' : undefined}
               onFocus={handleCellFocus}
             >
               {dayStart.getDate()}

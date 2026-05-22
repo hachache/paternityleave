@@ -15,7 +15,7 @@ Fichier principal contenant :
 
 ### 2. **Interface Utilisateur** (Composant LegalReferences)
 Page dédiée dans l'application affichant :
-- Liste des articles du Code du Travail appliqués
+- Liste des articles du Code du travail appliqués
 - Liens directs vers Légifrance et Service-Public.fr
 - Définitions interactives des types de jours
 - Avertissement légal
@@ -28,7 +28,7 @@ Export programmatique des sources légales :
 import { ARTICLE_L1225_35, ALL_LEGAL_SOURCES } from './utils/legalReferences';
 
 // Accès à une référence spécifique
-console.log(ARTICLE_L1225_35.url); 
+console.log(ARTICLE_L1225_35.url);
 // → https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923150
 
 // Filtrer par type
@@ -45,12 +45,12 @@ Chaque fonction critique du code contient des commentaires JSDoc référençant 
 ```typescript
 /**
  * Calcule la période de congé de naissance (employeur).
- * 
- * LEGISLATION : Article L1225-35-3 du Code du Travail
+ *
+ * LEGISLATION : Article L1225-35-3 du Code du travail
  * - 3 jours ouvrables (lundi-samedi hors fériés et dimanche)
- * - Rémunérés par l'employeur (pas la Sécurité Sociale)
+ * - Rémunérés par l'employeur (pas la Sécurité sociale)
  * - Peuvent commencer le jour de la naissance
- * 
+ *
  * @param birthDate Date de naissance de l'enfant
  * @returns LeaveBlock représentant les 3 jours de congé employeur
  */
@@ -63,10 +63,10 @@ export function calculateEmployerPeriod(birthDate: Date): LeaveBlock {
 ```typescript
 /**
  * Vérifie si une date est un jour ouvré.
- * 
+ *
  * DEFINITION LEGALE : Service-Public.fr
  * "Jours ouvrés = jours travaillés dans l'entreprise (généralement lun-ven)"
- * 
+ *
  * @param date Date à vérifier
  * @returns true si le jour est ouvré (lun-ven hors fériés)
  */
@@ -77,7 +77,7 @@ export function isWorkingDay(date: Date): boolean {
 
 ## 📖 Textes de Loi Principaux
 
-### Congé de paternité et d'accueil de l'enfant (Loi 2021-953)
+### Congé de paternité et d'accueil de l'enfant (LFSS 2021)
 
 | Article | Objet | URL |
 |---------|-------|-----|
@@ -86,20 +86,22 @@ export function isWorkingDay(date: Date): boolean {
 | **L1225-35-2** | Délai de prise (6 mois) | [Légifrance](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923132) |
 | **L1225-35-3** | Congé naissance (3j) | [Légifrance](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923122) |
 | **L331-8** | Indemnisation CPAM | [Légifrance](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923074) |
+| **LFSS 2021, art. 73** | Allongement du congé de paternité | [Légifrance](https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000042665368) |
+| **Décret n° 2021-574** | Modalités d'application | [Légifrance](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043492531) |
 
 ### Congé supplémentaire de naissance (LFSS 2026)
 
 | Référence | Objet | URL |
 |-----------|-------|-----|
 | **LFSS 2026, art. 99-V** | Création du dispositif | [Légifrance](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052832820) |
-| **L1225-46-2 à L1225-46-7** | Régime applicable (Code du Travail) | [Légifrance](https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000052832890/) |
+| **L1225-46-2 à L1225-46-7** | Régime applicable (Code du travail) | [Légifrance](https://www.legifrance.gouv.fr/codes/id/LEGIARTI000053271698) |
 | **Service-Public.gouv.fr** | Annonce officielle | [service-public.gouv.fr](https://www.service-public.gouv.fr/particuliers/actualites/A18750) |
 | **Code du travail numérique** | Synthèse au 1er juillet 2026 | [code.travail.gouv.fr](https://code.travail.gouv.fr/actualite/conge-de-naissance-supplementaire-ce-qui-change-au-1er-juillet-2026) |
 
 #### Caractéristiques retenues par l'application
 - **Bénéficiaires** : salariés, indépendants, non-salariés agricoles, fonctionnaires, militaires.
-- **Enfants concernés** : nés ou adoptés à partir du **1 janvier 2026**.
-- **Entrée en vigueur** : **1 juillet 2026**, sous réserve des décrets d'application.
+- **Enfants concernés** : nés ou adoptés à partir du **1er janvier 2026**.
+- **Entrée en vigueur** : **1er juillet 2026**, sous réserve des décrets d'application.
 - **Durée** : 1 à 2 mois par parent.
 - **Fractionnement** : 2 périodes d'1 mois disjointes possibles.
 - **Indemnisation** : 70% du salaire net le premier mois, 60% le second, dans la limite du plafond de la Sécurité sociale.
@@ -144,7 +146,7 @@ Exemple : Le samedi est bien un jour ouvrable selon Service-Public.fr, donc incl
 
 ### Historique des Versions Législatives
 - **Avant 1er juillet 2021** : Congé de 11 jours (ancienne loi)
-- **Depuis 1er juillet 2021** : Congé de 25 jours (Loi 2021-953)
+- **Depuis 1er juillet 2021** : Congé de 25 jours (loi n° 2020-1576 du 14 décembre 2020, article 73, et décret n° 2021-574 du 10 mai 2021)
 - **À partir du 1er juillet 2026** : Création du congé supplémentaire de naissance (LFSS 2026, art. 99-V) — 1 à 2 mois indemnisés par parent, ouvert aux salariés du privé, indépendants, agricoles, fonctionnaires et militaires
   - Application actuelle : **version 2026 (paternité 2021 + supplémentaire 2026)**
 
@@ -188,7 +190,8 @@ Merci de créer une issue sur le dépôt avec :
 
 ---
 
-**Dernière révision** : Mai 2026  
-**Version législation** : Loi n° 2021-953 (1er juillet 2021) + LFSS 2026, art. 99-V (entrée en vigueur 1er juillet 2026)  
-**Prochaine révision prévue** : à la publication des décrets d'application du congé supplémentaire de naissance
+**Dernière révision** : Mai 2026
 
+**Version législation** : LFSS 2021, art. 73 (1er juillet 2021) + LFSS 2026, art. 99-V (entrée en vigueur 1er juillet 2026)
+
+**Prochaine révision prévue** : à la publication des décrets d'application du congé supplémentaire de naissance

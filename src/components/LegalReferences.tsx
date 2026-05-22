@@ -11,43 +11,57 @@ interface LegalReference {
 const LEGAL_REFERENCES: LegalReference[] = [
   {
     title: 'Durée du congé de paternité',
-    article: 'Article L1225-35 du Code du Travail',
+    article: 'Article L1225-35 du Code du travail',
     url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923150',
     description: '25 jours calendaires pour naissance simple, 32 jours pour naissances multiples',
     category: 'code-travail'
   },
   {
     title: 'Fractionnement du congé',
-    article: 'Article L1225-35-1 du Code du Travail',
+    article: 'Article L1225-35-1 du Code du travail',
     url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923140',
-    description: 'Période obligatoire de 4 jours + 21 jours fractionnables en 2 blocs minimum de 5 jours',
+    description: 'Période obligatoire de 4 jours + 21 jours fractionnables, en 1 ou 2 périodes. Minimum 5 jours par période en cas de fractionnement.',
     category: 'code-travail'
   },
   {
     title: 'Période de référence',
-    article: 'Article L1225-35-2 du Code du Travail',
+    article: 'Article L1225-35-2 du Code du travail',
     url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923132',
     description: 'Congé à prendre dans les 6 mois suivant la naissance (12 mois en cas d\'hospitalisation)',
     category: 'code-travail'
   },
   {
     title: 'Congé de naissance',
-    article: 'Article L1225-35-3 du Code du Travail',
+    article: 'Article L1225-35-3 du Code du travail',
     url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923122',
     description: '3 jours ouvrables (lundi-samedi hors fériés) rémunérés par l\'employeur',
     category: 'code-travail'
   },
   {
     title: 'Indemnisation du congé',
-    article: 'Article L331-8 du Code de la Sécurité Sociale',
+    article: 'Article L331-8 du Code de la sécurité sociale',
     url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923074',
     description: 'Indemnités journalières versées par la CPAM pendant le congé de paternité',
     category: 'code-secu'
   },
   {
+    title: 'Allongement du congé de paternité',
+    article: 'LFSS 2021 - loi n° 2020-1576 du 14 décembre 2020, article 73',
+    url: 'https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000042665368',
+    description: 'Réforme entrée en vigueur le 1er juillet 2021 : 25 jours calendaires, dont 4 jours obligatoires.',
+    category: 'code-travail'
+  },
+  {
+    title: 'Modalités d’application 2021',
+    article: 'Décret n° 2021-574 du 10 mai 2021',
+    url: 'https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043492531',
+    description: 'Décret relatif à l’allongement et à l’obligation de prise d’une partie du congé.',
+    category: 'code-travail'
+  },
+  {
     title: 'Guide pratique du congé paternité',
     article: 'Service-Public.fr - Congé de paternité',
-    url: 'https://www.service-public.fr/particuliers/vosdroits/F583',
+    url: 'https://www.service-public.gouv.fr/particuliers/vosdroits/F3156',
     description: 'Informations pratiques sur les démarches et conditions du congé de paternité',
     category: 'service-public'
   },
@@ -66,13 +80,13 @@ const SUPPLEMENTARY_2026_REFERENCES: LegalReference[] = [
     article: 'LFSS 2026 - Article 99-V',
     url: 'https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052832820',
     description:
-      '1 à 2 mois indemnisés par parent (70% puis 60% du salaire net, dans la limite du plafond SS), pris après les congés mat/pat/adoption. Fractionnable en 2 périodes d\'1 mois.',
+      '1 à 2 mois indemnisés par parent (70% puis 60% du salaire net, dans la limite du plafond de la Sécurité sociale), pris après les congés de maternité, de paternité et d\'accueil ou d\'adoption. Fractionnable en 2 périodes d\'1 mois.',
     category: 'code-travail'
   },
   {
     title: 'Encadrement du nouveau congé',
-    article: 'Articles L1225-46-2 à L1225-46-7 du Code du Travail',
-    url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000052832890/',
+    article: 'Articles L1225-46-2 à L1225-46-7 du Code du travail',
+    url: 'https://www.legifrance.gouv.fr/codes/id/LEGIARTI000053271698',
     description:
       'Durée, fractionnement, prise simultanée ou en alternance entre parents, préavis (1 mois ou 15 jours en succession immédiate).',
     category: 'code-travail'
@@ -82,7 +96,7 @@ const SUPPLEMENTARY_2026_REFERENCES: LegalReference[] = [
     article: 'Service-Public.gouv.fr',
     url: 'https://www.service-public.gouv.fr/particuliers/actualites/A18750',
     description:
-      'Bénéficiaires : salariés, indépendants, non-salariés agricoles, fonctionnaires, militaires. Enfants nés/adoptés à partir du 1 janvier 2026.',
+      'Bénéficiaires : salariés, indépendants, non-salariés agricoles, fonctionnaires, militaires. Enfants nés/adoptés à partir du 1er janvier 2026.',
     category: 'service-public'
   },
   {
@@ -112,7 +126,7 @@ const DEFINITIONS = [
     term: 'Jours calendaires',
     definition: 'Tous les jours du calendrier, y compris weekends et jours fériés',
     usage: 'Utilisé pour les périodes obligatoire (4 jours) et fractionnable (21/28 jours)',
-    url: 'https://www.service-public.fr/particuliers/vosdroits/F583'
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F2258'
   }
 ];
 
@@ -131,11 +145,11 @@ function getCategoryIcon(category: LegalReference['category']) {
 function getCategoryLabel(category: LegalReference['category']) {
   switch (category) {
     case 'code-travail':
-      return 'Code du Travail';
+      return 'Code du travail';
     case 'code-secu':
-      return 'Code de la Sécurité Sociale';
+      return 'Code de la sécurité sociale';
     case 'service-public':
-      return 'Service Public';
+      return 'Service-Public.fr';
     case 'ameli':
       return 'Assurance Maladie';
   }
@@ -163,7 +177,7 @@ export function LegalReferences() {
           <Scale className="w-8 h-8 text-blue-600" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900">
-          Références Légales
+          Références légales
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Toutes les règles de calcul de cette application sont basées sur les textes de loi officiels français.
@@ -175,17 +189,19 @@ export function LegalReferences() {
         <div className="flex gap-4">
           <div className="flex-shrink-0">
             <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">⚖️</span>
+              <Scale className="w-5 h-5 text-amber-700" aria-hidden="true" />
             </div>
           </div>
           <div className="space-y-2">
             <h3 className="font-semibold text-amber-900">
-              Application de la loi du 19 juillet 2021
+              Application de la réforme 2021
             </h3>
             <p className="text-sm text-amber-900 leading-relaxed">
-              Cette application applique la <strong>Loi n° 2021-953 du 19 juillet 2021</strong> qui a allongé 
-              le congé de paternité de 11 à 25 jours calendaires. Toutes les règles implémentées sont conformes 
-              au Code du Travail et au Code de la Sécurité Sociale en vigueur.
+              Cette application applique la <strong>loi n° 2020-1576 du 14 décembre 2020
+              de financement de la sécurité sociale pour 2021, article 73</strong>, entrée
+              en vigueur le 1er juillet 2021, et le <strong>décret n° 2021-574 du 10 mai
+              2021</strong>. Toutes les règles implémentées sont conformes au Code du travail
+              et au Code de la sécurité sociale en vigueur.
             </p>
           </div>
         </div>
@@ -196,7 +212,7 @@ export function LegalReferences() {
         <div className="flex gap-4">
           <div className="flex-shrink-0">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">🆕</span>
+              <BookOpen className="w-5 h-5 text-blue-700" aria-hidden="true" />
             </div>
           </div>
           <div className="space-y-2">
@@ -206,13 +222,13 @@ export function LegalReferences() {
             <p className="text-sm text-blue-900 leading-relaxed">
               La <strong>LFSS pour 2026 (article 99-V)</strong> crée un congé supplémentaire de naissance
               <strong> applicable au 1er juillet 2026</strong> pour les enfants nés ou adoptés à partir du
-              1 janvier 2026. Durée : 1 à 2 mois par parent, fractionnable en 2 périodes d&apos;1 mois,
+              1er janvier 2026. Durée : 1 à 2 mois par parent, fractionnable en 2 périodes d&apos;1 mois,
               indemnisé à 70% du salaire net le premier mois et 60% le second, dans la limite du plafond
               de la Sécurité sociale.
             </p>
             <p className="text-xs text-blue-800 font-medium">
               Sous réserve de la publication des décrets d&apos;application. Codifié aux articles L1225-46-2
-              à L1225-46-7 du Code du Travail.
+              à L1225-46-7 du Code du travail.
             </p>
           </div>
         </div>
@@ -270,7 +286,7 @@ export function LegalReferences() {
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
           <BookOpen className="w-6 h-6 text-blue-600" />
-          Congé de paternité (Loi 2021-953)
+          Congé de paternité (LFSS 2021)
         </h2>
         
         <div className="grid gap-4">
@@ -318,7 +334,7 @@ export function LegalReferences() {
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
           <FileText className="w-6 h-6 text-blue-600" />
-          Définitions des Types de Jours
+          Définitions des types de jours
         </h2>
         
         <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
@@ -442,4 +458,3 @@ export function LegalReferences() {
     </div>
   );
 }
-

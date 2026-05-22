@@ -14,6 +14,7 @@ import {
 } from '../utils/paternityLeave';
 import { validateBirthDate } from '../utils/dateValidation';
 import { useSupplementaryLeave } from './useSupplementaryLeave';
+import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
 
 export type SelectionStep = 'idle' | 'selecting-start' | 'selecting-end';
 
@@ -141,7 +142,11 @@ export function usePaternityPlanning() {
     const normalized = startOfDay(date);
     
     // Validation complete de la date de naissance
-    const validation = validateBirthDate(normalized);
+    const vocabulary = getScenarioVocabulary(scenario);
+    const validation = validateBirthDate(normalized, {
+      eventName: vocabulary.eventName,
+      eventDateLabel: vocabulary.eventDateActionLabel
+    });
     
     if (!validation.valid) {
       setError(validation.error || 'Date de naissance invalide');
@@ -181,17 +186,18 @@ export function usePaternityPlanning() {
     setSuccessMessage(null);
 
     if (!birthDate || !mandatoryPeriod) return;
+    const eventName = scenario.id === 'adoption' ? "l'arrivée au foyer" : 'la naissance';
 
     if (visualSelectionMode && selectionStep === 'selecting-start') {
       if (normalized < birthDate) {
-        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
+        setError(`Les jours fractionnables ne peuvent pas être posés avant ${eventName}`);
         return;
       }
 
       setSelectionStartDate(normalized);
       setSelectionStep('selecting-end');
       setSuccessMessage(
-        `✅ Date de début sélectionnée : ${normalized.toLocaleDateString(
+        `Date de début sélectionnée : ${normalized.toLocaleDateString(
           'fr-FR'
         )}. Cliquez maintenant sur la date de FIN de votre première période.`
       );
@@ -248,14 +254,14 @@ export function usePaternityPlanning() {
       setSelectionStartDate(null);
       setCustomMode(false);
       setSuccessMessage(
-        `✅ Premier bloc de ${daysDiff} jours placé ! Cliquez sur le calendrier pour placer les ${remainingAfterFirst} jours restants.`
+        `Premier bloc de ${daysDiff} jours placé. Cliquez sur le calendrier pour placer les ${remainingAfterFirst} jours restants.`
       );
       return;
     }
 
     if (customMode && remainingBlocks.length === 0) {
       if (normalized < birthDate) {
-        setError('Les jours fractionnables ne peuvent pas être posés avant la date de naissance');
+        setError(`Les jours fractionnables ne peuvent pas être posés avant ${eventName}`);
         return;
       }
 
@@ -268,7 +274,7 @@ export function usePaternityPlanning() {
 
       if (!firstBlock) {
         setError(
-          `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+          `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après ${eventName}`
         );
         return;
       }
@@ -292,7 +298,7 @@ export function usePaternityPlanning() {
       const remainingAfterFirst = totalFractionableDays - customFirstBlockDays;
       setRemainingBlocks([firstBlock]);
       setSuccessMessage(
-        `✅ Premier bloc de ${customFirstBlockDays} jours placé ! Cliquez sur une autre date pour placer les ${remainingAfterFirst} jours restants.`
+        `Premier bloc de ${customFirstBlockDays} jours placé. Cliquez sur une autre date pour placer les ${remainingAfterFirst} jours restants.`
       );
       return;
     }
@@ -308,7 +314,7 @@ export function usePaternityPlanning() {
 
       if (!secondBlock) {
         setError(
-          `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+          `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après ${eventName}`
         );
         return;
       }
@@ -332,7 +338,7 @@ export function usePaternityPlanning() {
       setRemainingBlocks(prev => [...prev, secondBlock]);
       setCustomMode(false);
       setSuccessMessage(
-        `🎉 Planning complet ! Les ${totalFractionableDays} jours ont été planifiés en 2 périodes personnalisées.`
+        `Planning complet. Les ${totalFractionableDays} jours ont été planifiés en 2 périodes personnalisées.`
       );
       return;
     }
@@ -353,7 +359,7 @@ export function usePaternityPlanning() {
 
     if (!autoBlock) {
       setError(
-        `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après la naissance`
+        `Impossible de planifier à partir de cette date : la période dépasse les ${scenario.limitMonthsAfterBirth} mois après ${eventName}`
       );
       return;
     }
@@ -377,10 +383,10 @@ export function usePaternityPlanning() {
     setRemainingBlocks(prev => [...prev, autoBlock]);
     setError(null);
     if (!customMode && totalUsedDays + autoBlock.days === totalFractionableDays) {
-      setSuccessMessage(`✅ Les ${totalFractionableDays} jours ont été planifiés automatiquement !`);
+      setSuccessMessage(`Les ${totalFractionableDays} jours ont été planifiés automatiquement.`);
     } else if (!customMode) {
       const blocDays = autoBlock.days;
-      setSuccessMessage(`✅ Bloc de ${blocDays} jours planifié ! ${totalFractionableDays - totalUsedDays - autoBlock.days} jours restants.`);
+      setSuccessMessage(`Bloc de ${blocDays} jours planifié. ${totalFractionableDays - totalUsedDays - autoBlock.days} jours restants.`);
     }
   };
 
@@ -430,7 +436,7 @@ export function usePaternityPlanning() {
   const startVisualSelection = () => {
     setVisualSelectionMode(true);
     setSelectionStep('selecting-start');
-    setSuccessMessage('🎯 Mode sélection visuelle activé ! Cliquez sur la date de DÉBUT de votre première période.');
+    setSuccessMessage('Mode sélection visuelle activé. Cliquez sur la date de DÉBUT de votre première période.');
   };
 
   const cancelVisualSelection = () => {

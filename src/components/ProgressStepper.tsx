@@ -1,17 +1,15 @@
 import { Check } from 'lucide-react';
+import { LeaveScenarioConfig } from '../utils/paternityLeave';
+import { buildProgressSteps } from '../utils/progressSteps';
 
 interface ProgressStepperProps {
   currentStep: number;
   fractionableDays: number;
+  scenario: LeaveScenarioConfig;
 }
 
-export function ProgressStepper({ currentStep, fractionableDays }: ProgressStepperProps) {
-  const steps = [
-    { number: 1, label: 'Date de naissance', shortLabel: 'Naissance' },
-    { number: 2, label: 'Périodes obligatoires', shortLabel: 'Obligatoire' },
-    { number: 3, label: `Planification ${fractionableDays}j`, shortLabel: 'Planning' },
-    { number: 4, label: 'Finalisation', shortLabel: 'Suite' }
-  ];
+export function ProgressStepper({ currentStep, fractionableDays, scenario }: ProgressStepperProps) {
+  const steps = buildProgressSteps(fractionableDays, scenario);
 
   const progressPercent = currentStep <= 1 ? 0 : ((currentStep - 1) / (steps.length - 1)) * 100;
 

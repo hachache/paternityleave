@@ -3,6 +3,7 @@ import { fr } from 'date-fns/locale';
 import { Calendar, CheckCircle2, Clock, Trash2 } from 'lucide-react';
 import { LeaveBlock, LeaveScenarioConfig, countCalendarDays } from '../utils/paternityLeave';
 import { SupplementaryLeaveDuration, SupplementaryLeaveMode } from '../utils/supplementaryBirthLeave';
+import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
 
 interface SummaryProps {
   birthDate: Date | null;
@@ -36,6 +37,7 @@ export function Summary({
     0
   );
   const remainingDaysLeft = totalFractionableDays - totalRemainingDays;
+  const vocabulary = getScenarioVocabulary(scenario);
 
   return (
     <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/40">
@@ -60,19 +62,19 @@ export function Summary({
           </div>
           <p className="text-lg font-bold text-slate-900">{scenario.label}</p>
           <p className="text-sm text-slate-600 mt-1 font-medium">
-            Droit total : <span className="text-slate-900">{totalFractionableDays + 7} jours</span> (3j naissance + 4j obligatoires + {totalFractionableDays}j fractionnables)
+            Droit total : <span className="text-slate-900">{totalFractionableDays + 7} jours</span> ({vocabulary.totalDetail})
           </p>
         </div>
 
         <div className="relative pl-4 border-l-2 border-slate-100 space-y-8">
-          {/* Date de naissance */}
+          {/* Date de départ */}
           <div className="relative">
             <div className="absolute -left-[21px] top-1 h-4 w-4 rounded-full border-2 border-white bg-slate-900 shadow-sm" />
             <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Point de départ</p>
             <div className="flex items-center gap-3">
               <Calendar className="w-5 h-5 text-slate-700" />
               <div>
-                <p className="text-sm font-medium text-slate-500">Date de naissance</p>
+                <p className="text-sm font-medium text-slate-500">{vocabulary.eventDateLabel}</p>
                 <p className="text-base font-bold text-slate-900 capitalize">
                   {format(birthDate, 'EEEE d MMMM yyyy', { locale: fr })}
                 </p>
@@ -90,7 +92,7 @@ export function Summary({
                   <div className="flex gap-4 items-start p-4 rounded-xl bg-brand-50/50 border border-brand-100">
                     <div className="w-1 h-full bg-brand-300 rounded-full" />
                     <div>
-                      <p className="font-bold text-brand-900 text-sm">Congé de naissance (3j)</p>
+                      <p className="font-bold text-brand-900 text-sm">{vocabulary.employerLeaveLabel}</p>
                       <p className="text-xs text-brand-700 mt-1">
                         Du {format(employerPeriod.start, 'd MMM', { locale: fr })} au {format(employerPeriod.end, 'd MMM yyyy', { locale: fr })}
                       </p>
@@ -144,6 +146,7 @@ export function Summary({
                     </div>
                     <button
                       onClick={() => onRemoveBlock(index)}
+                      type="button"
                       className="p-2 rounded-lg text-slate-400 hover:bg-red-100 hover:text-red-600 transition-colors"
                       title="Supprimer cette période"
                     >
@@ -189,7 +192,7 @@ export function Summary({
                       <p className="font-bold text-sm">
                         {supplementaryLeavePeriods.length > 1
                           ? `Période ${index + 1} (1 mois)`
-                          : 'Période complémentaire validée'}
+                          : 'Période complémentaire ajoutée'}
                       </p>
                       <p className="text-xs text-slate-300 mt-1">
                         Du {format(entry.start, 'd MMM', { locale: fr })} au {format(entry.end, 'd MMM yyyy', { locale: fr })}
@@ -213,7 +216,9 @@ export function Summary({
               <p className="text-xl font-bold text-slate-900">
                 {totalRemainingDays} <span className="text-sm font-medium text-slate-500">/ {totalFractionableDays} jours</span>
                 {remainingDaysLeft === 0 && (
-                  <span className="ml-3 text-emerald-500 font-hand text-2xl font-bold -rotate-2 inline-block">Tout est bon ! 👌</span>
+                  <span className="ml-3 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                    Complet
+                  </span>
                 )}
               </p>
             </div>

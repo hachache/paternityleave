@@ -1,4 +1,5 @@
 import { LEAVE_SCENARIOS, LeaveScenarioConfig, LeaveScenarioId } from '../utils/paternityLeave';
+import { FRACTIONABLE_PERIODS_HINT } from '../utils/scenarioVocabulary';
 
 interface ScenarioSelectorProps {
   selectedScenario: LeaveScenarioId;
@@ -46,7 +47,9 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                     {config.label}
                   </p>
                   {config.id === 'standard' && (
-                    <span className="text-brand-500 font-hand font-bold text-lg -rotate-6 -mt-3 animate-pulse-subtle">Le plus courant !</span>
+                    <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-600">
+                      Courant
+                    </span>
                   )}
                 </div>
                 <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">{config.description}</p>
@@ -69,7 +72,9 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
               </div>
               <div className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
                 <p className="font-bold text-slate-900 text-sm">{details.limitText}</p>
-                <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide">2 périodes min.</p>
+                <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide">
+                  {FRACTIONABLE_PERIODS_HINT}
+                </p>
               </div>
             </div>
           </button>

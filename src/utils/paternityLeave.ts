@@ -26,7 +26,7 @@ export interface LeaveScenarioConfig {
 /**
  * Configuration des scénarios de congé de paternité selon la législation française.
  * 
- * LÉGISLATION : Articles L1225-35 et suivants du Code du Travail (depuis 1er juillet 2021)
+ * LÉGISLATION : Articles L1225-35 et suivants du Code du travail (depuis 1er juillet 2021)
  * 
  * STRUCTURE COMPLETE DU CONGE :
  * 1. Conge de naissance : 3 jours OUVRABLES (lundi-samedi hors feries) a charge employeur
@@ -103,7 +103,7 @@ export function getNextWorkingDay(date: Date): Date {
  * Trouve le prochain jour ouvrable (lundi-samedi hors feries et dimanche).
  * Utilise pour le conge de naissance a charge de l'employeur.
  * 
- * @legal Article L1225-35-3 du Code du Travail
+ * @legal Article L1225-35-3 du Code du travail
  */
 export function getNextWorkableDay(date: Date): Date {
   let current = startOfDay(date);
@@ -140,7 +140,7 @@ export function addWorkingDays(startDate: Date, days: number): Date {
 /**
  * Calcule la periode de conge de naissance a charge de l'employeur.
  * 
- * LEGISLATION : Article L1225-35-3 du Code du Travail (France)
+ * LEGISLATION : Article L1225-35-3 du Code du travail (France)
  * - 3 jours OUVRABLES (lundi a samedi, hors feries et dimanche)
  * - Pris immediatement apres la naissance
  * - Ne peut pas etre fractionne
@@ -188,7 +188,7 @@ export function calculateEmployerPeriod(birthDate: Date): LeaveBlock {
 /**
  * Calcule la periode obligatoire immediate.
  * 
- * LÉGISLATION : Article L1225-35-1 du Code du Travail
+ * LÉGISLATION : Article L1225-35-1 du Code du travail
  * - 4 jours CALENDAIRES obligatoires (incluant weekends et feries)
  * - Debut : jour calendaire suivant la fin du conge de naissance employeur
  * - Non modifiable, non reportable, non fractionnable
@@ -239,16 +239,17 @@ export function validateRemainingBlock(
   scenario: LeaveScenarioConfig
 ): { valid: boolean; error?: string; warning?: string; analysis?: ReturnType<typeof analyzePeriod> } {
   const usageLimit = getLimitDate(birthDate, scenario.limitMonthsAfterBirth);
+  const eventName = scenario.id === 'adoption' ? "l'arrivée au foyer" : 'la naissance';
 
   // Les jours fractionnables ne peuvent pas être posés AVANT la naissance
   if (isBefore(start, birthDate)) {
-    return { valid: false, error: 'Les jours fractionnables ne peuvent pas être posés avant la date de naissance' };
+    return { valid: false, error: `Les jours fractionnables ne peuvent pas être posés avant ${eventName}` };
   }
 
   if (isAfter(end, usageLimit)) {
     return {
       valid: false,
-      error: `Les jours doivent être pris dans les ${scenario.limitMonthsAfterBirth} mois suivant la naissance`
+      error: `Les jours doivent être pris dans les ${scenario.limitMonthsAfterBirth} mois suivant ${eventName}`
     };
   }
 

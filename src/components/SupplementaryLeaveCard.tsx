@@ -1,13 +1,15 @@
 import { format, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { CalendarDays, CheckCircle2, Clock3, Info, Wallet, Users, Split } from 'lucide-react';
-import { LeaveBlock } from '../utils/paternityLeave';
+import { LeaveBlock, LeaveScenarioConfig } from '../utils/paternityLeave';
 import {
   formatSupplementaryActivationCountdown,
   SupplementaryLeaveDuration,
   SupplementaryLeaveEligibility,
   SupplementaryLeaveMode
 } from '../utils/supplementaryBirthLeave';
+import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
+import { getSupplementaryLeaveStatusLabel } from '../utils/supplementaryLeaveCopy';
 
 interface SupplementaryLeaveCardProps {
   enabled: boolean;
@@ -18,6 +20,7 @@ interface SupplementaryLeaveCardProps {
   startDate: Date | null;
   periods: LeaveBlock[];
   error: string | null;
+  scenario: LeaveScenarioConfig;
   onEnabledChange: (enabled: boolean) => void;
   onDurationChange: (duration: SupplementaryLeaveDuration) => void;
   onModeChange: (mode: SupplementaryLeaveMode) => void;
@@ -42,6 +45,7 @@ export function SupplementaryLeaveCard({
   startDate,
   periods,
   error,
+  scenario,
   onEnabledChange,
   onDurationChange,
   onModeChange,
@@ -58,17 +62,14 @@ export function SupplementaryLeaveCard({
   const periodsValidated = enabled && hasPeriods && !error;
   const minDateValue = toInputValue(startDate);
   const maxDateValue = toInputValue(eligibility.limitDate);
+  const vocabulary = getScenarioVocabulary(scenario);
 
   const handleToggle = () => {
     if (!canActivate) return;
     onEnabledChange(!enabled);
   };
 
-  const statusLabel = periodsValidated
-    ? 'Activé'
-    : canActivate
-      ? 'Optionnel'
-      : 'À venir';
+  const statusLabel = getSupplementaryLeaveStatusLabel(periodsValidated, canActivate);
 
   return (
     <section className="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-lg shadow-slate-200/30">
@@ -87,7 +88,8 @@ export function SupplementaryLeaveCard({
               </span>
             </div>
             <p className="max-w-xl text-sm font-medium leading-relaxed text-slate-600">
-              Module secondaire pour projeter le nouveau congé de naissance applicable à partir du 1 juillet 2026.
+              Module secondaire pour projeter le nouveau congé supplémentaire applicable à partir du 1er juillet 2026,
+              sous réserve des décrets d&apos;application.
             </p>
             {activationCountdown && (
               <p className="mt-2 inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">
@@ -124,7 +126,7 @@ export function SupplementaryLeaveCard({
             Délai légal
           </div>
           <p className="text-sm font-bold text-slate-900">
-            {eligibility.limitDate ? `Jusqu'au ${formatDate(eligibility.limitDate)}` : 'Date de naissance requise'}
+            {eligibility.limitDate ? `Jusqu'au ${formatDate(eligibility.limitDate)}` : `${vocabulary.eventDateLabel} requise`}
           </p>
         </div>
 
@@ -134,7 +136,7 @@ export function SupplementaryLeaveCard({
             Début projeté
           </div>
           <p className="text-sm font-bold text-slate-900">
-            {startDate ? formatDate(startDate) : 'Après le planning paternité'}
+            {startDate ? formatDate(startDate) : 'Après le planning initial'}
           </p>
         </div>
       </div>
@@ -182,7 +184,7 @@ export function SupplementaryLeaveCard({
               const label = option === 'consecutive' ? '2 mois consécutifs' : '2 × 1 mois disjoints';
               const hint =
                 option === 'consecutive'
-                  ? 'Pris d\'affilée après le congé paternité.'
+                  ? 'Pris d\'affilée après le congé initial.'
                   : '2 périodes d\'1 mois prises séparément.';
 
               return (
@@ -228,7 +230,7 @@ export function SupplementaryLeaveCard({
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
               />
               <p className="mt-2 text-xs leading-relaxed text-slate-500">
-                Doit débuter après la fin du congé paternité et se terminer avant la date limite légale.
+                Doit débuter après la fin du congé initial et se terminer avant la date limite légale.
                 La seconde période ne peut pas chevaucher la première.
               </p>
             </div>
@@ -268,8 +270,8 @@ export function SupplementaryLeaveCard({
         </div>
         <p className="text-sm leading-relaxed text-slate-600">
           Ouvert aux deux parents : salariés, indépendants, non-salariés agricoles, fonctionnaires et
-          militaires. Pris simultanément ou en alternance, après les congés de maternité, paternité ou
-          adoption.
+          militaires. Pris simultanément ou en alternance, après les congés de maternité, de paternité
+          et d&apos;accueil de l&apos;enfant ou d&apos;adoption.
         </p>
       </div>
 
@@ -292,9 +294,12 @@ export function SupplementaryLeaveCard({
                 <ul className="space-y-1">
                   {periods.map((entry, index) => (
                     <li key={`${entry.start.getTime()}-${index}`}>
-                      Période {index + 1} : du {formatDate(entry.start)} au {formatDate(entry.end)}.
+                      Période {index + 1} projetée : du {formatDate(entry.start)} au {formatDate(entry.end)}.
                     </li>
                   ))}
+                  <li className="text-xs text-emerald-800">
+                    Ajouté au récapitulatif, sous réserve des décrets d&apos;application.
+                  </li>
                 </ul>
               ) : (
                 <p>{error || disabledReason}</p>

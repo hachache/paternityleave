@@ -111,8 +111,9 @@ export function LetterGenerator({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Lieu</label>
+              <label htmlFor="letter-lieu" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Lieu</label>
               <input
+                id="letter-lieu"
                 type="text"
                 value={lieu}
                 onChange={(e) => setLieu(e.target.value)}
@@ -121,8 +122,9 @@ export function LetterGenerator({
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Date de rédaction</label>
+              <label htmlFor="letter-date-redaction" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Date de rédaction</label>
               <input
+                id="letter-date-redaction"
                 type="text"
                 value={dateRedaction}
                 onChange={(e) => setDateRedaction(e.target.value)}
@@ -134,8 +136,9 @@ export function LetterGenerator({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Prénom</label>
+              <label htmlFor="letter-prenom" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Prénom</label>
               <input
+                id="letter-prenom"
                 type="text"
                 value={prenom}
                 onChange={(e) => setPrenom(e.target.value)}
@@ -144,8 +147,9 @@ export function LetterGenerator({
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nom</label>
+              <label htmlFor="letter-nom" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nom</label>
               <input
+                id="letter-nom"
                 type="text"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
@@ -156,8 +160,9 @@ export function LetterGenerator({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Adresse</label>
+            <label htmlFor="letter-adresse" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Adresse</label>
             <input
+              id="letter-adresse"
               type="text"
               value={adresse}
               onChange={(e) => setAdresse(e.target.value)}
@@ -167,8 +172,9 @@ export function LetterGenerator({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Fonction</label>
+            <label htmlFor="letter-fonction" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Fonction</label>
             <input
+              id="letter-fonction"
               type="text"
               value={fonction}
               onChange={(e) => setFonction(e.target.value)}
@@ -195,7 +201,7 @@ export function LetterGenerator({
         {copyError && (
           <div className="p-4 rounded-xl border border-red-300 bg-red-50 animate-fade-in">
             <p className="text-sm text-red-800 font-medium">
-              ❌ Impossible de copier. Sélectionnez le texte manuellement.
+              Impossible de copier. Sélectionnez le texte manuellement.
             </p>
           </div>
         )}
@@ -214,7 +220,7 @@ export function LetterGenerator({
           </Button>
           {copied && (
             <div className="absolute -right-4 top-1/2 -translate-y-1/2 translate-x-full hidden sm:block animate-fade-in">
-               <span className="text-emerald-600 font-hand text-xl font-bold -rotate-12 inline-block">Prêt à envoyer ! ✉️</span>
+               <span className="text-emerald-600 font-hand text-xl font-bold -rotate-12 inline-block">Prêt à envoyer</span>
                <svg className="w-8 h-8 text-emerald-400 absolute -left-6 top-4 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17l9.2-9.2M17 17V7H7" /></svg>
             </div>
           )}

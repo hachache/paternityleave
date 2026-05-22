@@ -10,10 +10,20 @@ export interface BirthDateValidationResult {
   context?: 'future' | 'past' | 'today';
 }
 
+export interface BirthDateValidationLabels {
+  eventName: string;
+  eventDateLabel: string;
+}
+
+const defaultLabels: BirthDateValidationLabels = {
+  eventName: 'naissance',
+  eventDateLabel: 'date de naissance'
+};
+
 /**
  * Valide une date de naissance pour le conge de paternite.
  * 
- * LEGISLATION : Article L1225-35 du Code du Travail
+ * LEGISLATION : Article L1225-35 du Code du travail
  * - Les jours fractionnables doivent etre pris dans les 6 mois (standard) ou 12 mois (hospitalisation)
  * - Le conge de naissance (3j employeur) est pris immediatement apres la naissance
  * 
@@ -29,7 +39,10 @@ export interface BirthDateValidationResult {
  * @param date Date de naissance a valider
  * @returns Resultat de validation avec erreur ou avertissement eventuel
  */
-export function validateBirthDate(date: Date): BirthDateValidationResult {
+export function validateBirthDate(
+  date: Date,
+  labels: BirthDateValidationLabels = defaultLabels
+): BirthDateValidationResult {
   const normalized = startOfDay(date);
   const today = startOfDay(new Date());
 
@@ -50,7 +63,7 @@ export function validateBirthDate(date: Date): BirthDateValidationResult {
     if (isAfter(normalized, maxFutureDate)) {
       return { 
         valid: false, 
-        error: 'La date de naissance ne peut pas depasser 9 mois dans le futur (duree maximale de grossesse)',
+        error: `La ${labels.eventDateLabel} ne peut pas depasser 9 mois dans le futur`,
         context: 'future'
       };
     }
@@ -70,7 +83,7 @@ export function validateBirthDate(date: Date): BirthDateValidationResult {
     if (isBefore(normalized, minPastDate)) {
       return { 
         valid: false, 
-        error: 'Cette naissance date de plus d\'un an. Le delai legal de 6 mois pour poser les jours fractionnables est depasse.',
+        error: `Cette ${labels.eventName} date de plus d'un an. Le delai legal de 6 mois pour poser les jours fractionnables est depasse.`,
         context: 'past'
       };
     }
@@ -81,7 +94,7 @@ export function validateBirthDate(date: Date): BirthDateValidationResult {
       return {
         valid: true,
         context: 'past',
-        warning: 'Attention : Cette naissance date de plus de 6 mois. Le delai legal standard est depasse, sauf cas d\'hospitalisation du nouveau-ne (12 mois).'
+        warning: `Attention : cette ${labels.eventName} date de plus de 6 mois. Le delai legal standard est depasse, sauf cas d'hospitalisation du nouveau-ne (12 mois).`
       };
     }
 
@@ -89,7 +102,7 @@ export function validateBirthDate(date: Date): BirthDateValidationResult {
     return { 
       valid: true, 
       context: 'past',
-      warning: 'Cette naissance est deja survenue. Certains jours ont peut-etre deja ete pris (conge de naissance + periode obligatoire).'
+      warning: `Cette ${labels.eventName} est deja survenue. Certains jours ont peut-etre deja ete pris (conge employeur + periode obligatoire).`
     };
   }
 
@@ -103,8 +116,11 @@ export function validateBirthDate(date: Date): BirthDateValidationResult {
  * @param date Date de naissance a valider
  * @returns Message d'erreur si invalide, undefined sinon
  */
-export function validateBirthDateSimple(date: Date): string | undefined {
-  const result = validateBirthDate(date);
+export function validateBirthDateSimple(
+  date: Date,
+  labels: BirthDateValidationLabels = defaultLabels
+): string | undefined {
+  const result = validateBirthDate(date, labels);
   return result.valid ? undefined : result.error;
 }
 
@@ -131,4 +147,3 @@ export function isBirthDateInPast(date: Date): boolean {
   const today = startOfDay(new Date());
   return isBefore(normalized, today);
 }
-

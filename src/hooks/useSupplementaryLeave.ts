@@ -125,7 +125,7 @@ export function useSupplementaryLeave({
       return eligibility.reason;
     }
     if (!isPaternityPlanComplete) {
-      return 'Planifiez d’abord 100% du congé paternité pour projeter ce congé.';
+      return 'Planifiez d’abord 100% du congé initial pour projeter ce congé.';
     }
     if (!startDate) {
       return 'Date de début indisponible.';

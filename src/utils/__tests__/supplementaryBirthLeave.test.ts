@@ -18,7 +18,7 @@ function dateKey(date: Date | null): string | null {
 }
 
 describe('getSupplementaryLeaveEligibility', () => {
-  it('refuse une naissance avant le 1 janvier 2026', () => {
+  it('refuse une naissance avant le 1er janvier 2026', () => {
     const result = getSupplementaryLeaveEligibility(
       new Date(2025, 11, 31),
       standardScenario,
@@ -28,10 +28,10 @@ describe('getSupplementaryLeaveEligibility', () => {
     expect(result.isEligibleBirthDate).toBe(false);
     expect(result.canActivate).toBe(false);
     expect(result.limitDate).toBeNull();
-    expect(result.reason).toContain('1 janvier 2026');
+    expect(result.reason).toContain('1er janvier 2026');
   });
 
-  it('marque une naissance du 1 janvier 2026 eligible mais non activable avant le 1 juillet 2026', () => {
+  it('marque une naissance du 1er janvier 2026 eligible mais non activable avant le 1er juillet 2026', () => {
     const result = getSupplementaryLeaveEligibility(
       new Date(2026, 0, 1),
       standardScenario,
@@ -46,10 +46,10 @@ describe('getSupplementaryLeaveEligibility', () => {
       'Activation demain (1er juillet 2026)'
     );
     expect(dateKey(result.limitDate)).toBe('2027-03-31');
-    expect(result.reason).toContain('1 juillet 2026');
+    expect(result.reason).toContain('1er juillet 2026');
   });
 
-  it('autorise l activation a partir du 1 juillet 2026', () => {
+  it('autorise l activation a partir du 1er juillet 2026', () => {
     const result = getSupplementaryLeaveEligibility(
       new Date(2026, 0, 1),
       standardScenario,
@@ -147,7 +147,7 @@ describe('calculateSupplementaryLeaveSplitBlocks', () => {
     expect(dateKey(result.blocks[1].end)).toBe('2026-09-30');
   });
 
-  it('refuse une periode debutant avant la fin du conge paternite', () => {
+  it('refuse une periode debutant avant la fin du conge initial', () => {
     const result = calculateSupplementaryLeaveSplitBlocks(
       new Date(2026, 5, 15),
       new Date(2026, 8, 1),
@@ -157,7 +157,7 @@ describe('calculateSupplementaryLeaveSplitBlocks', () => {
 
     expect(result.valid).toBe(false);
     expect(result.blocks).toEqual([]);
-    expect(result.error).toContain('fin du congé paternité');
+    expect(result.error).toContain('fin du congé initial');
   });
 
   it('refuse une periode depassant la date limite legale', () => {

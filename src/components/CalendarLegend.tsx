@@ -1,11 +1,13 @@
-const legendItems = [
-  { label: 'Date de naissance', color: 'bg-slate-900 shadow-sm' },
-  { label: 'Congé de naissance (3j)', color: 'bg-brand-300' },
-  { label: 'Période obligatoire (4j)', color: 'bg-brand-600 shadow-sm' },
-  { label: 'Jours à planifier', color: 'bg-success-500 shadow-sm' }
-] as const;
+import { LeaveScenarioConfig } from '../utils/paternityLeave';
+import { getCalendarLegendItems } from '../utils/calendarLegend';
 
-export function CalendarLegend() {
+interface CalendarLegendProps {
+  scenario: LeaveScenarioConfig;
+}
+
+export function CalendarLegend({ scenario }: CalendarLegendProps) {
+  const legendItems = getCalendarLegendItems(scenario);
+
   return (
     <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
       {legendItems.map(item => (

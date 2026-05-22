@@ -13,17 +13,17 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
 
   const sections = useMemo(() => {
     const items = [
-      { id: 'calendar', label: '📅 Calendrier', shortLabel: '📅' },
-      { id: 'summary', label: '📊 Résumé', shortLabel: '📊' }
+      { id: 'calendar', label: 'Calendrier', shortLabel: 'Cal.' },
+      { id: 'summary', label: 'Résumé', shortLabel: 'Récap' }
     ] as Array<{ id: string; label: string; shortLabel: string }>;
 
     if (showSupplementaryLink) {
-      items.push({ id: 'conge-supplementaire', label: '✨ Congé 2026', shortLabel: '✨' });
+      items.push({ id: 'conge-supplementaire', label: 'Congé 2026', shortLabel: '2026' });
     }
 
     items.push(
-      { id: 'letter', label: '📬 Courrier', shortLabel: '📬' },
-      { id: 'legal', label: '⚖️ Légal', shortLabel: '⚖️' }
+      { id: 'letter', label: 'Courrier', shortLabel: 'Doc' },
+      { id: 'legal', label: 'Légal', shortLabel: 'Légal' }
     );
 
     return items;

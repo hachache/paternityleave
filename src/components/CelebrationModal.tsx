@@ -2,11 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import Confetti from 'react-confetti';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import { LeaveScenarioConfig } from '../utils/paternityLeave';
+import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
 
 interface CelebrationModalProps {
   show: boolean;
   onClose: () => void;
   totalFractionableDays: number;
+  scenario: LeaveScenarioConfig;
   showSupplementaryAction: boolean;
   onGoToSupplementary: () => void;
   onGoToLetter: () => void;
@@ -16,6 +19,7 @@ export function CelebrationModal({
   show,
   onClose,
   totalFractionableDays,
+  scenario,
   showSupplementaryAction,
   onGoToSupplementary,
   onGoToLetter
@@ -26,6 +30,7 @@ export function CelebrationModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const totalDays = 7 + totalFractionableDays;
+  const vocabulary = getScenarioVocabulary(scenario);
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
 
@@ -171,7 +176,7 @@ export function CelebrationModal({
                 <CheckCircle className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <p className="text-base font-bold text-slate-900">Félicitations ! 🎉</p>
+                <p className="text-base font-bold text-slate-900">Planification complète</p>
                 <p className="text-sm text-slate-600 mt-0.5">
                   Planning complet ({totalDays} jours). {subtitle}
                 </p>
@@ -255,10 +260,10 @@ export function CelebrationModal({
               <CheckCircle className="w-12 h-12 text-white" strokeWidth={2.5} />
             </div>
 
-            <h3 className="text-3xl font-bold text-slate-900 mb-3 animate-slide-up">Félicitations ! 🎉</h3>
+            <h3 className="text-3xl font-bold text-slate-900 mb-3 animate-slide-up">Planification complète</h3>
 
             <p className="text-slate-600 text-base mb-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              Votre planning de congé paternité est complet
+              Votre planning de {vocabulary.initialLeaveLabel} est complet
             </p>
 
             <div

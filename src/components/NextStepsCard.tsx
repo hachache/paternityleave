@@ -1,4 +1,5 @@
-import { formatSupplementaryActivationCountdown } from '../utils/supplementaryBirthLeave';
+import { LeaveScenarioConfig } from '../utils/paternityLeave';
+import { buildChecklist } from '../utils/nextSteps';
 
 interface NextStepsCardProps {
   planningStep: number;
@@ -11,15 +12,8 @@ interface NextStepsCardProps {
   supplementaryLeaveConfigured: boolean;
   supplementaryLeaveActivationHint: string | null;
   supplementaryLeaveDaysUntilActivation: number | null;
+  scenario: LeaveScenarioConfig;
 }
-
-type ChecklistItem = {
-  label: string;
-  hint?: string;
-  status: 'pending' | 'active' | 'done';
-  index: number;
-  isFinale?: boolean;
-};
 
 export function NextStepsCard({
   planningStep,
@@ -31,7 +25,8 @@ export function NextStepsCard({
   isEligibleForSupplementaryLeave,
   supplementaryLeaveConfigured,
   supplementaryLeaveActivationHint,
-  supplementaryLeaveDaysUntilActivation
+  supplementaryLeaveDaysUntilActivation,
+  scenario
 }: NextStepsCardProps) {
   const checklist = buildChecklist({
     planningStep,
@@ -43,7 +38,8 @@ export function NextStepsCard({
     isEligibleForSupplementaryLeave,
     supplementaryLeaveConfigured,
     supplementaryLeaveActivationHint,
-    supplementaryLeaveDaysUntilActivation
+    supplementaryLeaveDaysUntilActivation,
+    scenario
   });
 
   return (
@@ -79,11 +75,6 @@ export function NextStepsCard({
               >
                 {item.label}
               </p>
-              {item.isFinale && item.status === 'active' && (
-                <span className="text-brand-500 font-hand text-lg -rotate-6 animate-pulse-subtle hidden sm:inline-block">
-                  Dernière ligne droite ! 🏁
-                </span>
-              )}
             </div>
             {item.hint && <p className="text-sm text-slate-500 font-medium leading-relaxed">{item.hint}</p>}
           </div>
@@ -91,98 +82,4 @@ export function NextStepsCard({
       ))}
     </ol>
   );
-}
-
-type ChecklistArgs = Required<
-  Pick<
-    NextStepsCardProps,
-    | 'planningStep'
-    | 'totalPlannedDays'
-    | 'hasBirthDate'
-    | 'hasMandatory'
-    | 'remainingBlocks'
-    | 'fractionableDays'
-    | 'isEligibleForSupplementaryLeave'
-    | 'supplementaryLeaveConfigured'
-    | 'supplementaryLeaveActivationHint'
-    | 'supplementaryLeaveDaysUntilActivation'
-  >
->;
-
-function buildChecklist({
-  planningStep,
-  totalPlannedDays,
-  hasBirthDate,
-  hasMandatory,
-  remainingBlocks,
-  fractionableDays,
-  isEligibleForSupplementaryLeave,
-  supplementaryLeaveConfigured,
-  supplementaryLeaveActivationHint,
-  supplementaryLeaveDaysUntilActivation
-}: ChecklistArgs): ChecklistItem[] {
-  const steps: ChecklistItem[] = [];
-  let index = 1;
-
-  const isStep1Done = hasBirthDate;
-  steps.push({
-    label: 'Définir la date de naissance',
-    hint: 'Point de départ de tout le calcul',
-    status: isStep1Done ? 'done' : 'active',
-    index: index++
-  });
-
-  const isStep2Done = hasMandatory || planningStep > 1;
-  steps.push({
-    label: 'Valider la période obligatoire',
-    hint: '3 jours naissance + 4 jours obligatoires',
-    status: isStep2Done ? 'done' : isStep1Done ? 'active' : 'pending',
-    index: index++
-  });
-
-  const hasAllBlocks = totalPlannedDays >= fractionableDays;
-  const remainingDays = Math.max(fractionableDays - totalPlannedDays, 0);
-
-  steps.push({
-    label: `Planifier vos ${fractionableDays} jours restants`,
-    hint:
-      remainingBlocks === 0
-        ? 'À poser en 2 périodes minimum (min. 5j chacune)'
-        : remainingDays > 0
-          ? `${remainingDays} jours encore à planifier`
-          : 'Planning complet !',
-    status: hasAllBlocks ? 'done' : isStep2Done ? 'active' : 'pending',
-    index: index++
-  });
-
-  if (isEligibleForSupplementaryLeave) {
-    const activationCountdown = formatSupplementaryActivationCountdown(
-      supplementaryLeaveDaysUntilActivation
-    );
-    const supplementaryHint = !hasAllBlocks
-      ? 'Disponible une fois le planning terminé'
-      : supplementaryLeaveConfigured
-        ? 'Option enregistrée dans votre récapitulatif'
-        : [activationCountdown, supplementaryLeaveActivationHint]
-            .filter(Boolean)
-            .join(' — ') ||
-          '1 ou 2 mois calendaires après le congé paternité (optionnel)';
-
-    steps.push({
-      label: 'Congé supplémentaire 2026',
-      hint: supplementaryHint,
-      status: !hasAllBlocks ? 'pending' : supplementaryLeaveConfigured ? 'done' : 'active',
-      index: index++
-    });
-  }
-
-  steps.push({
-    label: 'Générer votre courrier employeur',
-    hint: 'Modèle prêt à envoyer, avec ou sans congé supplémentaire',
-    status: hasAllBlocks ? 'active' : 'pending',
-    index: index++,
-    isFinale: true
-  });
-
-  return steps;
 }
