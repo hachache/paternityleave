@@ -714,9 +714,13 @@ function App() {
               <div ref={letterRef} className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in-delay'}`} id="letter">
                 <LetterGenerator
                   birthDate={birthDate}
+                  employerPeriod={employerPeriod}
                   mandatoryPeriod={mandatoryPeriod}
                   remainingBlocks={remainingBlocks}
+                  scenario={scenario}
                   supplementaryLeavePeriods={supplementaryLeavePeriods}
+                  supplementaryLeaveDuration={supplementaryLeaveDuration}
+                  supplementaryLeaveMode={supplementaryLeaveMode}
                 />
               </div>
             )}

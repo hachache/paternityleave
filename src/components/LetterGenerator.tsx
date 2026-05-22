@@ -1,21 +1,31 @@
 import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { Mail, Copy, Check } from 'lucide-react';
-import { LeaveBlock } from '../utils/paternityLeave';
+import { LeaveBlock, LeaveScenarioConfig } from '../utils/paternityLeave';
+import { SupplementaryLeaveDuration, SupplementaryLeaveMode } from '../utils/supplementaryBirthLeave';
+import { generateEmployerLetter } from '../utils/employerLetter';
 import { Button } from './Button';
 
 interface LetterGeneratorProps {
   birthDate: Date;
+  employerPeriod: LeaveBlock | null;
   mandatoryPeriod: LeaveBlock | null;
   remainingBlocks: LeaveBlock[];
+  scenario: LeaveScenarioConfig;
   supplementaryLeavePeriods?: LeaveBlock[];
+  supplementaryLeaveDuration?: SupplementaryLeaveDuration;
+  supplementaryLeaveMode?: SupplementaryLeaveMode;
 }
 
 export function LetterGenerator({
   birthDate,
+  employerPeriod,
   mandatoryPeriod,
   remainingBlocks,
-  supplementaryLeavePeriods
+  scenario,
+  supplementaryLeavePeriods,
+  supplementaryLeaveDuration,
+  supplementaryLeaveMode
 }: LetterGeneratorProps) {
   const [lieu, setLieu] = useState('');
   const [dateRedaction, setDateRedaction] = useState(format(new Date(), 'dd/MM/yyyy'));
@@ -27,51 +37,38 @@ export function LetterGenerator({
   const [copyError, setCopyError] = useState(false);
 
   const baseLetter = useMemo(() => {
-    const birthDateFormatted = format(birthDate, 'dd/MM/yyyy');
-
-    let letter = `${lieu}, le ${dateRedaction}\n${prenom} ${nom}\n${adresse}\n${fonction}\n\n\nMadame, Monsieur,\n\nJ'ai le plaisir de vous informer que mon enfant doit naître le ${birthDateFormatted}.\nPour cette occasion, je souhaite bénéficier du congé de paternité et d'accueil de l'enfant`;
-
-    if (mandatoryPeriod) {
-      const endDate = format(mandatoryPeriod.end, 'dd/MM/yyyy');
-      letter += `\nà la suite du congé de naissance et jusqu'au ${endDate}`;
-    }
-
-    if (remainingBlocks.length > 0) {
-      letter += '\n';
-      remainingBlocks.forEach((block, index) => {
-        const startDate = format(block.start, 'dd/MM/yyyy');
-        const endDate = format(block.end, 'dd/MM/yyyy');
-        if (index === 0) {
-          letter += `\n\nPuis du ${startDate} au ${endDate} ;`;
-        } else if (index === remainingBlocks.length - 1) {
-          letter += `\n\nEt du ${startDate} au ${endDate}`;
-        } else {
-          letter += `\n\nPuis du ${startDate} au ${endDate} ;`;
-        }
-      });
-    }
-
-    if (supplementaryLeavePeriods && supplementaryLeavePeriods.length > 0) {
-      const periodsText = supplementaryLeavePeriods
-        .map((entry) => `du ${format(entry.start, 'dd/MM/yyyy')} au ${format(entry.end, 'dd/MM/yyyy')}`)
-        .join(' puis ');
-      letter += `\n\nConformément aux articles L1225-46-2 et suivants du Code du Travail (LFSS 2026, art. 99-V), je souhaite également bénéficier du congé supplémentaire de naissance ${periodsText}.`;
-    }
-
-    letter += '\n\nConformément aux dispositions du Code du Travail, je vous informe au moins un mois avant le début du congé (délai ramené à 15 jours lorsque ce congé suit immédiatement le congé de paternité et d\'accueil de l\'enfant).';
-    letter += '\n\nVous trouverez ci-joint le certificat médical attestant la date prévue de la naissance.\n\nJe vous prie d\'agréer, Madame, Monsieur, l\'expression de ma considération distinguée.';
-
-    return letter;
+    return generateEmployerLetter({
+      birthDate,
+      employerPeriod,
+      mandatoryPeriod,
+      remainingBlocks,
+      scenario,
+      supplementaryLeavePeriods,
+      supplementaryLeaveDuration,
+      supplementaryLeaveMode,
+      identity: {
+        lieu,
+        dateRedaction,
+        nom,
+        prenom,
+        adresse,
+        fonction
+      }
+    });
   }, [
     adresse,
     birthDate,
     dateRedaction,
+    employerPeriod,
     fonction,
     lieu,
     mandatoryPeriod,
     nom,
     prenom,
     remainingBlocks,
+    scenario,
+    supplementaryLeaveDuration,
+    supplementaryLeaveMode,
     supplementaryLeavePeriods
   ]);
 
