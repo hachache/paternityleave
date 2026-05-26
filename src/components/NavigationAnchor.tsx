@@ -47,9 +47,18 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
     setActiveSection(closestSection.id);
   }, [sections]);
 
-  // IntersectionObserver for active section tracking
   useEffect(() => {
-    if (!show || isMobile) return; // Skip observer on mobile for performance
+    if (!show || !isMobile) return;
+
+    const handleScroll = () => detectActiveSection();
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [show, isMobile, detectActiveSection]);
+
+  // IntersectionObserver for active section tracking (desktop)
+  useEffect(() => {
+    if (!show || isMobile) return;
     if ('IntersectionObserver' in window) {
       const targets = sections
         .map(s => document.getElementById(s.id))
@@ -124,11 +133,11 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
             key={section.id}
             href={`#${section.id}`}
             className={`
-              relative px-2 sm:px-3 md:px-5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm md:text-sm
-              font-semibold whitespace-nowrap
+              relative px-2 sm:px-3 md:px-5 py-3 sm:py-2 rounded-xl text-xs sm:text-sm md:text-sm
+              font-semibold whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[44px]
               ${
                 isActive
-                  ? 'text-white bg-gradient-to-b from-teal-500 to-teal-600 shadow-lg'
+                  ? 'text-white bg-gradient-to-b from-brand-600 to-brand-700 shadow-lg'
                   : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
               }
             `}
@@ -153,16 +162,12 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
     </>
   );
 
-  // Masquer la barre de navigation sur mobile
-  if (isMobile) {
-    return null;
-  }
-
-  // Top nav pour desktop
+  // Top nav desktop, bottom nav mobile
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-3 sm:py-4 pointer-events-none">
+    <div className="fixed bottom-0 sm:bottom-auto sm:top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-3 sm:py-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-4 pointer-events-none">
       <nav
-        className="pointer-events-auto flex gap-1.5 px-3 py-2.5 rounded-2xl bg-white/95 dark:bg-slate-800/90 backdrop-blur-lg border border-slate-200/80 dark:border-slate-600 shadow-md"
+        aria-label="Navigation de la page"
+        className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl bg-white/95 backdrop-blur-lg border border-slate-200/80 shadow-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start"
         style={{
           transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }}
