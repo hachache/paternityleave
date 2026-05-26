@@ -13,6 +13,7 @@ import {
   startOfWeek
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
@@ -26,6 +27,7 @@ import {
 } from '../utils/paternityLeave';
 import { CalendarDayMetadata, CalendarDayType, buildCalendarDayAriaLabel, getInitialEventDateMetadata } from '../utils/calendarDay';
 import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
+import { fadeInUp, springs, useAppMotion } from '../lib/motion';
 
 interface CalendarProps {
   birthDate: Date | null;
@@ -52,10 +54,12 @@ export function Calendar({
 }: CalendarProps) {
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const [currentMonth, setCurrentMonth] = useState<Date>(() => startOfMonth(new Date()));
+  const [monthDirection, setMonthDirection] = useState(0);
   const [focusedDate, setFocusedDate] = useState<Date>(() => startOfDay(new Date()));
   const dayRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const today = useMemo(() => startOfDay(new Date()), []);
   const vocabulary = useMemo(() => getScenarioVocabulary(scenario), [scenario]);
+  const { shouldReduce, transition } = useAppMotion();
 
   const monthStart = currentMonth;
   const monthEnd = useMemo(() => endOfMonth(currentMonth), [currentMonth]);
@@ -104,27 +108,32 @@ export function Calendar({
     []
   );
 
+  const focusFocusedDay = useCallback(() => {
+    if (isCoarsePointer) return;
+    const key = startOfDay(focusedDate).getTime();
+    const target = dayRefs.current[key];
+    if (!target || document.activeElement === target) return;
+
+    try {
+      target.focus({ preventScroll: true } as FocusOptions);
+    } catch {
+      target.focus();
+    }
+  }, [focusedDate, isCoarsePointer]);
+
   useEffect(() => {
     if (!birthDate) {
       return;
     }
     const normalized = startOfDay(birthDate);
+    setMonthDirection(0);
     setCurrentMonth(startOfMonth(normalized));
     setFocusedDate(normalized);
   }, [birthDate]);
 
   useEffect(() => {
-    if (isCoarsePointer) return;
-    const key = startOfDay(focusedDate).getTime();
-    const target = dayRefs.current[key];
-    if (target && document.activeElement !== target) {
-      try {
-        target.focus({ preventScroll: true } as FocusOptions);
-      } catch {
-        target.focus();
-      }
-    }
-  }, [focusedDate, currentMonth, isCoarsePointer]);
+    focusFocusedDay();
+  }, [focusFocusedDay, currentMonth]);
 
   const getDayType = useCallback(
     (date: Date): CalendarDayType => {
@@ -175,7 +184,9 @@ export function Calendar({
       const normalized = startOfDay(date);
       setFocusedDate(normalized);
       if (!isSameMonth(normalized, currentMonth)) {
-        setCurrentMonth(startOfMonth(normalized));
+        const targetMonth = startOfMonth(normalized);
+        setMonthDirection(isAfter(targetMonth, currentMonth) ? 1 : -1);
+        setCurrentMonth(targetMonth);
       }
     },
     [currentMonth]
@@ -187,7 +198,9 @@ export function Calendar({
         const reference = prev ?? startOfMonth(currentMonth);
         const next = startOfDay(addDays(reference, offset));
         if (!isSameMonth(next, currentMonth)) {
-          setCurrentMonth(startOfMonth(next));
+          const targetMonth = startOfMonth(next);
+          setMonthDirection(isAfter(targetMonth, currentMonth) ? 1 : -1);
+          setCurrentMonth(targetMonth);
         }
         return next;
       });
@@ -198,6 +211,7 @@ export function Calendar({
   const goToMonth = useCallback(
     (offset: number) => {
       const target = startOfMonth(addMonths(currentMonth, offset));
+      setMonthDirection(offset > 0 ? 1 : -1);
       setCurrentMonth(target);
       setFocusedDate(prev => {
         if (prev && isSameMonth(prev, target)) return startOfDay(prev);
@@ -290,7 +304,7 @@ export function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation active:scale-90 ';
+      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
 
       if (!isCurrentMonthDay) {
         // Make non-current month days much fainter
@@ -308,7 +322,7 @@ export function Calendar({
       } else if (metadata.type === 'remaining') {
         classes += ' bg-success-500 text-white cursor-pointer hover:bg-success-600 hover:-translate-y-0.5 shadow-md shadow-success-500/30';
       } else if (metadata.selectable && isCurrentMonthDay) {
-        classes += ' cursor-pointer text-slate-700 hover:bg-brand-50 hover:text-brand-700 active:scale-95';
+        classes += ' cursor-pointer text-slate-700 hover:bg-brand-50 hover:text-brand-700';
       } else {
         classes += ' cursor-not-allowed';
         if (isCurrentMonthDay) classes += ' opacity-40';
@@ -321,14 +335,37 @@ export function Calendar({
     [currentMonth, holidays]
   );
 
+  const monthGridVariants = {
+    enter: (direction: number) => ({
+      opacity: shouldReduce ? 1 : 0,
+      x: shouldReduce ? 0 : direction * 24
+    }),
+    center: {
+      opacity: 1,
+      x: 0
+    },
+    exit: (direction: number) => ({
+      opacity: shouldReduce ? 1 : 0,
+      x: shouldReduce ? 0 : direction * -24
+    })
+  };
+
+  const dayTransition = shouldReduce ? { duration: 0 } : springs.snappy;
+
   return (
     <div className="rounded-[2rem] border border-white bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft relative">
       {!birthDate && (
-        <div className="mb-6 rounded-2xl bg-brand-50 p-5 border border-brand-100 animate-fade-in-up">
+        <motion.div
+          className="mb-6 rounded-2xl bg-brand-50 p-5 border border-brand-100"
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          transition={transition}
+        >
           <p className="text-brand-800 text-center font-medium">
             Sélectionnez la {vocabulary.eventDateActionLabel} pour démarrer le calcul.
           </p>
-        </div>
+        </motion.div>
       )}
 
       <div className="flex items-center justify-between mb-8">
@@ -363,48 +400,62 @@ export function Calendar({
         ))}
       </div>
 
-      <div
-        role="grid"
-        className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3"
-        onKeyDown={handleGridKeyDown}
-        onClick={handleGridClick}
-      >
-        {days.map(day => {
-          const dayStart = startOfDay(day);
-          const dayKey = dayStart.getTime();
-          const metadata = metadataByKey.get(dayKey) ?? { type: null, selectable: true, action: 'select' };
-          const isFocused = dayKey === startOfDay(focusedDate).getTime();
-          const isTodayDate = isSameDay(dayStart, today);
-          const ariaLabel = buildCalendarDayAriaLabel(dayStart, metadata, {
-            eventDateLabel: vocabulary.eventDateLabel,
-            eventDateActionLabel: vocabulary.eventDateActionLabel,
-            selectActionLabel: birthDate
-              ? 'ajouter une période à partir de cette date'
-              : `sélectionner cette date comme ${vocabulary.eventDateActionLabel}`
-          });
-          
-          return (
-            <button
-              key={dayKey}
-              ref={registerDayRef(dayKey)}
-              type="button"
-              data-date={dayKey}
-              className={getDayClasses(dayStart, metadata)}
-              tabIndex={isFocused ? 0 : -1}
-              title={metadata.reason}
-              aria-label={ariaLabel}
-              aria-disabled={!metadata.selectable && metadata.action === 'static'}
-              aria-current={isTodayDate ? 'date' : undefined}
-              onFocus={handleCellFocus}
-            >
-              {dayStart.getDate()}
-              {isTodayDate && (
-                <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-brand-500"></span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      <AnimatePresence mode="popLayout" custom={monthDirection}>
+        <motion.div
+          key={format(currentMonth, 'yyyy-MM')}
+          role="grid"
+          className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3"
+          layout
+          custom={monthDirection}
+          variants={monthGridVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={transition}
+          onAnimationComplete={focusFocusedDay}
+          onKeyDown={handleGridKeyDown}
+          onClick={handleGridClick}
+        >
+          {days.map(day => {
+            const dayStart = startOfDay(day);
+            const dayKey = dayStart.getTime();
+            const metadata = metadataByKey.get(dayKey) ?? { type: null, selectable: true, action: 'select' };
+            const isFocused = dayKey === startOfDay(focusedDate).getTime();
+            const isTodayDate = isSameDay(dayStart, today);
+            const ariaLabel = buildCalendarDayAriaLabel(dayStart, metadata, {
+              eventDateLabel: vocabulary.eventDateLabel,
+              eventDateActionLabel: vocabulary.eventDateActionLabel,
+              selectActionLabel: birthDate
+                ? 'ajouter une période à partir de cette date'
+                : `sélectionner cette date comme ${vocabulary.eventDateActionLabel}`
+            });
+
+            return (
+              <motion.button
+                key={dayKey}
+                ref={registerDayRef(dayKey)}
+                type="button"
+                data-date={dayKey}
+                className={getDayClasses(dayStart, metadata)}
+                tabIndex={isFocused ? 0 : -1}
+                title={metadata.reason}
+                aria-label={ariaLabel}
+                aria-disabled={!metadata.selectable && metadata.action === 'static'}
+                aria-current={isTodayDate ? 'date' : undefined}
+                layout
+                whileTap={metadata.selectable && !shouldReduce ? { scale: 0.92 } : undefined}
+                transition={dayTransition}
+                onFocus={handleCellFocus}
+              >
+                {dayStart.getDate()}
+                {isTodayDate && (
+                  <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-brand-500"></span>
+                )}
+              </motion.button>
+            );
+          })}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

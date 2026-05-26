@@ -1,5 +1,7 @@
+import { motion } from 'framer-motion';
 import { RotateCcw } from 'lucide-react';
 import { Button } from './Button';
+import { fadeIn, useAppMotion } from '../lib/motion';
 
 interface ResetConfirmDialogProps {
   open: boolean;
@@ -8,11 +10,24 @@ interface ResetConfirmDialogProps {
 }
 
 export function ResetConfirmDialog({ open, onCancel, onConfirm }: ResetConfirmDialogProps) {
+  const { shouldReduce, transition } = useAppMotion();
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 px-4 animate-fade-in">
-      <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-brand-900/20 max-w-md w-full p-8 animate-pop transform transition-all border border-white/50">
+    <motion.div
+      className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 px-4"
+      initial="hidden"
+      animate="visible"
+      variants={fadeIn}
+      transition={transition}
+    >
+      <motion.div
+        className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-brand-900/20 max-w-md w-full p-8 transform transition-all border border-white/50"
+        initial={{ opacity: 0, scale: shouldReduce ? 1 : 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={transition}
+      >
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-5 shadow-inner">
             <RotateCcw className="w-8 h-8" />
@@ -33,7 +48,7 @@ export function ResetConfirmDialog({ open, onCancel, onConfirm }: ResetConfirmDi
             Confirmer
           </Button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

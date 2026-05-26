@@ -1,4 +1,5 @@
 import type { ChangeEvent, RefObject } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowUp,
   CalendarDays as CalendarDaysIcon,
@@ -9,6 +10,7 @@ import {
   Zap
 } from 'lucide-react';
 import { Button } from './Button';
+import { fadeIn, fadeInUp, springs, useAppMotion } from '../lib/motion';
 
 interface PlanningModeSelectorProps {
   isChoiceVisible: boolean;
@@ -62,17 +64,26 @@ export function PlanningModeSelector({
   onCustomFirstBlockDaysChange
 }: PlanningModeSelectorProps) {
   const sliderPercentage = getSliderPercentage(customFirstBlockDays, sliderMax);
+  const { shouldReduce, transition } = useAppMotion();
+  const firstBlockPercentage = getRatioPercentage(customFirstBlockDays, totalFractionableDays);
+  const secondBlockPercentage = getRatioPercentage(secondBlockDays, totalFractionableDays);
 
   const handleCustomFirstBlockDaysChange = (event: ChangeEvent<HTMLInputElement>) => {
     onCustomFirstBlockDaysChange(Number(event.target.value));
   };
 
   return (
-    <>
+    <AnimatePresence initial={false} mode="wait">
       {isChoiceVisible && (
-        <div
+        <motion.div
+          key="planning-choice"
           ref={planningRef}
-          className={`max-w-3xl mx-auto mb-8 sm:mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'} scroll-mt-28`}
+          className="max-w-3xl mx-auto mb-8 sm:mb-12 scroll-mt-28"
+          initial={isCoarsePointer ? false : 'hidden'}
+          animate="visible"
+          exit="hidden"
+          variants={fadeIn}
+          transition={transition}
         >
           <div className={`premium-card p-6 sm:p-8 ${isCoarsePointer ? '' : 'transition-all duration-500'}`}>
             <div className="text-center mb-8">
@@ -151,12 +162,20 @@ export function PlanningModeSelector({
                     <span className="flex-1">Période 2</span>
                   </div>
                   <div className="flex gap-2">
-                    <div className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700">
+                    <motion.div
+                      layout
+                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700"
+                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                    >
                       {customFirstBlockDays}j
-                    </div>
-                    <div className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700">
+                    </motion.div>
+                    <motion.div
+                      layout
+                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700"
+                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                    >
                       {secondBlockDays}j
-                    </div>
+                    </motion.div>
                   </div>
                 </div>
 
@@ -170,11 +189,20 @@ export function PlanningModeSelector({
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {isCustomModeVisible && (
-        <div ref={customModeRef} className="max-w-3xl mx-auto mb-8 sm:mb-12 animate-fade-in-up scroll-mt-28">
+        <motion.div
+          key="planning-custom"
+          ref={customModeRef}
+          className="max-w-3xl mx-auto mb-8 sm:mb-12 scroll-mt-28"
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={fadeInUp}
+          transition={transition}
+        >
           <div className="premium-card p-6 sm:p-8">
             <div className="flex items-start gap-5 mb-8">
               <div className="flex-shrink-0">
@@ -238,29 +266,41 @@ export function PlanningModeSelector({
                 </p>
                 <div className="flex gap-4 justify-center items-center">
                   <div className="flex flex-col items-center">
-                    <div className="w-20 h-20 rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-600/20 flex items-center justify-center text-3xl font-bold font-display mb-2">
+                    <motion.div
+                      layout
+                      className="w-20 h-20 rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-600/20 flex items-center justify-center text-3xl font-bold font-display mb-2"
+                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                    >
                       {customFirstBlockDays}
-                    </div>
+                    </motion.div>
                     <span className="text-xs font-bold text-brand-700 uppercase">Période 1</span>
                   </div>
                   <div className="text-2xl text-slate-300 font-light">+</div>
                   <div className="flex flex-col items-center">
-                    <div className="w-20 h-20 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 flex items-center justify-center text-3xl font-bold font-display mb-2">
+                    <motion.div
+                      layout
+                      className="w-20 h-20 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 flex items-center justify-center text-3xl font-bold font-display mb-2"
+                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                    >
                       {secondBlockDays}
-                    </div>
+                    </motion.div>
                     <span className="text-xs font-bold text-emerald-600 uppercase">Période 2</span>
                   </div>
                 </div>
               </div>
 
               <div className="h-4 bg-slate-200 rounded-full overflow-hidden mb-6 flex">
-                <div
+                <motion.div
+                  layout
                   className="h-full bg-brand-500 transition-all duration-300 ease-out"
-                  style={{ width: `${getRatioPercentage(customFirstBlockDays, totalFractionableDays)}%` }}
+                  style={{ width: `${firstBlockPercentage}%` }}
+                  transition={shouldReduce ? { duration: 0 } : springs.soft}
                 />
-                <div
+                <motion.div
+                  layout
                   className="h-full bg-emerald-500 transition-all duration-300 ease-out"
-                  style={{ width: `${getRatioPercentage(secondBlockDays, totalFractionableDays)}%` }}
+                  style={{ width: `${secondBlockPercentage}%` }}
+                  transition={shouldReduce ? { duration: 0 } : springs.soft}
                 />
               </div>
 
@@ -297,11 +337,19 @@ export function PlanningModeSelector({
               Annuler et revenir au mode simple
             </Button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {isFinalStepVisible && (
-        <div className="max-w-3xl mx-auto mb-8 sm:mb-12 animate-fade-in-up sticky top-24 z-30">
+        <motion.div
+          key="planning-final-step"
+          className="max-w-3xl mx-auto mb-8 sm:mb-12 sticky top-24 z-30"
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={fadeInUp}
+          transition={transition}
+        >
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50/90 backdrop-blur-md p-5 shadow-2xl shadow-emerald-500/10">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-emerald-500/30 flex-shrink-0">
@@ -315,8 +363,8 @@ export function PlanningModeSelector({
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
-    </>
+    </AnimatePresence>
   );
 }

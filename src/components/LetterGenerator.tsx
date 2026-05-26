@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Mail, Copy, Check } from 'lucide-react';
 import { LeaveBlock, LeaveScenarioConfig } from '../utils/paternityLeave';
 import { SupplementaryLeaveDuration, SupplementaryLeaveMode } from '../utils/supplementaryBirthLeave';
 import { generateEmployerLetter } from '../utils/employerLetter';
 import { Button } from './Button';
+import { fadeIn, staggerContainer, useAppMotion } from '../lib/motion';
 
 interface LetterGeneratorProps {
   birthDate: Date;
@@ -35,6 +37,7 @@ export function LetterGenerator({
   const [fonction, setFonction] = useState('');
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const { shouldReduce, transition } = useAppMotion();
 
   const baseLetter = useMemo(() => {
     return generateEmployerLetter({
@@ -71,6 +74,8 @@ export function LetterGenerator({
     supplementaryLeaveMode,
     supplementaryLeavePeriods
   ]);
+
+  const previewLines = useMemo(() => baseLetter.split('\n'), [baseLetter]);
 
   useEffect(() => {
     if (!copied) return;
@@ -191,19 +196,39 @@ export function LetterGenerator({
               {/* Grain texture overlay (subtle) */}
               <div className="absolute inset-0 bg-slate-50 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")' }}></div>
               
-              <div className="relative z-10 whitespace-pre-line">
-                {baseLetter}
-              </div>
+              <motion.div
+                className="relative z-10 whitespace-pre-line"
+                initial={shouldReduce ? false : 'hidden'}
+                animate="visible"
+                variants={staggerContainer(shouldReduce ? 0 : 0.03)}
+              >
+                {previewLines.map((line, index) => (
+                  <motion.span
+                    key={index}
+                    className="block min-h-[1em]"
+                    variants={fadeIn}
+                    transition={shouldReduce ? { duration: 0 } : { duration: 0.2, delay: index * 0.03 }}
+                  >
+                    {line || '\u00a0'}
+                  </motion.span>
+                ))}
+              </motion.div>
             </div>
           </div>
         </div>
 
         {copyError && (
-          <div className="p-4 rounded-xl border border-red-300 bg-red-50 animate-fade-in">
+          <motion.div
+            className="p-4 rounded-xl border border-red-300 bg-red-50"
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            transition={transition}
+          >
             <p className="text-sm text-red-800 font-medium">
               Impossible de copier. Sélectionnez le texte manuellement.
             </p>
-          </div>
+          </motion.div>
         )}
 
         <div className="relative">
@@ -212,10 +237,31 @@ export function LetterGenerator({
             variant="primary"
             size="lg"
             fullWidth
-            icon={copied ? Check : Copy}
-            iconPosition="left"
             className={`shadow-xl transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-1'}`}
           >
+            <AnimatePresence mode="wait" initial={false}>
+              {copied ? (
+                <motion.span
+                  key="copied-icon"
+                  initial={shouldReduce ? false : { opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={shouldReduce ? { duration: 0 } : { duration: 0.15 }}
+                >
+                  <Check className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2.5} aria-hidden="true" />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="copy-icon"
+                  initial={shouldReduce ? false : { opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={shouldReduce ? { duration: 0 } : { duration: 0.15 }}
+                >
+                  <Copy className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2.5} aria-hidden="true" />
+                </motion.span>
+              )}
+            </AnimatePresence>
             {copied ? 'Courrier copié !' : 'Copier le courrier'}
           </Button>
         </div>

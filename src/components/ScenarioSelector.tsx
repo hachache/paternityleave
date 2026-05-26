@@ -1,5 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { LEAVE_SCENARIOS, LeaveScenarioConfig, LeaveScenarioId } from '../utils/paternityLeave';
 import { FRACTIONABLE_PERIODS_HINT } from '../utils/scenarioVocabulary';
+import { springs, useAppMotion } from '../lib/motion';
 
 interface ScenarioSelectorProps {
   selectedScenario: LeaveScenarioId;
@@ -19,6 +21,8 @@ function formatScenarioDetails(config: LeaveScenarioConfig) {
 
 export function ScenarioSelector({ selectedScenario, onScenarioChange }: ScenarioSelectorProps) {
   const scenarios = Object.values(LEAVE_SCENARIOS);
+  const { shouldReduce } = useAppMotion();
+  const cardTransition = shouldReduce ? { duration: 0 } : springs.snappy;
 
   return (
     <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-4 sm:grid-cols-2 auto-rows-fr">
@@ -27,18 +31,28 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
         const details = formatScenarioDetails(config);
 
         return (
-          <button
+          <motion.button
             key={config.id}
             type="button"
             role="radio"
             aria-checked={isSelected}
             onClick={() => onScenarioChange(config.id)}
+            whileHover={shouldReduce ? undefined : { y: -2 }}
+            whileTap={shouldReduce ? undefined : { scale: 0.98 }}
+            transition={cardTransition}
             className={`group relative rounded-3xl p-6 text-left transition-all duration-300 h-full flex flex-col border-2 ${
               isSelected
-                ? 'border-brand-500 bg-brand-50/50 shadow-lg shadow-brand-500/10'
+                ? 'border-transparent bg-brand-50/50 shadow-lg shadow-brand-500/10'
                 : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
             }`}
           >
+            {isSelected && (
+              <motion.div
+                layoutId="scenario-active-border"
+                className="pointer-events-none absolute inset-0 rounded-3xl border-2 border-brand-500"
+                transition={cardTransition}
+              />
+            )}
             {/* Selection Indicator */}
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1">
@@ -59,7 +73,20 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                   isSelected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-200 group-hover:border-brand-300'
                 }`}
               >
-                {isSelected && <span className="text-xs font-bold">✓</span>}
+                <AnimatePresence initial={false}>
+                  {isSelected && (
+                    <motion.span
+                      key="selected-check"
+                      className="text-xs font-bold"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={cardTransition}
+                    >
+                      ✓
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
@@ -77,7 +104,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                 </p>
               </div>
             </div>
-          </button>
+          </motion.button>
         );
       })}
     </div>

@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import { springs, useAppMotion } from '../lib/motion';
 
 interface NavigationAnchorProps {
   show: boolean;
@@ -10,6 +12,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
   const [activeSection, setActiveSection] = useState<string>('calendar');
   const isMobile = useMediaQuery('(max-width: 767px)');
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const { shouldReduce } = useAppMotion();
 
   const sections = useMemo(() => {
     const items = [
@@ -121,8 +124,6 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
     }
   }, [show, detectActiveSection]);
 
-  if (!show) return null;
-
   // Navigation réutilisable
   const navContent = (
     <>
@@ -133,16 +134,16 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
             key={section.id}
             href={`#${section.id}`}
             className={`
-              relative px-2 sm:px-3 md:px-5 py-3 sm:py-2 rounded-xl text-xs sm:text-sm md:text-sm
+              relative isolate px-2 sm:px-3 md:px-5 py-3 sm:py-2 rounded-xl text-xs sm:text-sm md:text-sm
               font-semibold whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[44px]
               ${
                 isActive
-                  ? 'text-white bg-gradient-to-b from-brand-600 to-brand-700 shadow-lg'
+                  ? 'text-white'
                   : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
               }
             `}
             style={{
-              transition: 'background 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              transition: 'background 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
               transform: isActive ? 'scale(1)' : 'scale(0.98)'
             }}
             title={section.label}
@@ -154,8 +155,15 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
               }
             }}
           >
-            <span className="hidden sm:inline">{section.label}</span>
-            <span className="sm:hidden">{section.shortLabel}</span>
+            {isActive && (
+              <motion.div
+                className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-brand-600 to-brand-700 shadow-lg"
+                layoutId="nav-active-pill"
+                transition={shouldReduce ? { duration: 0 } : springs.soft}
+              />
+            )}
+            <span className="relative z-10 hidden sm:inline">{section.label}</span>
+            <span className="relative z-10 sm:hidden">{section.shortLabel}</span>
           </a>
         );
       })}
@@ -164,16 +172,26 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
 
   // Top nav desktop, bottom nav mobile
   return (
-    <div className="fixed bottom-0 sm:bottom-auto sm:top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-3 sm:py-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-4 pointer-events-none">
-      <nav
-        aria-label="Navigation de la page"
-        className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl bg-white/95 backdrop-blur-lg border border-slate-200/80 shadow-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start"
-        style={{
-          transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-        }}
-      >
-        {navContent}
-      </nav>
-    </div>
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          className="fixed bottom-0 sm:bottom-auto sm:top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-3 sm:py-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-4 pointer-events-none"
+          initial={shouldReduce ? false : { y: isMobile ? 100 : -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={shouldReduce ? undefined : { y: isMobile ? 100 : -100, opacity: 0 }}
+          transition={shouldReduce ? { duration: 0 } : springs.soft}
+        >
+          <nav
+            aria-label="Navigation de la page"
+            className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl bg-white/95 backdrop-blur-lg border border-slate-200/80 shadow-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start"
+            style={{
+              transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            }}
+          >
+            {navContent}
+          </nav>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

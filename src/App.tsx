@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Linkedin, Trash2 } from 'lucide-react';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { useScrollOrchestrator } from './hooks/useScrollOrchestrator';
@@ -24,12 +25,14 @@ import { ResetConfirmDialog } from './components/ResetConfirmDialog';
 import { HeroHeader } from './components/HeroHeader';
 import { PlanningModeSelector } from './components/PlanningModeSelector';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
+import { fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
 
 function App() {
   const [showLegalReferences, setShowLegalReferences] = useState(false);
   const [calendarHighlight, setCalendarHighlight] = useState(false);
   const calendarHighlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
+  const { shouldReduce, transition } = useAppMotion();
   const {
     birthDate,
     employerPeriod,
@@ -243,80 +246,106 @@ function App() {
 
       <main id={mainContentId} className="flex-1 relative z-10">
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl pt-20 sm:pt-24 pb-28 sm:pb-12">
-          <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
-
-          <ScrollIndicator show={birthDate !== null} />
-
-          <NavigationAnchor
-            show={birthDate !== null && hasScrolledPastStart}
-            showSupplementaryLink={isPaternityPlanComplete && isEligibleForSupplementaryLeave}
-          />
-
-          <div className="max-w-3xl mx-auto mb-12 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            <SectionCard
-              title="Votre situation"
-              description="Adaptez le calendrier à votre cas spécifique"
-              accent="brand"
-            >
-              <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
-            </SectionCard>
-          </div>
-
-          <div className="max-w-3xl mx-auto mb-12">
-            <ProgressStepper
-              currentStep={planningStep}
-              fractionableDays={totalFractionableDays}
-              scenario={scenario}
-            />
-            {birthDate && (
-              <p className="mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm backdrop-blur-sm">
-                {totalPlannedDays} / {totalFractionableDays} jours planifiés
-              </p>
-            )}
-          </div>
-
-          <div
-            ref={calendarRef}
-            id="calendar"
-            className={`mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-[3rem] transition-shadow duration-500 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_60px_-10px_rgba(0,113,227,0.45)]' : ''}`}
+          <motion.div
+            className="space-y-0"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer(shouldReduce ? 0 : 0.08)}
           >
-            <div className="absolute inset-0 -z-10 bg-brand-500/5 blur-3xl rounded-[3rem] transform scale-105"></div>
-            <Calendar
-              birthDate={birthDate}
-              onSelectBirthDate={handleSelectBirthDate}
-              employerPeriod={employerPeriod}
-              mandatoryPeriod={mandatoryPeriod}
-              remainingBlocks={remainingBlocks}
-              onSelectRemainingDay={handleSelectRemainingDay}
-              onRemoveBlock={handleRemoveBlock}
-              scenario={scenario}
-            />
-            <CalendarLegend scenario={scenario} />
-          </div>
+            <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
-          <div className="max-w-3xl mx-auto mb-12">
-            <SectionCard
-              title="Prochaines étapes"
-              description="Votre guide pour finaliser la demande"
-              accent="slate"
+            <ScrollIndicator show={birthDate !== null} />
+
+            <NavigationAnchor
+              show={birthDate !== null && hasScrolledPastStart}
+              showSupplementaryLink={isPaternityPlanComplete && isEligibleForSupplementaryLeave}
+            />
+
+            <motion.div
+              className="max-w-3xl mx-auto mb-12"
+              variants={fadeInUp}
+              transition={transition}
             >
-              <NextStepsCard
-                planningStep={planningStep}
-                totalPlannedDays={totalPlannedDays}
-                hasBirthDate={Boolean(birthDate)}
-                hasMandatory={Boolean(mandatoryPeriod)}
-                remainingBlocks={remainingBlocks.length}
+              <SectionCard
+                title="Votre situation"
+                description="Adaptez le calendrier à votre cas spécifique"
+                accent="brand"
+              >
+                <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
+              </SectionCard>
+            </motion.div>
+
+            <motion.div className="max-w-3xl mx-auto mb-12" variants={fadeInUp} transition={transition}>
+              <ProgressStepper
+                currentStep={planningStep}
                 fractionableDays={totalFractionableDays}
-                isEligibleForSupplementaryLeave={isEligibleForSupplementaryLeave}
-                supplementaryLeaveConfigured={supplementaryLeaveConfigured}
-                supplementaryLeaveActivationHint={supplementaryLeaveEligibility.reason}
-                supplementaryLeaveDaysUntilActivation={
-                  supplementaryLeaveEligibility.daysUntilActivation
-                }
                 scenario={scenario}
               />
-          </SectionCard>
-        </div>
+              <AnimatePresence>
+                {birthDate && (
+                  <motion.p
+                    className="mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm backdrop-blur-sm"
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    variants={fadeIn}
+                    transition={transition}
+                  >
+                    {totalPlannedDays} / {totalFractionableDays} jours planifiés
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            <motion.div
+              ref={calendarRef}
+              id="calendar"
+              className={`mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-[3rem] transition-shadow duration-500 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_60px_-10px_rgba(0,113,227,0.45)]' : ''}`}
+              variants={fadeInUp}
+              transition={transition}
+            >
+              <div className="absolute inset-0 -z-10 bg-brand-500/5 blur-3xl rounded-[3rem] transform scale-105"></div>
+              <Calendar
+                birthDate={birthDate}
+                onSelectBirthDate={handleSelectBirthDate}
+                employerPeriod={employerPeriod}
+                mandatoryPeriod={mandatoryPeriod}
+                remainingBlocks={remainingBlocks}
+                onSelectRemainingDay={handleSelectRemainingDay}
+                onRemoveBlock={handleRemoveBlock}
+                scenario={scenario}
+              />
+              <CalendarLegend scenario={scenario} />
+            </motion.div>
+
+            <motion.div
+              className="max-w-3xl mx-auto mb-12"
+              variants={fadeInUp}
+              transition={transition}
+            >
+              <SectionCard
+                title="Prochaines étapes"
+                description="Votre guide pour finaliser la demande"
+                accent="slate"
+              >
+                <NextStepsCard
+                  planningStep={planningStep}
+                  totalPlannedDays={totalPlannedDays}
+                  hasBirthDate={Boolean(birthDate)}
+                  hasMandatory={Boolean(mandatoryPeriod)}
+                  remainingBlocks={remainingBlocks.length}
+                  fractionableDays={totalFractionableDays}
+                  isEligibleForSupplementaryLeave={isEligibleForSupplementaryLeave}
+                  supplementaryLeaveConfigured={supplementaryLeaveConfigured}
+                  supplementaryLeaveActivationHint={supplementaryLeaveEligibility.reason}
+                  supplementaryLeaveDaysUntilActivation={
+                    supplementaryLeaveEligibility.daysUntilActivation
+                  }
+                  scenario={scenario}
+                />
+              </SectionCard>
+            </motion.div>
+          </motion.div>
 
         <CelebrationModal
           show={showCelebration}
@@ -337,65 +366,85 @@ function App() {
           onConfirm={handleResetConfirm}
         />
 
-        {(error || (successMessage && !visualSelectionMode)) && (
-          <div className={`max-w-3xl mx-auto space-y-4 mb-8 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
-            {error && (
-              <FeedbackBanner
-                tone="error"
-                title="Attention"
-                message={error}
-              />
-            )}
+        <AnimatePresence>
+          {(error || (successMessage && !visualSelectionMode)) && (
+            <motion.div
+              key="feedback"
+              className="max-w-3xl mx-auto space-y-4 mb-8"
+              initial={isCoarsePointer ? false : 'hidden'}
+              animate="visible"
+              exit="hidden"
+              variants={fadeIn}
+              transition={transition}
+            >
+              {error && (
+                <FeedbackBanner
+                  tone="error"
+                  title="Attention"
+                  message={error}
+                />
+              )}
 
-            {successMessage && !visualSelectionMode && (
-              <FeedbackBanner
-                tone="success"
-                title="Succès"
-                message={successMessage}
-              />
-            )}
-          </div>
-        )}
+              {successMessage && !visualSelectionMode && (
+                <FeedbackBanner
+                  tone="success"
+                  title="Succès"
+                  message={successMessage}
+                />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Bannière d'instruction pour le mode sélection visuelle */}
-        {visualSelectionMode && selectionStep !== 'idle' && (
-          <div className="mb-6 max-w-3xl mx-auto animate-fade-in-up sticky top-24 z-30">
-            <div className="rounded-2xl border border-brand-200 bg-white/90 backdrop-blur-xl p-5 shadow-2xl shadow-brand-900/10 ring-1 ring-black/5">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-brand-500/30">
-                    {selectionStep === 'selecting-start' ? '1' : '2'}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-lg font-bold text-brand-900 mb-1 font-display">
-                    {selectionStep === 'selecting-start'
-                      ? 'Sélectionnez le DÉBUT'
-                      : 'Sélectionnez la FIN'}
-                  </h4>
-                  <p className="text-sm text-brand-700 font-medium">
-                    {selectionStep === 'selecting-start'
-                      ? 'Cliquez sur la première date de votre période'
-                      : `Cliquez sur la dernière date (min. 5 jours)`}
-                  </p>
-                  {selectionStartDate && selectionStep === 'selecting-end' && (
-                    <div className="mt-2 inline-flex px-3 py-1 bg-white rounded-lg text-xs font-bold text-brand-700 shadow-sm border border-brand-100">
-                      Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+        <AnimatePresence>
+          {visualSelectionMode && selectionStep !== 'idle' && (
+            <motion.div
+              key="visual-selection-banner"
+              className="mb-6 max-w-3xl mx-auto sticky top-24 z-30"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={fadeInUp}
+              transition={transition}
+            >
+              <div className="rounded-2xl border border-brand-200 bg-white/90 backdrop-blur-xl p-5 shadow-2xl shadow-brand-900/10 ring-1 ring-black/5">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-brand-500/30">
+                      {selectionStep === 'selecting-start' ? '1' : '2'}
                     </div>
-                  )}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-bold text-brand-900 mb-1 font-display">
+                      {selectionStep === 'selecting-start'
+                        ? 'Sélectionnez le DÉBUT'
+                        : 'Sélectionnez la FIN'}
+                    </h4>
+                    <p className="text-sm text-brand-700 font-medium">
+                      {selectionStep === 'selecting-start'
+                        ? 'Cliquez sur la première date de votre période'
+                        : `Cliquez sur la dernière date (min. 5 jours)`}
+                    </p>
+                    {selectionStartDate && selectionStep === 'selecting-end' && (
+                      <div className="mt-2 inline-flex px-3 py-1 bg-white rounded-lg text-xs font-bold text-brand-700 shadow-sm border border-brand-100">
+                        Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handleCancelVisualSelection}
+                    variant="secondary"
+                    size="sm"
+                    className="bg-white hover:bg-white shadow-sm"
+                  >
+                    Annuler
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleCancelVisualSelection}
-                  variant="secondary"
-                  size="sm"
-                  className="bg-white hover:bg-white shadow-sm"
-                >
-                  Annuler
-                </Button>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <PlanningModeSelector
           isChoiceVisible={Boolean(birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode)}
@@ -418,52 +467,90 @@ function App() {
         />
 
         {/* Bouton Effacer tous les blocs */}
-        {remainingBlocks.length > 0 && (
-          <div className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'}`}>
-            <Button
-              onClick={handleClearAllBlocks}
-              variant="outline"
-              size="md"
-              fullWidth
-              className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
+        <AnimatePresence>
+          {remainingBlocks.length > 0 && (
+            <motion.div
+              key="clear-all-blocks"
+              className="max-w-3xl mx-auto mb-12"
+              initial={isCoarsePointer ? false : 'hidden'}
+              animate="visible"
+              exit="hidden"
+              variants={fadeIn}
+              transition={transition}
             >
-              <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
-              Recommencer la planification
-            </Button>
-          </div>
-        )}
+              <Button
+                onClick={handleClearAllBlocks}
+                variant="outline"
+                size="md"
+                fullWidth
+                className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
+              >
+                <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+                Recommencer la planification
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {isPaternityPlanComplete && (
-          <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
-        )}
+        <AnimatePresence>
+          {isPaternityPlanComplete && (
+            <motion.div
+              key="post-planning-nav"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={fadeIn}
+              transition={transition}
+            >
+              <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {birthDate && isPaternityPlanComplete && (
-          <div
-            ref={supplementaryLeaveRef}
-            id="conge-supplementaire"
-            className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'}`}
-          >
-            <SupplementaryLeaveCard
-              enabled={supplementaryLeaveEnabled}
-              duration={supplementaryLeaveDuration}
-              mode={supplementaryLeaveMode}
-              secondStartDate={supplementaryLeaveSecondStartDate}
-              eligibility={supplementaryLeaveEligibility}
-              startDate={supplementaryLeaveStartDate}
-              periods={supplementaryLeavePeriods}
-              error={supplementaryLeaveError}
-              scenario={scenario}
-              onEnabledChange={setSupplementaryLeaveEnabled}
-              onDurationChange={setSupplementaryLeaveDuration}
-              onModeChange={setSupplementaryLeaveMode}
-              onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
-            />
-          </div>
-        )}
+        <AnimatePresence>
+          {birthDate && isPaternityPlanComplete && (
+            <motion.div
+              key="supplementary-leave-card"
+              ref={supplementaryLeaveRef}
+              id="conge-supplementaire"
+              className="max-w-3xl mx-auto mb-12"
+              initial={isCoarsePointer ? false : 'hidden'}
+              animate="visible"
+              exit="hidden"
+              variants={fadeIn}
+              transition={transition}
+            >
+              <SupplementaryLeaveCard
+                enabled={supplementaryLeaveEnabled}
+                duration={supplementaryLeaveDuration}
+                mode={supplementaryLeaveMode}
+                secondStartDate={supplementaryLeaveSecondStartDate}
+                eligibility={supplementaryLeaveEligibility}
+                startDate={supplementaryLeaveStartDate}
+                periods={supplementaryLeavePeriods}
+                error={supplementaryLeaveError}
+                scenario={scenario}
+                onEnabledChange={setSupplementaryLeaveEnabled}
+                onDurationChange={setSupplementaryLeaveDuration}
+                onModeChange={setSupplementaryLeaveMode}
+                onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {birthDate && (
-          <>
-            <div className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in'}`} id="summary">
+        <AnimatePresence>
+          {birthDate && (
+            <motion.div
+              key="summary"
+              className="max-w-3xl mx-auto mb-12"
+              id="summary"
+              initial={isCoarsePointer ? false : 'hidden'}
+              animate="visible"
+              exit="hidden"
+              variants={fadeIn}
+              transition={transition}
+            >
               <Summary
                 birthDate={birthDate}
                 employerPeriod={employerPeriod}
@@ -476,24 +563,36 @@ function App() {
                 supplementaryLeaveDuration={supplementaryLeaveDuration}
                 supplementaryLeaveMode={supplementaryLeaveMode}
               />
-            </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {mandatoryPeriod && (
-              <div ref={letterRef} className={`max-w-3xl mx-auto mb-12 ${isCoarsePointer ? '' : 'animate-fade-in-delay'}`} id="letter">
-                <LetterGenerator
-                  birthDate={birthDate}
-                  employerPeriod={employerPeriod}
-                  mandatoryPeriod={mandatoryPeriod}
-                  remainingBlocks={remainingBlocks}
-                  scenario={scenario}
-                  supplementaryLeavePeriods={supplementaryLeavePeriods}
-                  supplementaryLeaveDuration={supplementaryLeaveDuration}
-                  supplementaryLeaveMode={supplementaryLeaveMode}
-                />
-              </div>
-            )}
-          </>
-        )}
+        <AnimatePresence>
+          {birthDate && mandatoryPeriod && (
+            <motion.div
+              key="letter-generator"
+              ref={letterRef}
+              className="max-w-3xl mx-auto mb-12"
+              id="letter"
+              initial={isCoarsePointer ? false : 'hidden'}
+              animate="visible"
+              exit="hidden"
+              variants={fadeIn}
+              transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
+            >
+              <LetterGenerator
+                birthDate={birthDate}
+                employerPeriod={employerPeriod}
+                mandatoryPeriod={mandatoryPeriod}
+                remainingBlocks={remainingBlocks}
+                scenario={scenario}
+                supplementaryLeavePeriods={supplementaryLeavePeriods}
+                supplementaryLeaveDuration={supplementaryLeaveDuration}
+                supplementaryLeaveMode={supplementaryLeaveMode}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
           <div className="mt-24 max-w-3xl mx-auto mb-16" id="legal">
             <LegalInfo onShowLegalReferences={handleShowLegalReferences} />

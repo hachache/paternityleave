@@ -1,5 +1,6 @@
 import { format, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CalendarDays, CheckCircle2, Clock3, Info, Wallet, Users, Split } from 'lucide-react';
 import { LeaveBlock, LeaveScenarioConfig } from '../utils/paternityLeave';
 import {
@@ -10,6 +11,7 @@ import {
 } from '../utils/supplementaryBirthLeave';
 import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
 import { getSupplementaryLeaveStatusLabel } from '../utils/supplementaryLeaveCopy';
+import { useAppMotion } from '../lib/motion';
 
 interface SupplementaryLeaveCardProps {
   enabled: boolean;
@@ -63,6 +65,7 @@ export function SupplementaryLeaveCard({
   const minDateValue = toInputValue(startDate);
   const maxDateValue = toInputValue(eligibility.limitDate);
   const vocabulary = getScenarioVocabulary(scenario);
+  const { shouldReduce, transition } = useAppMotion();
 
   const handleToggle = () => {
     if (!canActivate) return;
@@ -141,102 +144,133 @@ export function SupplementaryLeaveCard({
         </div>
       </div>
 
-      <div className="mt-5">
-        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">
-          Durée à projeter
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          {[1, 2].map((value) => {
-            const typedValue = value as SupplementaryLeaveDuration;
-            const selected = duration === typedValue;
-
-            return (
-              <button
-                key={value}
-                type="button"
-                disabled={!canActivate}
-                onClick={() => onDurationChange(typedValue)}
-                className={`rounded-2xl border px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
-                  selected
-                    ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                <span className="block text-base font-bold">{value} mois</span>
-                <span className={`mt-1 block text-xs font-medium ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
-                  {value === 1 ? 'Projection courte' : 'Projection complète'}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {isSplitAvailable && (
-        <div className="mt-5">
-          <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
-            <Split className="h-4 w-4" aria-hidden="true" />
-            Mode de prise
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            {(['consecutive', 'split'] as SupplementaryLeaveMode[]).map((option) => {
-              const selected = mode === option;
-              const label = option === 'consecutive' ? '2 mois consécutifs' : '2 × 1 mois disjoints';
-              const hint =
-                option === 'consecutive'
-                  ? 'Pris d\'affilée après le congé initial.'
-                  : '2 périodes d\'1 mois prises séparément.';
-
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  disabled={!canActivate}
-                  onClick={() => onModeChange(option)}
-                  className={`rounded-2xl border px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
-                    selected
-                      ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className="block text-sm font-bold">{label}</span>
-                  <span className={`mt-1 block text-xs font-medium ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
-                    {hint}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {isSplitActive && (
-            <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
-                Début de la 2<sup>e</sup> période d&apos;1 mois
-              </label>
-              <input
-                type="date"
-                value={toInputValue(secondStartDate)}
-                min={minDateValue || undefined}
-                max={maxDateValue || undefined}
-                disabled={!canActivate}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  if (!value) {
-                    onSecondStartDateChange(null);
-                    return;
-                  }
-                  onSecondStartDateChange(startOfDay(new Date(value)));
-                }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-              <p className="mt-2 text-xs leading-relaxed text-slate-500">
-                Doit débuter après la fin du congé initial et se terminer avant la date limite légale.
-                La seconde période ne peut pas chevaucher la première.
+      <AnimatePresence initial={false}>
+        {enabled && (
+          <motion.div
+            key="supplementary-configuration"
+            className="overflow-hidden"
+            initial={shouldReduce ? false : { opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={transition}
+          >
+            <div className="mt-5">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+                Durée à projeter
               </p>
+              <div className="grid grid-cols-2 gap-3">
+                {[1, 2].map((value) => {
+                  const typedValue = value as SupplementaryLeaveDuration;
+                  const selected = duration === typedValue;
+
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      disabled={!canActivate}
+                      onClick={() => onDurationChange(typedValue)}
+                      className={`rounded-2xl border px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                        selected
+                          ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="block text-base font-bold">{value} mois</span>
+                      <span className={`mt-1 block text-xs font-medium ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
+                        {value === 1 ? 'Projection courte' : 'Projection complète'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          )}
-        </div>
-      )}
+
+            <AnimatePresence initial={false}>
+              {isSplitAvailable && (
+                <motion.div
+                  key="supplementary-mode"
+                  className="mt-5 overflow-hidden"
+                  initial={shouldReduce ? false : { opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={transition}
+                >
+                  <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                    <Split className="h-4 w-4" aria-hidden="true" />
+                    Mode de prise
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {(['consecutive', 'split'] as SupplementaryLeaveMode[]).map((option) => {
+                      const selected = mode === option;
+                      const label = option === 'consecutive' ? '2 mois consécutifs' : '2 × 1 mois disjoints';
+                      const hint =
+                        option === 'consecutive'
+                          ? 'Pris d\'affilée après le congé initial.'
+                          : '2 périodes d\'1 mois prises séparément.';
+
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          disabled={!canActivate}
+                          onClick={() => onModeChange(option)}
+                          className={`rounded-2xl border px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                            selected
+                              ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
+                              : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span className="block text-sm font-bold">{label}</span>
+                          <span className={`mt-1 block text-xs font-medium ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
+                            {hint}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <AnimatePresence initial={false}>
+                    {isSplitActive && (
+                      <motion.div
+                        key="supplementary-second-date"
+                        className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                        initial={shouldReduce ? false : { opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={transition}
+                      >
+                        <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                          Début de la 2<sup>e</sup> période d&apos;1 mois
+                        </label>
+                        <input
+                          type="date"
+                          value={toInputValue(secondStartDate)}
+                          min={minDateValue || undefined}
+                          max={maxDateValue || undefined}
+                          disabled={!canActivate}
+                          onChange={(event) => {
+                            const value = event.target.value;
+                            if (!value) {
+                              onSecondStartDateChange(null);
+                              return;
+                            }
+                            onSecondStartDateChange(startOfDay(new Date(value)));
+                          }}
+                          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                          Doit débuter après la fin du congé initial et se terminer avant la date limite légale.
+                          La seconde période ne peut pas chevaucher la première.
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
         <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
