@@ -44,11 +44,11 @@ export function NextStepsCard({
 
   return (
     <ol className="relative space-y-0">
-      <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-slate-100" />
+      <div className="absolute left-[17px] sm:left-[19px] top-4 bottom-4 w-0.5 bg-slate-100" />
       {checklist.map(item => (
-        <li key={item.label} className="group relative pl-12 py-4 first:pt-0 last:pb-0 transition-all duration-300">
+        <li key={item.label} className="group relative pl-11 sm:pl-12 py-3 sm:py-4 first:pt-0 last:pb-0 transition-all duration-300">
           <span
-            className={`absolute left-0 top-4 inline-flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold shadow-sm ring-4 ring-white transition-all duration-500 ${
+            className={`absolute left-0 top-3 sm:top-4 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-sm font-bold shadow-sm ring-4 ring-white transition-all duration-500 ${
               item.status === 'done'
                 ? 'bg-emerald-500 text-white scale-100'
                 : 'bg-white text-slate-300 border-2 border-slate-100 group-hover:border-brand-200 group-hover:text-brand-300'
@@ -57,9 +57,9 @@ export function NextStepsCard({
             {item.status === 'done' ? '✓' : item.index}
           </span>
           <div
-            className={`space-y-1 p-4 rounded-2xl transition-all duration-300 ${
+            className={`space-y-1 p-3.5 sm:p-4 rounded-2xl transition-all duration-300 ${
               item.status === 'active'
-                ? 'bg-white border border-brand-100 shadow-soft scale-[1.02]'
+                ? 'bg-white border border-brand-100 shadow-soft sm:scale-[1.02]'
                 : 'group-hover:bg-slate-50'
             }`}
           >

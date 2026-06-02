@@ -6,6 +6,7 @@ import {
   calculateSupplementaryLeavePeriod,
   calculateSupplementaryLeaveSplitBlocks,
   formatSupplementaryActivationCountdown,
+  getSupplementaryLeaveEarliestStartDate,
   getSupplementaryLeaveEligibility,
   getSupplementaryLeaveLimitDate
 } from '../supplementaryBirthLeave';
@@ -26,30 +27,51 @@ describe('getSupplementaryLeaveEligibility', () => {
     );
 
     expect(result.isEligibleBirthDate).toBe(false);
+    expect(result.canPlan).toBe(false);
     expect(result.canActivate).toBe(false);
     expect(result.limitDate).toBeNull();
     expect(result.reason).toContain('1er janvier 2026');
   });
 
-  it('marque une naissance du 1er janvier 2026 eligible mais non activable avant le 1er juillet 2026', () => {
+  it('marque une naissance du 1er janvier 2026 eligible mais non planifiable avant le 1er juin 2026', () => {
     const result = getSupplementaryLeaveEligibility(
       new Date(2026, 0, 1),
       standardScenario,
-      new Date(2026, 5, 30)
+      new Date(2026, 4, 31)
     );
 
     expect(result.isEligibleBirthDate).toBe(true);
+    expect(result.isRequestWindowOpen).toBe(false);
     expect(result.isAvailableNow).toBe(false);
+    expect(result.canPlan).toBe(false);
     expect(result.canActivate).toBe(false);
-    expect(result.daysUntilActivation).toBe(1);
-    expect(formatSupplementaryActivationCountdown(result.daysUntilActivation)).toBe(
-      'Activation demain (1er juillet 2026)'
-    );
+    expect(result.daysUntilRequestWindow).toBe(1);
+    expect(result.daysUntilActivation).toBe(31);
     expect(dateKey(result.limitDate)).toBe('2027-03-31');
-    expect(result.reason).toContain('1er juillet 2026');
+    expect(result.reason).toContain('1er juin 2026');
   });
 
-  it('autorise l activation a partir du 1er juillet 2026', () => {
+  it('autorise la planification a partir du 1er juin 2026 sans permettre un debut avant le 1er juillet', () => {
+    const result = getSupplementaryLeaveEligibility(
+      new Date(2026, 0, 1),
+      standardScenario,
+      new Date(2026, 5, 1)
+    );
+
+    expect(result.isEligibleBirthDate).toBe(true);
+    expect(result.isRequestWindowOpen).toBe(true);
+    expect(result.isAvailableNow).toBe(false);
+    expect(result.canPlan).toBe(true);
+    expect(result.canActivate).toBe(false);
+    expect(result.daysUntilRequestWindow).toBeNull();
+    expect(result.daysUntilActivation).toBe(30);
+    expect(formatSupplementaryActivationCountdown(result.daysUntilActivation)).toBe(
+      'Début possible dans 30 jours (1er juillet 2026)'
+    );
+    expect(result.reason).toBeNull();
+  });
+
+  it('autorise le debut effectif a partir du 1er juillet 2026', () => {
     const result = getSupplementaryLeaveEligibility(
       new Date(2026, 0, 1),
       standardScenario,
@@ -57,13 +79,15 @@ describe('getSupplementaryLeaveEligibility', () => {
     );
 
     expect(result.isEligibleBirthDate).toBe(true);
+    expect(result.isRequestWindowOpen).toBe(true);
     expect(result.isAvailableNow).toBe(true);
+    expect(result.canPlan).toBe(true);
     expect(result.canActivate).toBe(true);
     expect(result.daysUntilActivation).toBeNull();
     expect(result.reason).toBeNull();
   });
 
-  it('calcule le nombre de jours avant activation pour une date intermediaire', () => {
+  it('calcule le nombre de jours avant debut effectif pour une date intermediaire', () => {
     const result = getSupplementaryLeaveEligibility(
       new Date(2026, 0, 1),
       standardScenario,
@@ -72,8 +96,22 @@ describe('getSupplementaryLeaveEligibility', () => {
 
     expect(result.daysUntilActivation).toBe(30);
     expect(formatSupplementaryActivationCountdown(result.daysUntilActivation)).toBe(
-      'Activation dans 30 jours (1er juillet 2026)'
+      'Début possible dans 30 jours (1er juillet 2026)'
     );
+  });
+});
+
+describe('getSupplementaryLeaveEarliestStartDate', () => {
+  it('force le début au 1er juillet 2026 si le congé initial se termine avant', () => {
+    const result = getSupplementaryLeaveEarliestStartDate(new Date(2026, 1, 15));
+
+    expect(dateKey(result)).toBe('2026-07-01');
+  });
+
+  it('démarre le lendemain du congé initial si celui-ci finit après le 1er juillet 2026', () => {
+    const result = getSupplementaryLeaveEarliestStartDate(new Date(2026, 6, 10));
+
+    expect(dateKey(result)).toBe('2026-07-11');
   });
 });
 
@@ -157,7 +195,7 @@ describe('calculateSupplementaryLeaveSplitBlocks', () => {
 
     expect(result.valid).toBe(false);
     expect(result.blocks).toEqual([]);
-    expect(result.error).toContain('fin du congé initial');
+    expect(result.error).toContain('date autorisée');
   });
 
   it('refuse une periode depassant la date limite legale', () => {

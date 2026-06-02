@@ -23,24 +23,24 @@ export function ResetConfirmDialog({ open, onCancel, onConfirm }: ResetConfirmDi
       transition={transition}
     >
       <motion.div
-        className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-brand-900/20 max-w-md w-full p-8 transform transition-all border border-white/50"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 transform transition-all border border-white/50"
         initial={{ opacity: 0, scale: shouldReduce ? 1 : 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={transition}
       >
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-5 shadow-inner">
-            <RotateCcw className="w-8 h-8" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-amber-100 text-amber-600 mb-4 sm:mb-5 shadow-inner">
+            <RotateCcw className="w-6 h-6 sm:w-8 sm:h-8" aria-hidden="true" />
           </div>
-          <h3 className="text-2xl font-bold font-display text-slate-900 mb-3">
+          <h3 className="text-xl sm:text-2xl font-bold font-display text-slate-900 mb-3">
             Réinitialiser le planning ?
           </h3>
-          <p className="text-slate-600 text-base leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
             Toute votre progression actuelle sera perdue. Cette action est irréversible.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <Button onClick={onCancel} variant="secondary" size="lg" className="w-full">
             Annuler
           </Button>

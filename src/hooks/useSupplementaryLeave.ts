@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { addDays, isAfter, startOfDay } from 'date-fns';
+import { isAfter } from 'date-fns';
 
 import { LeaveBlock, LeaveScenarioConfig } from '../utils/paternityLeave';
 import {
@@ -7,6 +7,7 @@ import {
   SupplementaryLeaveMode,
   calculateSupplementaryLeavePeriod,
   calculateSupplementaryLeaveSplitBlocks,
+  getSupplementaryLeaveEarliestStartDate,
   getSupplementaryLeaveEligibility
 } from '../utils/supplementaryBirthLeave';
 
@@ -58,8 +59,11 @@ export function useSupplementaryLeave({
 
   const startDate = useMemo(() => {
     if (!paternityEndDate) return null;
-    return addDays(startOfDay(paternityEndDate), 1);
-  }, [paternityEndDate]);
+    return getSupplementaryLeaveEarliestStartDate(
+      paternityEndDate,
+      eligibility.activationDate
+    );
+  }, [eligibility.activationDate, paternityEndDate]);
 
   const reset = useCallback(() => {
     setEnabled(false);
@@ -69,10 +73,10 @@ export function useSupplementaryLeave({
   }, []);
 
   useEffect(() => {
-    if (enabled && (!isPaternityPlanComplete || !eligibility.canActivate)) {
+    if (enabled && (!isPaternityPlanComplete || !eligibility.canPlan)) {
       setEnabled(false);
     }
-  }, [enabled, eligibility.canActivate, isPaternityPlanComplete]);
+  }, [enabled, eligibility.canPlan, isPaternityPlanComplete]);
 
   useEffect(() => {
     if (duration === 1 && mode === 'split') {
@@ -121,7 +125,7 @@ export function useSupplementaryLeave({
 
   const error = useMemo(() => {
     if (!enabled) return null;
-    if (!eligibility.canActivate) {
+    if (!eligibility.canPlan) {
       return eligibility.reason;
     }
     if (!isPaternityPlanComplete) {
@@ -155,7 +159,7 @@ export function useSupplementaryLeave({
     return null;
   }, [
     duration,
-    eligibility.canActivate,
+    eligibility.canPlan,
     eligibility.limitDate,
     eligibility.reason,
     enabled,

@@ -6,7 +6,9 @@ import { validateBirthDate } from '../dateValidation';
 import {
   ARTICLE_L1225_46_2,
   LFSS_2021,
-  SERVICE_PUBLIC_CONGE_PATERNITE
+  SERVICE_PUBLIC_CONGE_PATERNITE,
+  SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE,
+  SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE_PUBLIC
 } from '../legalReferences';
 import { LEAVE_SCENARIOS } from '../paternityLeave';
 import {
@@ -88,19 +90,23 @@ describe('copies UI métier', () => {
     expect(ARTICLE_L1225_46_2.url).toBe(
       'https://www.legifrance.gouv.fr/codes/id/LEGIARTI000053271698'
     );
+    expect(SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE.url).toContain('F39685');
+    expect(SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE_PUBLIC.url).toContain('F39693');
     expect(LFSS_2021.article).toContain('loi n° 2020-1576');
     expect(LFSS_2021.url).toContain('JORFARTI000042665368');
   });
 
-  it('présente le congé 2026 comme projeté et sous réserve des décrets', () => {
+  it('présente le congé 2026 comme planifiable avant juillet puis projeté', () => {
     const eligibility = getSupplementaryLeaveEligibility(
       new Date(2026, 0, 1),
       LEAVE_SCENARIOS.standard,
-      new Date(2026, 5, 30)
+      new Date(2026, 5, 1)
     );
 
-    expect(getSupplementaryLeaveStatusLabel(true, true)).toBe('Projeté');
-    expect(getSupplementaryLeaveStatusLabel(false, true)).toBe('Optionnel');
-    expect(eligibility.reason).toContain('sous réserve des décrets');
+    expect(getSupplementaryLeaveStatusLabel(true, true, false)).toBe('Projeté');
+    expect(getSupplementaryLeaveStatusLabel(false, true, false)).toBe('Planifiable');
+    expect(getSupplementaryLeaveStatusLabel(false, true, true)).toBe('Optionnel');
+    expect(eligibility.canPlan).toBe(true);
+    expect(eligibility.canActivate).toBe(false);
   });
 });

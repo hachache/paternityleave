@@ -53,8 +53,12 @@ export function SupplementaryLeaveCard({
   onModeChange,
   onSecondStartDateChange
 }: SupplementaryLeaveCardProps) {
-  const canActivate = eligibility.canActivate;
-  const disabledReason = !canActivate ? eligibility.reason : null;
+  const canPlan = eligibility.canPlan;
+  const disabledReason = !canPlan ? eligibility.reason : null;
+  const planningNotice =
+    canPlan && !eligibility.isAvailableNow
+      ? 'Vous pouvez préparer la demande employeur dès maintenant. Le congé projeté débutera au plus tôt le 1er juillet 2026.'
+      : null;
   const activationCountdown = formatSupplementaryActivationCountdown(
     eligibility.daysUntilActivation
   );
@@ -68,22 +72,26 @@ export function SupplementaryLeaveCard({
   const { shouldReduce, transition } = useAppMotion();
 
   const handleToggle = () => {
-    if (!canActivate) return;
+    if (!canPlan) return;
     onEnabledChange(!enabled);
   };
 
-  const statusLabel = getSupplementaryLeaveStatusLabel(periodsValidated, canActivate);
+  const statusLabel = getSupplementaryLeaveStatusLabel(
+    periodsValidated,
+    canPlan,
+    eligibility.isAvailableNow
+  );
 
   return (
-    <section className="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-lg shadow-slate-200/30">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+    <section className="rounded-2xl sm:rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-6 shadow-soft">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-sm">
-            <CalendarDays className="h-6 w-6" aria-hidden="true" />
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-slate-900 text-white shadow-sm">
+            <CalendarDays className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
           </div>
           <div>
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold font-display text-slate-900">
+              <h2 className="text-lg sm:text-xl font-bold font-display text-slate-900">
                 Congé supplémentaire 2026
               </h2>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-600">
@@ -95,7 +103,7 @@ export function SupplementaryLeaveCard({
               sous réserve des décrets d&apos;application.
             </p>
             {activationCountdown && (
-              <p className="mt-2 inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">
+              <p className="mt-2 inline-flex items-center rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-800">
                 {activationCountdown}
               </p>
             )}
@@ -106,24 +114,25 @@ export function SupplementaryLeaveCard({
           type="button"
           role="switch"
           aria-checked={enabled}
-          disabled={!canActivate}
+          aria-label="Activer la projection du congé supplémentaire 2026"
+          disabled={!canPlan}
           onClick={handleToggle}
-          className={`inline-flex h-8 w-14 shrink-0 items-center rounded-full border p-1 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+          className={`inline-flex h-11 w-[4.25rem] shrink-0 items-center rounded-full border p-1.5 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
             enabled
               ? 'border-brand-600 bg-brand-600'
               : 'border-slate-200 bg-slate-100'
           }`}
         >
           <span
-            className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
-              enabled ? 'translate-x-6' : 'translate-x-0'
+            className={`h-7 w-7 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+              enabled ? 'translate-x-7' : 'translate-x-0'
             }`}
           />
         </button>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 sm:p-4">
           <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
             <Clock3 className="h-4 w-4" aria-hidden="true" />
             Délai légal
@@ -133,7 +142,7 @@ export function SupplementaryLeaveCard({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 sm:p-4">
           <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
             <CalendarDays className="h-4 w-4" aria-hidden="true" />
             Début projeté
@@ -167,9 +176,9 @@ export function SupplementaryLeaveCard({
                     <button
                       key={value}
                       type="button"
-                      disabled={!canActivate}
+                      disabled={!canPlan}
                       onClick={() => onDurationChange(typedValue)}
-                      className={`rounded-2xl border px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                         selected
                           ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                           : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -199,7 +208,7 @@ export function SupplementaryLeaveCard({
                     <Split className="h-4 w-4" aria-hidden="true" />
                     Mode de prise
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     {(['consecutive', 'split'] as SupplementaryLeaveMode[]).map((option) => {
                       const selected = mode === option;
                       const label = option === 'consecutive' ? '2 mois consécutifs' : '2 × 1 mois disjoints';
@@ -212,9 +221,9 @@ export function SupplementaryLeaveCard({
                         <button
                           key={option}
                           type="button"
-                          disabled={!canActivate}
+                          disabled={!canPlan}
                           onClick={() => onModeChange(option)}
-                          className={`rounded-2xl border px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                             selected
                               ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                               : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -247,7 +256,7 @@ export function SupplementaryLeaveCard({
                           value={toInputValue(secondStartDate)}
                           min={minDateValue || undefined}
                           max={maxDateValue || undefined}
-                          disabled={!canActivate}
+                          disabled={!canPlan}
                           onChange={(event) => {
                             const value = event.target.value;
                             if (!value) {
@@ -309,7 +318,7 @@ export function SupplementaryLeaveCard({
         </p>
       </div>
 
-      {(disabledReason || error || periodsValidated) && (
+      {(disabledReason || planningNotice || error || periodsValidated) && (
         <div
           className={`mt-5 rounded-2xl border p-4 ${
             periodsValidated
@@ -336,7 +345,7 @@ export function SupplementaryLeaveCard({
                   </li>
                 </ul>
               ) : (
-                <p>{error || disabledReason}</p>
+                <p>{error || disabledReason || planningNotice}</p>
               )}
             </div>
           </div>

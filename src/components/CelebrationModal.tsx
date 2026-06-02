@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
-import Confetti from 'react-confetti';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { LeaveScenarioConfig } from '../utils/paternityLeave';
 import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
@@ -17,6 +16,14 @@ interface CelebrationModalProps {
   onGoToLetter: () => void;
 }
 
+const successParticles = [
+  { x: -54, y: 2, size: 'h-2.5 w-2.5', color: 'bg-brand-100', delay: 0.08 },
+  { x: -40, y: 9, size: 'h-2 w-2', color: 'bg-amber-100', delay: 0.14 },
+  { x: 42, y: -22, size: 'h-3 w-3', color: 'bg-brand-100', delay: 0.18 },
+  { x: 54, y: -30, size: 'h-2.5 w-2.5', color: 'bg-amber-200', delay: 0.22 },
+  { x: 66, y: -42, size: 'h-3 w-3', color: 'bg-indigo-200', delay: 0.26 }
+] as const;
+
 export function CelebrationModal({
   show,
   onClose,
@@ -27,8 +34,6 @@ export function CelebrationModal({
   onGoToLetter
 }: CelebrationModalProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const totalDays = 7 + totalFractionableDays;
@@ -42,35 +47,12 @@ export function CelebrationModal({
       return;
     }
     setIsVisible(false);
-    setShowConfetti(false);
     setTimeout(action, isCoarsePointer ? 300 : 400);
   }, [isCoarsePointer, shouldReduce]);
 
   useEffect(() => {
-    let resizeTimer: ReturnType<typeof setTimeout>;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-      }, 100);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      clearTimeout(resizeTimer);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (show) {
-      setIsVisible(true);
-      setShowConfetti(!shouldReduce);
-      const timer = setTimeout(() => setShowConfetti(false), isCoarsePointer ? 1000 : 3000);
-      return () => clearTimeout(timer);
-    }
-    setIsVisible(false);
-    setShowConfetti(false);
-  }, [show, shouldReduce, isCoarsePointer]);
+    setIsVisible(show);
+  }, [show]);
 
   useEffect(() => {
     if (!show) {
@@ -156,93 +138,8 @@ export function CelebrationModal({
     ? 'Découvrez le congé supplémentaire 2026 ou passez directement au courrier employeur.'
     : 'Générez votre courrier pour informer votre employeur.';
 
-  if (isCoarsePointer) {
-    return (
-      <>
-        {showConfetti && (
-          <Confetti
-            width={windowSize.width}
-            height={Math.min(windowSize.height, 220)}
-            numberOfPieces={24}
-            recycle={false}
-            gravity={0.35}
-            colors={['#10b981', '#34d399', '#a7f3d0']}
-            style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
-          />
-        )}
-        <AnimatePresence>
-          {isVisible && (
-            <motion.div
-              key="mobile-celebration-sheet"
-              className="fixed inset-x-0 bottom-3 z-50 px-4"
-              role="dialog"
-              aria-label="Planification complète"
-              initial={shouldReduce ? false : { y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={transition}
-            >
-              <div className="mx-auto max-w-md rounded-2xl border border-emerald-200 bg-white/95 shadow-lg p-4">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-base font-bold text-slate-900">Planification complète</p>
-                    <p className="text-sm text-slate-600 mt-0.5">
-                      Planning complet ({totalDays} jours). {subtitle}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  {showSupplementaryAction && (
-                    <button
-                      type="button"
-                      onClick={() => dismissWithAnimation(onGoToSupplementary)}
-                      className="w-full px-3 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-semibold"
-                      data-autofocus
-                    >
-                      Congé supplémentaire 2026
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => dismissWithAnimation(onGoToLetter)}
-                    className={`w-full px-3 py-2.5 rounded-lg text-sm font-semibold ${
-                      showSupplementaryAction
-                        ? 'bg-white border border-slate-200 text-slate-800'
-                        : 'bg-emerald-600 text-white'
-                    }`}
-                    data-autofocus={!showSupplementaryAction}
-                  >
-                    {showSupplementaryAction ? 'Courrier employeur' : 'Générer le courrier'}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </>
-    );
-  }
-
   return (
     <>
-      {showConfetti && (
-        <Confetti
-          width={windowSize.width}
-          height={windowSize.height}
-          numberOfPieces={Math.min(
-            160,
-            Math.max(40, Math.floor((windowSize.width * windowSize.height) / 80000))
-          )}
-          recycle={false}
-          gravity={0.3}
-          colors={['#0f766e', '#14b8a6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#f43f5e']}
-          style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
-        />
-      )}
-
       <AnimatePresence>
         {isVisible && (
           <motion.div
@@ -255,7 +152,7 @@ export function CelebrationModal({
             onClick={() => dismissWithAnimation(onClose)}
           >
             <motion.div
-              className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden"
+              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-2xl bg-white p-5 shadow-xl sm:rounded-3xl sm:p-8 relative"
               initial={shouldReduce ? false : { opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
@@ -267,53 +164,46 @@ export function CelebrationModal({
               tabIndex={-1}
               onClick={event => event.stopPropagation()}
             >
-              {!shouldReduce && (
-                <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-                  {Array.from({ length: 8 }, (_, index) => {
-                    const direction = index < 4 ? -1 : 1;
-                    const distance = 36 + (index % 4) * 12;
-
-                    return (
-                      <motion.div
-                        key={index}
-                        className="absolute left-1/2 top-12 h-2.5 w-2.5 rounded-full"
-                        style={{
-                          backgroundColor: ['#10b981', '#34d399', '#f59e0b', '#8b5cf6'][index % 4]
-                        }}
-                        initial={{ x: 0, y: 0, opacity: 0, rotate: 0 }}
-                        animate={{
-                          x: direction * distance,
-                          y: [0, -36 - (index % 3) * 8, 32],
-                          opacity: [0, 1, 0],
-                          rotate: direction * 180
-                        }}
-                        transition={{ delay: index * 0.05, duration: 0.9, ease: 'easeOut' }}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
               <motion.div
                 className="text-center relative z-10"
                 initial="hidden"
                 animate="visible"
                 variants={staggerContainer(shouldReduce ? 0 : 0.08)}
               >
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-full mb-4 shadow-lg">
-                  <CheckCircle className="w-12 h-12 text-white" strokeWidth={2.5} />
+                <div className="relative mb-4 inline-flex h-20 w-28 items-center justify-center sm:h-24 sm:w-32">
+                  {successParticles.map((particle, index) => (
+                    <motion.span
+                      key={`${particle.x}-${particle.y}-${index}`}
+                      className={`absolute left-1/2 top-1/2 rounded-full ${particle.size} ${particle.color}`}
+                      aria-hidden="true"
+                      initial={
+                        shouldReduce
+                          ? false
+                          : { opacity: 0, scale: 0.7, x: particle.x, y: particle.y + 4 }
+                      }
+                      animate={{ opacity: 0.85, scale: 1, x: particle.x, y: particle.y }}
+                      transition={
+                        shouldReduce
+                          ? { duration: 0 }
+                          : { duration: 0.28, delay: particle.delay, ease: 'easeOut' }
+                      }
+                    />
+                  ))}
+                  <div className="relative z-10 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md sm:h-20 sm:w-20">
+                    <CheckCircle className="w-9 h-9 sm:w-12 sm:h-12" strokeWidth={2.5} aria-hidden="true" />
+                  </div>
                 </div>
 
-                <motion.h3 className="text-3xl font-bold text-slate-900 mb-3" variants={slideUp} transition={transition}>
+                <motion.h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3" variants={slideUp} transition={transition}>
                   Planification complète
                 </motion.h3>
 
-                <motion.p className="text-slate-600 text-base mb-2" variants={slideUp} transition={transition}>
+                <motion.p className="text-sm sm:text-base text-slate-600 mb-2" variants={slideUp} transition={transition}>
                   Votre planning de {vocabulary.initialLeaveLabel} est complet
                 </motion.p>
 
                 <motion.div
-                  className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 mt-4"
+                  className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 sm:p-4 mt-4"
                   variants={slideUp}
                   transition={transition}
                 >
@@ -329,12 +219,12 @@ export function CelebrationModal({
                   {subtitle}
                 </motion.p>
 
-                <div className="mt-6 space-y-3">
+                <div className="mt-5 sm:mt-6 space-y-3">
                   {showSupplementaryAction && (
                     <button
                       type="button"
                       onClick={() => dismissWithAnimation(onGoToSupplementary)}
-                      className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-semibold w-full transition-colors"
+                      className="px-5 sm:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold w-full transition-colors"
                       data-autofocus
                     >
                       Configurer le congé supplémentaire
@@ -343,7 +233,7 @@ export function CelebrationModal({
                   <button
                     type="button"
                     onClick={() => dismissWithAnimation(onGoToLetter)}
-                    className={`px-6 py-3 rounded-xl font-semibold w-full transition-colors ${
+                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-colors ${
                       showSupplementaryAction
                         ? 'bg-white border-2 border-slate-200 text-slate-800 hover:bg-slate-50'
                         : 'bg-emerald-600 hover:bg-emerald-700 text-white'

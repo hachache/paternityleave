@@ -1,8 +1,10 @@
 export function getSupplementaryLeaveStatusLabel(
   periodsProjected: boolean,
-  canActivate: boolean
+  canPlan: boolean,
+  canStartNow = false
 ): string {
   if (periodsProjected) return 'Projeté';
-  if (canActivate) return 'Optionnel';
+  if (canPlan && !canStartNow) return 'Planifiable';
+  if (canPlan) return 'Optionnel';
   return 'À venir';
 }

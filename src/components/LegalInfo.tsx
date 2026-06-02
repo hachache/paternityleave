@@ -94,8 +94,8 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
                 Congé supplémentaire de naissance 2026 (LFSS 2026, art. 99-V)
               </span>
               <p className="text-xs text-blue-800 mt-1 leading-relaxed">
-                Applicable au 1er juillet 2026, pour les enfants nés/adoptés à partir du 1er janvier 2026,
-                sous réserve des décrets d&apos;application.
+                Demande possible à partir du 1er juin 2026, avec un début effectif au plus tôt le
+                1er juillet 2026, pour les enfants nés/adoptés à partir du 1er janvier 2026.
                 Indemnisation : 70% du salaire net le premier mois, 60% le second (plafond SS).
                 Fractionnable en 2 périodes d&apos;1 mois.
               </p>

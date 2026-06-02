@@ -16,17 +16,26 @@ export type SupplementaryLeaveMode = 'consecutive' | 'split';
 
 export interface SupplementaryLeaveEligibility {
   isEligibleBirthDate: boolean;
+  /** La demande peut être préparée/envoyée à partir du 1er juin 2026. */
+  isRequestWindowOpen: boolean;
   isAvailableNow: boolean;
+  /** Autorise la configuration UI, même si le congé ne débute qu'au 1er juillet 2026. */
+  canPlan: boolean;
+  /** Indique si le congé peut déjà débuter effectivement. */
   canActivate: boolean;
   /** Jours restants avant le 1er juillet 2026 (affichage informatif uniquement). */
   daysUntilActivation: number | null;
+  /** Jours restants avant le 1er juin 2026 (ouverture de la demande). */
+  daysUntilRequestWindow: number | null;
   minBirthDate: Date;
+  requestDate: Date;
   activationDate: Date;
   limitDate: Date | null;
   reason: string | null;
 }
 
 export const SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE = startOfDay(new Date(2026, 0, 1));
+export const SUPPLEMENTARY_LEAVE_REQUEST_DATE = startOfDay(new Date(2026, 5, 1));
 export const SUPPLEMENTARY_LEAVE_ACTIVATION_DATE = startOfDay(new Date(2026, 6, 1));
 export const SUPPLEMENTARY_LEAVE_TRANSITION_LAST_BIRTH_DATE = startOfDay(new Date(2026, 5, 30));
 export const SUPPLEMENTARY_LEAVE_TRANSITION_LIMIT_DATE = startOfDay(new Date(2027, 2, 31));
@@ -67,7 +76,7 @@ function getDaysUntilActivation(today: Date, activationDate: Date): number | nul
   return differenceInCalendarDays(activationDate, today);
 }
 
-/** Libellé informatif ; ne modifie pas les droits d’activation (`canActivate`). */
+/** Libellé informatif ; ne modifie pas les droits de planification (`canPlan`). */
 export function formatSupplementaryActivationCountdown(
   daysUntilActivation: number | null
 ): string | null {
@@ -75,12 +84,31 @@ export function formatSupplementaryActivationCountdown(
     return null;
   }
   if (daysUntilActivation === 0) {
-    return 'Activation prévue aujourd’hui (1er juillet 2026)';
+    return 'Début possible aujourd’hui (1er juillet 2026)';
   }
   if (daysUntilActivation === 1) {
-    return 'Activation demain (1er juillet 2026)';
+    return 'Début possible demain (1er juillet 2026)';
   }
-  return `Activation dans ${daysUntilActivation} jours (1er juillet 2026)`;
+  return `Début possible dans ${daysUntilActivation} jours (1er juillet 2026)`;
+}
+
+function getDaysUntilRequestWindow(today: Date, requestDate: Date): number | null {
+  if (!isBefore(today, requestDate)) {
+    return null;
+  }
+  return differenceInCalendarDays(requestDate, today);
+}
+
+export function getSupplementaryLeaveEarliestStartDate(
+  initialLeaveEndDate: Date,
+  activationDate: Date = SUPPLEMENTARY_LEAVE_ACTIVATION_DATE
+): Date {
+  const dayAfterInitialLeave = addDays(startOfDay(initialLeaveEndDate), 1);
+  const normalizedActivation = startOfDay(activationDate);
+
+  return isBefore(dayAfterInitialLeave, normalizedActivation)
+    ? normalizedActivation
+    : dayAfterInitialLeave;
 }
 
 export function getSupplementaryLeaveEligibility(
@@ -89,19 +117,28 @@ export function getSupplementaryLeaveEligibility(
   today: Date = new Date()
 ): SupplementaryLeaveEligibility {
   const normalizedToday = startOfDay(today);
+  const isRequestWindowOpen = !isBefore(normalizedToday, SUPPLEMENTARY_LEAVE_REQUEST_DATE);
   const isAvailableNow = !isBefore(normalizedToday, SUPPLEMENTARY_LEAVE_ACTIVATION_DATE);
   const daysUntilActivation = getDaysUntilActivation(
     normalizedToday,
     SUPPLEMENTARY_LEAVE_ACTIVATION_DATE
   );
+  const daysUntilRequestWindow = getDaysUntilRequestWindow(
+    normalizedToday,
+    SUPPLEMENTARY_LEAVE_REQUEST_DATE
+  );
 
   if (!birthDate) {
     return {
       isEligibleBirthDate: false,
+      isRequestWindowOpen,
       isAvailableNow,
+      canPlan: false,
       canActivate: false,
       daysUntilActivation,
+      daysUntilRequestWindow,
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
+      requestDate: SUPPLEMENTARY_LEAVE_REQUEST_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
       reason: 'Définissez d’abord la date de naissance ou d’arrivée au foyer.'
@@ -117,10 +154,14 @@ export function getSupplementaryLeaveEligibility(
   if (!isEligibleBirthDate) {
     return {
       isEligibleBirthDate: false,
+      isRequestWindowOpen,
       isAvailableNow,
+      canPlan: false,
       canActivate: false,
       daysUntilActivation,
+      daysUntilRequestWindow,
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
+      requestDate: SUPPLEMENTARY_LEAVE_REQUEST_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
       reason:
@@ -128,26 +169,34 @@ export function getSupplementaryLeaveEligibility(
     };
   }
 
-  if (!isAvailableNow) {
+  if (!isRequestWindowOpen) {
     return {
       isEligibleBirthDate: true,
+      isRequestWindowOpen,
       isAvailableNow,
+      canPlan: false,
       canActivate: false,
       daysUntilActivation,
+      daysUntilRequestWindow,
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
+      requestDate: SUPPLEMENTARY_LEAVE_REQUEST_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario),
       reason:
-        'Activation prévue au 1er juillet 2026, sous réserve des décrets d’application.'
+        'Demande possible à partir du 1er juin 2026. Le congé ne pourra débuter qu’au 1er juillet 2026.'
     };
   }
 
   return {
     isEligibleBirthDate: true,
-    isAvailableNow: true,
-    canActivate: true,
-    daysUntilActivation: null,
+    isRequestWindowOpen: true,
+    isAvailableNow,
+    canPlan: true,
+    canActivate: isAvailableNow,
+    daysUntilActivation,
+    daysUntilRequestWindow: null,
     minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
+    requestDate: SUPPLEMENTARY_LEAVE_REQUEST_DATE,
     activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
     limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario),
     reason: null
@@ -201,7 +250,8 @@ export function calculateSupplementaryLeaveSplitBlocks(
     return {
       valid: false,
       blocks: [],
-      error: 'Chaque période doit débuter après la fin du congé initial.'
+      error:
+        'Chaque période doit débuter au plus tôt à la date autorisée, après le congé initial et jamais avant le 1er juillet 2026.'
     };
   }
 

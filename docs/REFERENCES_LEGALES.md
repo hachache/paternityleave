@@ -95,13 +95,15 @@ export function isWorkingDay(date: Date): boolean {
 |-----------|-------|-----|
 | **LFSS 2026, art. 99-V** | Création du dispositif | [Légifrance](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052832820) |
 | **L1225-46-2 à L1225-46-7** | Régime applicable (Code du travail) | [Légifrance](https://www.legifrance.gouv.fr/codes/id/LEGIARTI000053271698) |
-| **Service-Public.gouv.fr** | Annonce officielle | [service-public.gouv.fr](https://www.service-public.gouv.fr/particuliers/actualites/A18750) |
+| **Service-Public.gouv.fr** | Fiche secteur privé | [service-public.gouv.fr](https://www.service-public.gouv.fr/particuliers/vosdroits/F39685) |
+| **Service-Public.gouv.fr** | Fiche fonction publique | [service-public.gouv.fr](https://www.service-public.gouv.fr/particuliers/vosdroits/F39693) |
 | **Code du travail numérique** | Synthèse au 1er juillet 2026 | [code.travail.gouv.fr](https://code.travail.gouv.fr/actualite/conge-de-naissance-supplementaire-ce-qui-change-au-1er-juillet-2026) |
 
 #### Caractéristiques retenues par l'application
 - **Bénéficiaires** : salariés, indépendants, non-salariés agricoles, fonctionnaires, militaires.
 - **Enfants concernés** : nés ou adoptés à partir du **1er janvier 2026**.
-- **Entrée en vigueur** : **1er juillet 2026**, sous réserve des décrets d'application.
+- **Demande / planification** : possible à partir du **1er juin 2026**, pour respecter le préavis employeur d'1 mois.
+- **Début effectif** : **1er juillet 2026** au plus tôt, sous réserve des décrets d'application.
 - **Durée** : 1 à 2 mois par parent.
 - **Fractionnement** : 2 périodes d'1 mois disjointes possibles.
 - **Indemnisation** : 70% du salaire net le premier mois, 60% le second, dans la limite du plafond de la Sécurité sociale.

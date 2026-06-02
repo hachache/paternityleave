@@ -92,11 +92,19 @@ const SUPPLEMENTARY_2026_REFERENCES: LegalReference[] = [
     category: 'code-travail'
   },
   {
-    title: 'Annonce officielle du dispositif',
-    article: 'Service-Public.gouv.fr',
-    url: 'https://www.service-public.gouv.fr/particuliers/actualites/A18750',
+    title: 'Fiche secteur privé',
+    article: 'Service-Public.fr - Salarié du secteur privé',
+    url: 'https://www.service-public.gouv.fr/particuliers/vosdroits/F39685',
     description:
-      'Bénéficiaires : salariés, indépendants, non-salariés agricoles, fonctionnaires, militaires. Enfants nés/adoptés à partir du 1er janvier 2026.',
+      'Mise en œuvre à compter du 1er juillet 2026, avec respect du délai de prévenance auprès de l’employeur.',
+    category: 'service-public'
+  },
+  {
+    title: 'Fiche fonction publique',
+    article: 'Service-Public.fr - Fonction publique',
+    url: 'https://www.service-public.gouv.fr/particuliers/vosdroits/F39693',
+    description:
+      'Demande possible à partir du 1er juin 2026 pour un bénéfice ouvert à partir du 1er juillet 2026.',
     category: 'service-public'
   },
   {
@@ -160,7 +168,7 @@ function getCategoryColor(category: LegalReference['category']) {
     case 'code-travail':
       return 'bg-blue-50 border-blue-200 text-blue-700';
     case 'code-secu':
-      return 'bg-purple-50 border-purple-200 text-purple-700';
+      return 'bg-slate-50 border-slate-200 text-slate-700';
     case 'service-public':
       return 'bg-green-50 border-green-200 text-green-700';
     case 'ameli':
@@ -221,8 +229,9 @@ export function LegalReferences() {
             </h3>
             <p className="text-sm text-blue-900 leading-relaxed">
               La <strong>LFSS pour 2026 (article 99-V)</strong> crée un congé supplémentaire de naissance
-              <strong> applicable au 1er juillet 2026</strong> pour les enfants nés ou adoptés à partir du
-              1er janvier 2026. Durée : 1 à 2 mois par parent, fractionnable en 2 périodes d&apos;1 mois,
+              pour les enfants nés ou adoptés à partir du 1er janvier 2026. La demande peut être préparée
+              à partir du <strong>1er juin 2026</strong>, avec un début effectif au plus tôt le
+              <strong> 1er juillet 2026</strong>. Durée : 1 à 2 mois par parent, fractionnable en 2 périodes d&apos;1 mois,
               indemnisé à 70% du salaire net le premier mois et 60% le second, dans la limite du plafond
               de la Sécurité sociale.
             </p>

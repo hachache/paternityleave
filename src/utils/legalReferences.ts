@@ -157,14 +157,25 @@ export const ARTICLE_L1225_46_2: LegalSource = {
 };
 
 /**
- * Service-Public.gouv.fr - Annonce officielle du congé supplémentaire 2026.
+ * Service-Public.fr - Fiche secteur privé du congé supplémentaire 2026.
  */
 export const SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE: LegalSource = {
   type: 'service-public',
-  title: 'Annonce officielle du congé supplémentaire de naissance',
-  url: 'https://www.service-public.gouv.fr/particuliers/actualites/A18750',
+  title: 'Congé supplémentaire de naissance - secteur privé',
+  url: 'https://www.service-public.gouv.fr/particuliers/vosdroits/F39685',
   description:
-    'Présentation officielle du nouveau dispositif, des bénéficiaires (salariés, indépendants, agricoles, fonctionnaires, militaires) et des délais de prise.'
+    'Mise en œuvre à partir du 1er juillet 2026 et conditions de demande auprès de l’employeur.'
+};
+
+/**
+ * Service-Public.fr - Fiche fonction publique du congé supplémentaire 2026.
+ */
+export const SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE_PUBLIC: LegalSource = {
+  type: 'service-public',
+  title: 'Congé supplémentaire de naissance - fonction publique',
+  url: 'https://www.service-public.gouv.fr/particuliers/vosdroits/F39693',
+  description:
+    'Demande possible à partir du 1er juin 2026 pour un bénéfice ouvert à partir du 1er juillet 2026.'
 };
 
 /**
@@ -229,6 +240,7 @@ export const ALL_LEGAL_SOURCES: LegalSource[] = [
   ARTICLE_L1225_46_2,
   SERVICE_PUBLIC_CONGE_PATERNITE,
   SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE,
+  SERVICE_PUBLIC_CONGE_SUPPLEMENTAIRE_PUBLIC,
   CODE_TRAVAIL_NUMERIQUE_CONGE_SUPPLEMENTAIRE,
   SERVICE_PUBLIC_JOURS,
   AMELI_CONGE_PATERNITE

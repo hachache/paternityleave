@@ -25,7 +25,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
   const cardTransition = shouldReduce ? { duration: 0 } : springs.snappy;
 
   return (
-    <div role="radiogroup" aria-label="Choix de la situation" className="grid gap-4 sm:grid-cols-2 auto-rows-fr">
+    <div role="radiogroup" aria-label="Choix de la situation" className="grid grid-cols-2 gap-2.5 sm:gap-4 auto-rows-auto sm:auto-rows-fr">
       {scenarios.map(config => {
         const isSelected = config.id === selectedScenario;
         const details = formatScenarioDetails(config);
@@ -40,24 +40,24 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             whileHover={shouldReduce ? undefined : { y: -2 }}
             whileTap={shouldReduce ? undefined : { scale: 0.98 }}
             transition={cardTransition}
-            className={`group relative rounded-3xl p-6 text-left transition-all duration-300 h-full flex flex-col border-2 ${
+            className={`group relative rounded-2xl sm:rounded-3xl p-3 sm:p-6 text-left transition-all duration-300 h-full flex flex-col border ${isSelected ? 'col-span-2 sm:col-span-1' : ''} ${
               isSelected
-                ? 'border-transparent bg-brand-50/50 shadow-lg shadow-brand-500/10'
+                ? 'border-brand-500 bg-brand-50/50 shadow-md shadow-brand-500/10 sm:border-transparent sm:shadow-lg'
                 : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
             }`}
           >
             {isSelected && (
               <motion.div
                 layoutId="scenario-active-border"
-                className="pointer-events-none absolute inset-0 rounded-3xl border-2 border-brand-500"
+                className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl border-2 border-brand-500 hidden sm:block"
                 transition={cardTransition}
               />
             )}
             {/* Selection Indicator */}
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-500'}`}>
+            <div className={`flex items-start justify-between gap-3 sm:gap-4 ${isSelected ? 'mb-2 sm:mb-4' : 'mb-0 sm:mb-4'}`}>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className={`text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-1.5 sm:mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-500'}`}>
                     {config.label}
                   </p>
                   {config.id === 'standard' && (
@@ -66,10 +66,12 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                     </span>
                   )}
                 </div>
-                <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">{config.description}</p>
+                <p className={`text-xs sm:text-lg text-slate-700 font-medium leading-relaxed ${isSelected ? 'line-clamp-2 sm:line-clamp-none' : 'hidden sm:block sm:line-clamp-none'}`}>
+                  {config.description}
+                </p>
               </div>
               <div
-                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
+                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 items-center justify-center transition-colors duration-300 ${isSelected ? 'flex' : 'hidden sm:flex'} ${
                   isSelected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-200 group-hover:border-brand-300'
                 }`}
               >
@@ -90,16 +92,19 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
               </div>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-slate-100/50 grid sm:grid-cols-2 gap-3">
-              <div className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
-                <p className="font-bold text-slate-900 text-sm">{details.totalText}</p>
+            <div className={`mt-auto pt-2.5 sm:pt-4 border-t border-slate-100/50 grid grid-cols-2 gap-2 sm:gap-3 ${isSelected ? '' : 'hidden sm:grid'}`}>
+              <div className={`rounded-xl p-2.5 sm:p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
+                <p className="font-bold text-slate-900 text-xs sm:text-sm">{details.totalText}</p>
                 {details.bonusText && (
                   <p className="text-xs font-bold text-emerald-600 mt-0.5">{details.bonusText}</p>
                 )}
               </div>
-              <div className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
-                <p className="font-bold text-slate-900 text-sm">{details.limitText}</p>
-                <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide">
+              <div className={`rounded-xl p-2.5 sm:p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
+                <p className="font-bold text-slate-900 text-xs sm:text-sm">{details.limitText}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide sm:hidden">
+                  1 ou 2 périodes
+                </p>
+                <p className="hidden sm:block text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide">
                   {FRACTIONABLE_PERIODS_HINT}
                 </p>
               </div>

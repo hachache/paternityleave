@@ -16,7 +16,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
 
   const sections = useMemo(() => {
     const items = [
-      { id: 'calendar', label: 'Calendrier', shortLabel: 'Cal.' },
+      { id: 'calendar', label: 'Calendrier', shortLabel: 'Date' },
       { id: 'summary', label: 'Résumé', shortLabel: 'Récap' }
     ] as Array<{ id: string; label: string; shortLabel: string }>;
 

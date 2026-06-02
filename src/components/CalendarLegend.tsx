@@ -9,7 +9,7 @@ export function CalendarLegend({ scenario }: CalendarLegendProps) {
   const legendItems = getCalendarLegendItems(scenario);
 
   return (
-    <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+    <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-6">
       {legendItems.map(item => (
         <div key={item.label} className="flex items-center gap-2.5 group">
           <span

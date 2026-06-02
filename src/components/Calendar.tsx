@@ -304,7 +304,7 @@ export function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      let classes = 'relative aspect-square flex flex-col items-center justify-center text-sm sm:text-base rounded-xl font-medium min-h-[2.5rem] sm:min-h-[3rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
+      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center text-sm sm:h-12 sm:text-base rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
 
       if (!isCurrentMonthDay) {
         // Make non-current month days much fainter
@@ -353,26 +353,26 @@ export function Calendar({
   const dayTransition = shouldReduce ? { duration: 0 } : springs.snappy;
 
   return (
-    <div className="rounded-[2rem] border border-white bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-soft relative">
+    <div className="rounded-2xl sm:rounded-[1.5rem] border border-white bg-white/90 backdrop-blur-xl p-1 min-[360px]:p-3.5 sm:p-8 shadow-soft relative">
       {!birthDate && (
         <motion.div
-          className="mb-6 rounded-2xl bg-brand-50 p-5 border border-brand-100"
+          className="mb-5 rounded-2xl bg-brand-50 p-4 sm:p-5 border border-brand-100"
           initial="hidden"
           animate="visible"
           variants={fadeInUp}
           transition={transition}
         >
-          <p className="text-brand-800 text-center font-medium">
+          <p className="text-sm sm:text-base text-brand-800 text-center font-medium">
             Sélectionnez la {vocabulary.eventDateActionLabel} pour démarrer le calcul.
           </p>
         </motion.div>
       )}
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-5 sm:mb-8">
         <button
           type="button"
           onClick={previousMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
+          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois précédent"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -385,16 +385,16 @@ export function Calendar({
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
+          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois suivant"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-2 mb-4">
+      <div className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 mb-3 sm:mb-4">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-xs uppercase tracking-wider font-bold text-slate-400 py-2">
+          <div key={day} className="text-center text-[10px] sm:text-xs uppercase tracking-wider font-bold text-slate-400 py-1.5 sm:py-2">
             {day}
           </div>
         ))}
@@ -404,7 +404,7 @@ export function Calendar({
         <motion.div
           key={format(currentMonth, 'yyyy-MM')}
           role="grid"
-          className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3"
+          className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 md:gap-3"
           layout
           custom={monthDirection}
           variants={monthGridVariants}

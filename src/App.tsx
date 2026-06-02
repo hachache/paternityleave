@@ -20,7 +20,6 @@ import { PostPlanningNavBar } from './components/PostPlanningNavBar';
 import { ScenarioSelector } from './components/ScenarioSelector';
 import { SupplementaryLeaveCard } from './components/SupplementaryLeaveCard';
 import { Button } from './components/Button';
-import { AuroraBackground } from './components/AuroraBackground';
 import { ResetConfirmDialog } from './components/ResetConfirmDialog';
 import { HeroHeader } from './components/HeroHeader';
 import { PlanningModeSelector } from './components/PlanningModeSelector';
@@ -235,8 +234,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-surface-100 flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900 overflow-x-hidden">
-      <AuroraBackground />
-
       <a
         href={`#${mainContentId}`}
         className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 bg-brand-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform"
@@ -245,7 +242,7 @@ function App() {
       </a>
 
       <main id={mainContentId} className="flex-1 relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl pt-20 sm:pt-24 pb-28 sm:pb-12">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
           <motion.div
             className="space-y-0"
             initial="hidden"
@@ -262,7 +259,7 @@ function App() {
             />
 
             <motion.div
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-8 sm:mb-12"
               variants={fadeInUp}
               transition={transition}
             >
@@ -275,7 +272,7 @@ function App() {
               </SectionCard>
             </motion.div>
 
-            <motion.div className="max-w-3xl mx-auto mb-12" variants={fadeInUp} transition={transition}>
+            <motion.div className="max-w-3xl mx-auto mb-8 sm:mb-12" variants={fadeInUp} transition={transition}>
               <ProgressStepper
                 currentStep={planningStep}
                 fractionableDays={totalFractionableDays}
@@ -300,11 +297,11 @@ function App() {
             <motion.div
               ref={calendarRef}
               id="calendar"
-              className={`mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-[3rem] transition-shadow duration-500 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_60px_-10px_rgba(0,113,227,0.45)]' : ''}`}
+              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-2xl sm:rounded-[2rem] transition-shadow duration-500 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
               variants={fadeInUp}
               transition={transition}
             >
-              <div className="absolute inset-0 -z-10 bg-brand-500/5 blur-3xl rounded-[3rem] transform scale-105"></div>
+              <div className="absolute inset-0 -z-10 hidden bg-brand-500/5 blur-3xl rounded-[2rem] transform scale-105 sm:block"></div>
               <Calendar
                 birthDate={birthDate}
                 onSelectBirthDate={handleSelectBirthDate}
@@ -401,27 +398,27 @@ function App() {
           {visualSelectionMode && selectionStep !== 'idle' && (
             <motion.div
               key="visual-selection-banner"
-              className="mb-6 max-w-3xl mx-auto sticky top-24 z-30"
+              className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30"
               initial="hidden"
               animate="visible"
               exit="hidden"
               variants={fadeInUp}
               transition={transition}
             >
-              <div className="rounded-2xl border border-brand-200 bg-white/90 backdrop-blur-xl p-5 shadow-2xl shadow-brand-900/10 ring-1 ring-black/5">
-                <div className="flex items-center gap-4">
+              <div className="rounded-2xl border border-brand-200 bg-white/95 backdrop-blur-xl p-4 sm:p-5 shadow-lg shadow-brand-900/5 ring-1 ring-black/5">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-xl shadow-lg shadow-brand-500/30">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-lg sm:text-xl shadow-md shadow-brand-500/20">
                       {selectionStep === 'selecting-start' ? '1' : '2'}
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold text-brand-900 mb-1 font-display">
+                    <h4 className="text-base sm:text-lg font-bold text-brand-900 mb-1 font-display">
                       {selectionStep === 'selecting-start'
                         ? 'Sélectionnez le DÉBUT'
                         : 'Sélectionnez la FIN'}
                     </h4>
-                    <p className="text-sm text-brand-700 font-medium">
+                    <p className="text-xs sm:text-sm text-brand-700 font-medium">
                       {selectionStep === 'selecting-start'
                         ? 'Cliquez sur la première date de votre période'
                         : `Cliquez sur la dernière date (min. 5 jours)`}
@@ -619,7 +616,7 @@ function App() {
               href="https://www.linkedin.com/in/hedi-a-2382551a1/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-bold text-slate-800 hover:text-brand-600 transition-colors flex items-center gap-1.5"
+              className="inline-flex min-h-10 items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors hover:text-brand-600"
             >
               <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" aria-hidden="true" />
               Hedi ACHACHE
@@ -632,7 +629,7 @@ function App() {
             <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="hover:text-brand-600 transition-colors"
+              className="inline-flex min-h-10 items-center px-2 transition-colors hover:text-brand-600"
             >
               Remonter ↑
             </button>

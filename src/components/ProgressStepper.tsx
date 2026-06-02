@@ -35,7 +35,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
       variants={slideUp}
       transition={transition}
     >
-      <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-white/50 p-4 sm:p-6 shadow-soft relative overflow-hidden">
+      <div className="bg-white/85 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-white/60 p-3.5 sm:p-6 shadow-soft relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-100 via-brand-50 to-transparent opacity-50" />
 
         <div className="flex items-center justify-between relative">
@@ -59,10 +59,10 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
               <div key={step.number} className="flex flex-col items-center relative z-10 flex-1 min-w-0 group">
                 <motion.div
                   className={`
-                    w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center font-display font-bold text-base sm:text-lg
+                    w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center font-display font-bold text-sm sm:text-lg
                     border-2
-                    ${isCompleted ? 'bg-brand-500 border-brand-500 text-white shadow-lg shadow-brand-500/30 scale-90' : ''}
-                    ${isCurrent ? 'bg-white border-brand-500 text-brand-600 shadow-xl shadow-brand-500/20 scale-105 ring-4 ring-brand-500/10' : ''}
+                    ${isCompleted ? 'bg-brand-500 border-brand-500 text-white shadow-md shadow-brand-500/20 scale-90' : ''}
+                    ${isCurrent ? 'bg-white border-brand-500 text-brand-600 shadow-lg shadow-brand-500/15 scale-105 ring-4 ring-brand-500/10' : ''}
                     ${isPending ? 'bg-white border-slate-100 text-slate-300 scale-90' : ''}
                   `}
                   variants={isCurrent ? activeStepVariants : undefined}
