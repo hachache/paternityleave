@@ -239,7 +239,7 @@ export function LetterGenerator({
             variant="primary"
             size="lg"
             fullWidth
-            className={`shadow-md transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-0.5'}`}
+            className={`py-4 transition-colors duration-200 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800'}`}
             aria-live="polite"
           >
             <AnimatePresence mode="wait" initial={false}>

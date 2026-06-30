@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { LeaveScenarioConfig } from '../utils/paternityLeave';
 import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
 import { fadeIn, slideUp, staggerContainer, useAppMotion } from '../lib/motion';
+import { Button } from './Button';
 
 interface CelebrationModalProps {
   show: boolean;
@@ -15,14 +16,6 @@ interface CelebrationModalProps {
   onGoToSupplementary: () => void;
   onGoToLetter: () => void;
 }
-
-const successParticles = [
-  { x: -54, y: 2, size: 'h-2.5 w-2.5', color: 'bg-brand-100', delay: 0.08 },
-  { x: -40, y: 9, size: 'h-2 w-2', color: 'bg-amber-100', delay: 0.14 },
-  { x: 42, y: -22, size: 'h-3 w-3', color: 'bg-brand-100', delay: 0.18 },
-  { x: 54, y: -30, size: 'h-2.5 w-2.5', color: 'bg-amber-200', delay: 0.22 },
-  { x: 66, y: -42, size: 'h-3 w-3', color: 'bg-indigo-200', delay: 0.26 }
-] as const;
 
 export function CelebrationModal({
   show,
@@ -36,6 +29,8 @@ export function CelebrationModal({
   const [isVisible, setIsVisible] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
+  const descriptionId = useId();
   const totalDays = 7 + totalFractionableDays;
   const vocabulary = getScenarioVocabulary(scenario);
   const { shouldReduce, transition } = useAppMotion();
@@ -56,10 +51,6 @@ export function CelebrationModal({
 
   useEffect(() => {
     if (!show) {
-      return undefined;
-    }
-
-    if (isCoarsePointer) {
       return undefined;
     }
 
@@ -105,16 +96,24 @@ export function CelebrationModal({
 
       const first = focusableElements[0];
       const last = focusableElements[focusableElements.length - 1];
+      const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
 
-      if (event.shiftKey) {
-        if (document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        }
-      } else if (document.activeElement === last) {
+      if (currentIndex === -1) {
         event.preventDefault();
         first.focus();
+        return;
       }
+
+      if (event.shiftKey) {
+        event.preventDefault();
+        const previous = currentIndex === 0 ? last : focusableElements[currentIndex - 1];
+        previous.focus();
+        return;
+      }
+
+      event.preventDefault();
+      const next = currentIndex === focusableElements.length - 1 ? first : focusableElements[currentIndex + 1];
+      next.focus();
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -123,14 +122,14 @@ export function CelebrationModal({
       cancelAnimationFrame(frame);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [dismissWithAnimation, onClose, show, isCoarsePointer]);
+  }, [dismissWithAnimation, onClose, show]);
 
   useEffect(() => {
-    if (!show && previouslyFocusedRef.current && !isCoarsePointer) {
+    if (!show && previouslyFocusedRef.current) {
       previouslyFocusedRef.current.focus();
       previouslyFocusedRef.current = null;
     }
-  }, [show, isCoarsePointer]);
+  }, [show]);
 
   if (!show && !isVisible) return null;
 
@@ -143,7 +142,7 @@ export function CelebrationModal({
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            className="fixed inset-0 bg-slate-900/30 flex items-center justify-center z-50 px-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/25 px-4"
             initial={shouldReduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -152,7 +151,7 @@ export function CelebrationModal({
             onClick={() => dismissWithAnimation(onClose)}
           >
             <motion.div
-              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-2xl bg-white p-5 shadow-xl sm:rounded-3xl sm:p-8 relative"
+              className="relative max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-[18px] bg-white p-5 shadow-soft sm:p-8"
               initial={shouldReduce ? false : { opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
@@ -160,7 +159,8 @@ export function CelebrationModal({
               ref={dialogRef}
               role="dialog"
               aria-modal="true"
-              aria-label="Planification complète"
+              aria-labelledby={titleId}
+              aria-describedby={descriptionId}
               tabIndex={-1}
               onClick={event => event.stopPropagation()}
             >
@@ -170,40 +170,22 @@ export function CelebrationModal({
                 animate="visible"
                 variants={staggerContainer(shouldReduce ? 0 : 0.08)}
               >
-                <div className="relative mb-4 inline-flex h-20 w-28 items-center justify-center sm:h-24 sm:w-32">
-                  {successParticles.map((particle, index) => (
-                    <motion.span
-                      key={`${particle.x}-${particle.y}-${index}`}
-                      className={`absolute left-1/2 top-1/2 rounded-full ${particle.size} ${particle.color}`}
-                      aria-hidden="true"
-                      initial={
-                        shouldReduce
-                          ? false
-                          : { opacity: 0, scale: 0.7, x: particle.x, y: particle.y + 4 }
-                      }
-                      animate={{ opacity: 0.85, scale: 1, x: particle.x, y: particle.y }}
-                      transition={
-                        shouldReduce
-                          ? { duration: 0 }
-                          : { duration: 0.28, delay: particle.delay, ease: 'easeOut' }
-                      }
-                    />
-                  ))}
-                  <div className="relative z-10 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md sm:h-20 sm:w-20">
-                    <CheckCircle className="w-9 h-9 sm:w-12 sm:h-12" strokeWidth={2.5} aria-hidden="true" />
+                <div className="relative mb-4 inline-flex h-16 w-16 items-center justify-center">
+                  <div className="relative z-10 inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white sm:h-16 sm:w-16">
+                    <CheckCircle className="h-8 w-8 sm:h-9 sm:w-9" strokeWidth={2.25} aria-hidden="true" />
                   </div>
                 </div>
 
-                <motion.h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3" variants={slideUp} transition={transition}>
+                <motion.h3 id={titleId} className="mb-3 text-2xl font-semibold tracking-[-0.018em] text-[#1d1d1f] sm:text-3xl" variants={slideUp} transition={transition}>
                   Planification complète
                 </motion.h3>
 
-                <motion.p className="text-sm sm:text-base text-slate-600 mb-2" variants={slideUp} transition={transition}>
+                <motion.p id={descriptionId} className="mb-2 text-sm leading-relaxed text-slate-600 sm:text-base" variants={slideUp} transition={transition}>
                   Votre planning de {vocabulary.initialLeaveLabel} est complet
                 </motion.p>
 
                 <motion.div
-                  className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 sm:p-4 mt-4"
+                  className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3.5 sm:p-4"
                   variants={slideUp}
                   transition={transition}
                 >
@@ -219,29 +201,25 @@ export function CelebrationModal({
                   {subtitle}
                 </motion.p>
 
-                <div className="mt-5 sm:mt-6 space-y-3">
+                <div className="mt-5 space-y-3 sm:mt-6">
                   {showSupplementaryAction && (
-                    <button
-                      type="button"
+                    <Button
                       onClick={() => dismissWithAnimation(onGoToSupplementary)}
-                      className="px-5 sm:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold w-full transition-colors"
+                      variant="primary"
+                      fullWidth
                       data-autofocus
                     >
                       Configurer le congé supplémentaire
-                    </button>
+                    </Button>
                   )}
-                  <button
-                    type="button"
+                  <Button
                     onClick={() => dismissWithAnimation(onGoToLetter)}
-                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-colors ${
-                      showSupplementaryAction
-                        ? 'bg-white border-2 border-slate-200 text-slate-800 hover:bg-slate-50'
-                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                    }`}
+                    variant={showSupplementaryAction ? 'outline' : 'primary'}
+                    fullWidth
                     data-autofocus={!showSupplementaryAction}
                   >
                     {showSupplementaryAction ? 'Générer le courrier employeur' : 'Générer le courrier'}
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             </motion.div>

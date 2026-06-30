@@ -162,7 +162,7 @@ describe('calculateAutomaticRemainingPeriod', () => {
     expect(result).toBeNull();
   });
 
-  it('creates a block inside the allowed window for an extended scenario', () => {
+  it('keeps the hospitalisation scenario within the standard 6-month window', () => {
     const start = addMonths(birthDate, hospitalizedScenario.limitMonthsAfterBirth - 1);
     const result = calculateAutomaticRemainingPeriod(
       birthDate,
@@ -171,6 +171,7 @@ describe('calculateAutomaticRemainingPeriod', () => {
       hospitalizedScenario
     );
 
+    expect(hospitalizedScenario.limitMonthsAfterBirth).toBe(6);
     expect(result).not.toBeNull();
     expect(result?.start.getTime()).toBe(startOfDay(start).getTime());
     expect(result?.days).toBe(5);

@@ -30,7 +30,10 @@ export function ScrollIndicator({ show }: ScrollIndicatorProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [visible]);
 
-  // Always render a fixed-height wrapper so the page layout stays stable.
+  if (!show) {
+    return <div className="h-2 sm:h-3" aria-hidden="true" />;
+  }
+
   return (
     <div className="flex justify-center mb-6 h-8" aria-hidden={!visible}>
       <motion.div animate={{ opacity: visible ? 1 : 0 }} transition={transition}>

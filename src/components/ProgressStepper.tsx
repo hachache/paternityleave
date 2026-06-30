@@ -15,8 +15,8 @@ const activeStepVariants = {
     boxShadow: '0 0 0 0 rgba(20, 124, 229, 0)'
   },
   animate: {
-    scale: 1.05,
-    boxShadow: '0 20px 25px -5px rgba(20, 124, 229, 0.2)'
+    scale: 1,
+    boxShadow: '0 0 0 4px rgba(0, 113, 227, 0.08)'
   }
 };
 
@@ -29,14 +29,13 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
 
   return (
     <motion.div
-      className="max-w-3xl mx-auto mb-8"
+      className="mx-auto w-full"
       initial="hidden"
       animate="visible"
       variants={slideUp}
       transition={transition}
     >
-      <div className="bg-white/85 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-white/60 p-3.5 sm:p-6 shadow-soft relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-100 via-brand-50 to-transparent opacity-50" />
+      <div className="relative overflow-hidden rounded-[18px] border border-slate-200 bg-white p-3.5 shadow-none sm:p-5">
 
         <div className="flex items-center justify-between relative">
           <div
@@ -59,10 +58,10 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
               <div key={step.number} className="flex flex-col items-center relative z-10 flex-1 min-w-0 group">
                 <motion.div
                   className={`
-                    w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center font-display font-bold text-sm sm:text-lg
+                    w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-display font-bold text-sm sm:text-base
                     border-2
-                    ${isCompleted ? 'bg-brand-500 border-brand-500 text-white shadow-md shadow-brand-500/20 scale-90' : ''}
-                    ${isCurrent ? 'bg-white border-brand-500 text-brand-600 shadow-lg shadow-brand-500/15 scale-105 ring-4 ring-brand-500/10' : ''}
+                    ${isCompleted ? 'bg-brand-500 border-brand-500 text-white shadow-sm shadow-brand-500/10 scale-90' : ''}
+                    ${isCurrent ? 'bg-white border-brand-500 text-brand-600 shadow-sm ring-4 ring-brand-500/10' : ''}
                     ${isPending ? 'bg-white border-slate-100 text-slate-300 scale-90' : ''}
                   `}
                   variants={isCurrent ? activeStepVariants : undefined}

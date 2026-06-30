@@ -6,6 +6,7 @@ import {
   calculateSupplementaryLeavePeriod,
   calculateSupplementaryLeaveSplitBlocks,
   formatSupplementaryActivationCountdown,
+  getSupplementaryLeaveEarliestStartInfo,
   getSupplementaryLeaveEarliestStartDate,
   getSupplementaryLeaveEligibility,
   getSupplementaryLeaveLimitDate
@@ -19,7 +20,7 @@ function dateKey(date: Date | null): string | null {
 }
 
 describe('getSupplementaryLeaveEligibility', () => {
-  it('refuse une naissance avant le 1er janvier 2026', () => {
+  it('refuse une naissance avant le 1er janvier 2026 sans confirmation du cas prématuré', () => {
     const result = getSupplementaryLeaveEligibility(
       new Date(2025, 11, 31),
       standardScenario,
@@ -31,6 +32,21 @@ describe('getSupplementaryLeaveEligibility', () => {
     expect(result.canActivate).toBe(false);
     expect(result.limitDate).toBeNull();
     expect(result.reason).toContain('1er janvier 2026');
+  });
+
+  it('autorise un prématuré né en 2025 si la naissance était prévue après le 1er janvier 2026', () => {
+    const result = getSupplementaryLeaveEligibility(
+      new Date(2025, 11, 31),
+      standardScenario,
+      new Date(2026, 6, 1),
+      { prematureExpectedAfterMinDate: true }
+    );
+
+    expect(result.isEligibleBirthDate).toBe(true);
+    expect(result.isPrematureBirthBefore2026).toBe(true);
+    expect(result.isPrematureExpectedAfterMinDate).toBe(true);
+    expect(result.canPlan).toBe(true);
+    expect(dateKey(result.limitDate)).toBe('2027-03-31');
   });
 
   it('marque une naissance du 1er janvier 2026 eligible mais non planifiable avant le 1er juin 2026', () => {
@@ -102,16 +118,52 @@ describe('getSupplementaryLeaveEligibility', () => {
 });
 
 describe('getSupplementaryLeaveEarliestStartDate', () => {
-  it('force le début au 1er juillet 2026 si le congé initial se termine avant', () => {
-    const result = getSupplementaryLeaveEarliestStartDate(new Date(2026, 1, 15));
+  it('force le début au 1er juillet 2026 si le congé initial se termine avant et que le préavis est respecté', () => {
+    const result = getSupplementaryLeaveEarliestStartDate(
+      new Date(2026, 1, 15),
+      undefined,
+      new Date(2026, 0, 1),
+      new Date(2026, 5, 1)
+    );
 
     expect(dateKey(result)).toBe('2026-07-01');
   });
 
   it('démarre le lendemain du congé initial si celui-ci finit après le 1er juillet 2026', () => {
-    const result = getSupplementaryLeaveEarliestStartDate(new Date(2026, 6, 10));
+    const result = getSupplementaryLeaveEarliestStartDate(
+      new Date(2026, 6, 10),
+      undefined,
+      new Date(2026, 5, 30),
+      new Date(2026, 5, 1)
+    );
 
     expect(dateKey(result)).toBe('2026-07-11');
+  });
+
+  it('repousse le début projeté quand le préavis standard d’un mois n’est pas respecté', () => {
+    const result = getSupplementaryLeaveEarliestStartInfo(
+      new Date(2026, 1, 15),
+      undefined,
+      new Date(2026, 0, 1),
+      new Date(2026, 5, 30)
+    );
+
+    expect(dateKey(result.noticeDate)).toBe('2026-07-30');
+    expect(dateKey(result.startDate)).toBe('2026-07-30');
+    expect(result.noticeRule).toBe('standard-1-month');
+  });
+
+  it('applique le préavis réduit de 15 jours seulement en succession immédiate dans le mois suivant la naissance', () => {
+    const result = getSupplementaryLeaveEarliestStartInfo(
+      new Date(2026, 6, 27),
+      undefined,
+      new Date(2026, 5, 30),
+      new Date(2026, 5, 30)
+    );
+
+    expect(dateKey(result.noticeDate)).toBe('2026-07-15');
+    expect(dateKey(result.startDate)).toBe('2026-07-28');
+    expect(result.noticeRule).toBe('reduced-15-days');
   });
 });
 
@@ -120,6 +172,16 @@ describe('getSupplementaryLeaveLimitDate', () => {
     const result = getSupplementaryLeaveLimitDate(
       new Date(2026, 5, 30),
       standardScenario
+    );
+
+    expect(dateKey(result)).toBe('2027-03-31');
+  });
+
+  it('applique la limite transitoire aux prématurés 2025 prévus après le 1er janvier 2026', () => {
+    const result = getSupplementaryLeaveLimitDate(
+      new Date(2025, 11, 31),
+      standardScenario,
+      { prematureExpectedAfterMinDate: true }
     );
 
     expect(dateKey(result)).toBe('2027-03-31');

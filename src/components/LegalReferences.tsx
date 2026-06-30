@@ -27,7 +27,7 @@ const LEGAL_REFERENCES: LegalReference[] = [
     title: 'Période de référence',
     article: 'Article L1225-35-2 du Code du travail',
     url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923132',
-    description: 'Congé à prendre dans les 6 mois suivant la naissance (12 mois en cas d\'hospitalisation)',
+    description: 'Congé à prendre dans les 6 mois suivant la naissance ou l’accueil, sauf report spécifique justifié',
     category: 'code-travail'
   },
   {

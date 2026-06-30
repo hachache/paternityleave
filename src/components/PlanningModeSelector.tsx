@@ -1,16 +1,8 @@
 import type { ChangeEvent, RefObject } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  ArrowUp,
-  CalendarDays as CalendarDaysIcon,
-  MousePointer2,
-  Settings2,
-  SlidersHorizontal,
-  Star,
-  Zap
-} from 'lucide-react';
+import { CalendarDays as CalendarDaysIcon, MousePointer2, Settings2 } from 'lucide-react';
 import { Button } from './Button';
-import { fadeIn, fadeInUp, springs, useAppMotion } from '../lib/motion';
+import { fadeIn, fadeInUp, useAppMotion } from '../lib/motion';
 
 interface PlanningModeSelectorProps {
   isChoiceVisible: boolean;
@@ -23,7 +15,6 @@ interface PlanningModeSelectorProps {
   customFirstBlockDays: number;
   secondBlockDays: number;
   sliderMax: number;
-  onFocusCalendar: () => void;
   onActivateCustomMode: () => void;
   onStartVisualSelection: () => void;
   onCancelCustomMode: () => void;
@@ -31,18 +22,12 @@ interface PlanningModeSelectorProps {
 }
 
 function getRatioPercentage(value: number, total: number) {
-  if (total <= 0) {
-    return 0;
-  }
-
+  if (total <= 0) return 0;
   return (value / total) * 100;
 }
 
 function getSliderPercentage(value: number, max: number) {
-  if (max <= 5) {
-    return 0;
-  }
-
+  if (max <= 5) return 0;
   return ((value - 5) / (max - 5)) * 100;
 }
 
@@ -57,136 +42,73 @@ export function PlanningModeSelector({
   customFirstBlockDays,
   secondBlockDays,
   sliderMax,
-  onFocusCalendar,
   onActivateCustomMode,
   onStartVisualSelection,
   onCancelCustomMode,
   onCustomFirstBlockDaysChange
 }: PlanningModeSelectorProps) {
   const sliderPercentage = getSliderPercentage(customFirstBlockDays, sliderMax);
-  const { shouldReduce, transition } = useAppMotion();
   const firstBlockPercentage = getRatioPercentage(customFirstBlockDays, totalFractionableDays);
   const secondBlockPercentage = getRatioPercentage(secondBlockDays, totalFractionableDays);
+  const { transition } = useAppMotion();
 
   const handleCustomFirstBlockDaysChange = (event: ChangeEvent<HTMLInputElement>) => {
     onCustomFirstBlockDaysChange(Number(event.target.value));
   };
 
   return (
-    <AnimatePresence initial={false} mode="wait">
+    <AnimatePresence initial={false}>
       {isChoiceVisible && (
         <motion.div
           key="planning-choice"
-          ref={planningRef}
-          className="max-w-3xl mx-auto mb-28 sm:mb-12 scroll-mt-28"
+          className="mx-auto mb-8 max-w-4xl scroll-mt-28 sm:mb-10"
           initial={isCoarsePointer ? false : 'hidden'}
           animate="visible"
           exit="hidden"
           variants={fadeIn}
           transition={transition}
         >
-          <div className={`premium-card p-5 sm:p-8 ${isCoarsePointer ? '' : 'transition-all duration-300'}`}>
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-brand-50 text-brand-600 mb-3 sm:mb-4 shadow-inner">
-                <CalendarDaysIcon className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
+          <div ref={planningRef} className="premium-card scroll-mt-28 p-4 sm:p-5">
+            <div className="mb-4 flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1d1d1f] text-white">
+                <CalendarDaysIcon className="h-5 w-5" aria-hidden="true" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold font-display text-slate-900 mb-2">
-                Planifiez vos {totalFractionableDays} jours
-              </h3>
-              <p className="text-sm sm:text-lg text-slate-500 max-w-md mx-auto leading-relaxed">
-                Deux modes au choix selon vos préférences.
-              </p>
+              <div>
+                <h3 className="text-lg font-semibold tracking-[-0.018em] text-[#1d1d1f] sm:text-xl">
+                  Planifier les {totalFractionableDays} jours restants
+                </h3>
+                <p className="mt-1 text-sm font-normal leading-relaxed text-slate-500">
+                  Pour le mode simple, cliquez directement sur la date de début dans le calendrier.
+                </p>
+              </div>
             </div>
 
-            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-              <div className="relative flex flex-col rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-4 sm:p-6 shadow-sm shadow-brand-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/10">
-                <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md shadow-brand-500/30">
-                  <Star className="h-3 w-3" aria-hidden="true" />
-                  Recommandé
-                </span>
-
-                <div className="mb-4 sm:mb-5 flex items-center gap-3">
-                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm shadow-brand-500/20">
-                    <Zap className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold font-display text-slate-900">Mode simple</h4>
-                    <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
-                      1 clic = {totalFractionableDays} jours
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mb-4 sm:mb-5 rounded-xl border border-brand-100 bg-white/80 p-3.5 sm:p-4 shadow-sm">
-                  <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Période unique
-                  </p>
-                  <div className="flex h-12 items-center justify-center rounded-lg bg-gradient-to-r from-brand-500 to-brand-600 text-sm font-bold text-white shadow-inner">
-                    {totalFractionableDays} jours consécutifs
-                  </div>
-                </div>
-
-                <p className="mb-4 sm:mb-5 flex-1 text-sm leading-relaxed text-slate-600">
-                  Cliquez sur une date dans le calendrier ci-dessus, vos {totalFractionableDays} jours se placent
-                  automatiquement à la suite.
+            <div className="grid gap-2 sm:grid-cols-2">
+              <div className="rounded-lg border border-slate-200 bg-[#fafafc] p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Mode simple</p>
+                <p className="mt-1 text-sm font-semibold text-[#1d1d1f]">
+                  {totalFractionableDays} jours consécutifs
                 </p>
-
-                <Button
-                  onClick={onFocusCalendar}
-                  variant="primary"
-                  size="md"
-                  icon={ArrowUp}
-                  iconPosition="right"
-                  fullWidth
-                >
-                  Choisir une date sur le calendrier
-                </Button>
+                <p className="mt-2 text-xs font-normal leading-relaxed text-slate-600">
+                  Le calendrier place automatiquement toute la période à partir du jour choisi.
+                </p>
               </div>
 
-              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
-                <div className="mb-4 sm:mb-5 flex items-center gap-3">
-                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-sm">
-                    <Settings2 className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={onActivateCustomMode}
+                className="rounded-lg border border-slate-200 bg-white p-4 text-left transition-colors hover:border-slate-300 hover:bg-[#fafafc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f5f5f7] text-slate-700">
+                    <Settings2 className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold font-display text-slate-900">Mode personnalisé</h4>
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      2 périodes ajustables
-                    </p>
+                    <p className="text-sm font-semibold text-[#1d1d1f]">Mode personnalisé</p>
+                    <p className="text-xs font-normal text-slate-500">1 ou 2 périodes, minimum 5 jours.</p>
                   </div>
                 </div>
-
-                <div className="mb-4 sm:mb-5 rounded-xl border border-slate-100 bg-slate-50/80 p-3.5 sm:p-4 shadow-sm">
-                  <div className="mb-2 flex gap-2 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    <span className="flex-1">Période 1</span>
-                    <span className="flex-1">Période 2</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <motion.div
-                      layout
-                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
-                    >
-                      {customFirstBlockDays}j
-                    </motion.div>
-                    <motion.div
-                      layout
-                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
-                    >
-                      {secondBlockDays}j
-                    </motion.div>
-                  </div>
-                </div>
-
-                <p className="mb-4 sm:mb-5 flex-1 text-sm leading-relaxed text-slate-600">
-                  Définissez vous-même la durée de chaque période (minimum 5 jours par bloc).
-                </p>
-
-                <Button onClick={onActivateCustomMode} variant="secondary" size="md" fullWidth>
-                  Activer le mode personnalisé
-                </Button>
-              </div>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -195,147 +117,78 @@ export function PlanningModeSelector({
       {isCustomModeVisible && (
         <motion.div
           key="planning-custom"
-          ref={customModeRef}
-          className="max-w-3xl mx-auto mb-28 sm:mb-12 scroll-mt-28"
+          className="mx-auto mb-8 max-w-4xl scroll-mt-28 sm:mb-10"
           initial="hidden"
           animate="visible"
           exit="hidden"
           variants={fadeInUp}
           transition={transition}
         >
-          <div className="premium-card p-5 sm:p-8">
-            <div className="flex items-start gap-4 sm:gap-5 mb-6 sm:mb-8">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-brand-600 text-white flex items-center justify-center shadow-md shadow-brand-600/20">
-                  <Settings2 className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
-                </div>
+          <div ref={customModeRef} className="premium-card scroll-mt-28 p-4 sm:p-6">
+            <div className="mb-5 flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1d1d1f] text-white">
+                <Settings2 className="h-5 w-5" aria-hidden="true" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl sm:text-2xl font-bold font-display text-slate-900 mb-1 sm:mb-2">Mode personnalisé</h3>
-                <p className="text-sm sm:text-lg text-slate-500 font-medium">Choisissez votre méthode de sélection</p>
+              <div>
+                <h3 className="text-lg font-semibold tracking-[-0.018em] text-[#1d1d1f] sm:text-xl">Mode personnalisé</h3>
+                <p className="mt-1 text-sm font-normal leading-relaxed text-slate-500">
+                  Ajustez la répartition puis choisissez les dates dans le calendrier.
+                </p>
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              <div className="bg-slate-50/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group backdrop-blur-sm">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white text-slate-700 border border-slate-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                    <SlidersHorizontal className="h-6 w-6" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-slate-900">Curseur</h4>
-                    <p className="text-xs font-bold uppercase text-slate-400 tracking-wider">Simple & Rapide</p>
-                  </div>
+            <div className="rounded-lg border border-slate-200 bg-[#fafafc] p-4">
+              <div className="mb-4 grid grid-cols-2 gap-2">
+                <div className="rounded-lg bg-white p-3 text-center ring-1 ring-slate-200">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-600">Période 1</p>
+                  <p className="mt-1 text-2xl font-semibold text-[#1d1d1f]">{customFirstBlockDays}</p>
+                  <p className="text-xs font-normal text-slate-500">jours</p>
                 </div>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Ajustez la répartition avec le curseur ci-dessous, puis cliquez sur le calendrier.
-                </p>
-              </div>
-
-              <div className="bg-slate-50/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group relative overflow-hidden backdrop-blur-sm">
-                <div className="relative z-10">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
-                      <MousePointer2 className="h-6 w-6" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <h4 className="text-base font-bold text-slate-900">Sélection directe</h4>
-                      <p className="text-xs font-bold uppercase text-brand-500 tracking-wider">Précis</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                    Sélectionnez manuellement vos dates de début et de fin sur le calendrier.
-                  </p>
-                  <Button
-                    onClick={onStartVisualSelection}
-                    variant="primary"
-                    size="sm"
-                    fullWidth
-                    className="shadow-none"
-                  >
-                    Commencer
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-50/50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 mb-6 border border-slate-100 backdrop-blur-sm">
-              <div className="text-center mb-6 sm:mb-8">
-                <p className="text-xs sm:text-sm font-bold uppercase tracking-widest text-slate-400 mb-5 sm:mb-6">
-                  Répartition des jours
-                </p>
-                <div className="flex gap-4 justify-center items-center">
-                  <div className="flex flex-col items-center">
-                    <motion.div
-                      layout
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-brand-600 text-white shadow-md shadow-brand-600/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
-                    >
-                      {customFirstBlockDays}
-                    </motion.div>
-                    <span className="text-xs font-bold text-brand-700 uppercase">Période 1</span>
-                  </div>
-                  <div className="text-2xl text-slate-300 font-light">+</div>
-                  <div className="flex flex-col items-center">
-                    <motion.div
-                      layout
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-emerald-500 text-white shadow-md shadow-emerald-500/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
-                    >
-                      {secondBlockDays}
-                    </motion.div>
-                    <span className="text-xs font-bold text-emerald-600 uppercase">Période 2</span>
-                  </div>
+                <div className="rounded-lg bg-white p-3 text-center ring-1 ring-slate-200">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">Période 2</p>
+                  <p className="mt-1 text-2xl font-semibold text-[#1d1d1f]">{secondBlockDays}</p>
+                  <p className="text-xs font-normal text-slate-500">jours</p>
                 </div>
               </div>
 
-              <div className="h-4 bg-slate-200 rounded-full overflow-hidden mb-6 flex">
-                <motion.div
-                  layout
-                  className="h-full bg-brand-500 transition-all duration-300 ease-out"
-                  style={{ width: `${firstBlockPercentage}%` }}
-                  transition={shouldReduce ? { duration: 0 } : springs.soft}
-                />
-                <motion.div
-                  layout
-                  className="h-full bg-emerald-500 transition-all duration-300 ease-out"
-                  style={{ width: `${secondBlockPercentage}%` }}
-                  transition={shouldReduce ? { duration: 0 } : springs.soft}
-                />
+              <div className="mb-4 flex h-2 overflow-hidden rounded-full bg-slate-200" aria-hidden="true">
+                <div className="h-full bg-brand-600 transition-[width] duration-200" style={{ width: `${firstBlockPercentage}%` }} />
+                <div className="h-full bg-emerald-500 transition-[width] duration-200" style={{ width: `${secondBlockPercentage}%` }} />
               </div>
 
-              <div className="relative h-12 flex items-center">
+              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500" htmlFor="custom-first-block-days">
+                Répartition de la première période
+              </label>
+              <div className="relative mt-2 h-10 flex items-center">
                 <input
+                  id="custom-first-block-days"
                   type="range"
                   min="5"
                   max={sliderMax}
                   value={customFirstBlockDays}
                   onChange={handleCustomFirstBlockDaysChange}
-                  aria-label="Répartition de la première période"
-                  className="w-full absolute z-20 opacity-0 cursor-pointer h-full"
+                  className="absolute z-20 h-full w-full cursor-pointer opacity-0"
                 />
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-slate-300" style={{ width: `${sliderPercentage}%` }} />
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                  <div className="h-full bg-slate-400" style={{ width: `${sliderPercentage}%` }} />
                 </div>
                 <div
-                  className="absolute h-8 w-8 bg-white border-4 border-brand-500 rounded-full shadow-lg pointer-events-none transition-all duration-75"
-                  style={{ left: `calc(${sliderPercentage}% - 16px)` }}
+                  className="absolute h-7 w-7 rounded-full border-4 border-brand-600 bg-white shadow-sm pointer-events-none transition-[left] duration-75"
+                  style={{ left: `calc(${sliderPercentage}% - 14px)` }}
                 />
               </div>
-              <p className="text-xs text-center text-slate-400 font-medium mt-2">
-                Glissez pour ajuster (min. 5 jours par période)
-              </p>
+              <p className="text-xs font-normal text-slate-500">Minimum 5 jours calendaires par période.</p>
             </div>
 
-            <Button
-              onClick={onCancelCustomMode}
-              variant="ghost"
-              size="lg"
-              fullWidth
-              className="text-slate-500 hover:text-slate-800"
-            >
-              Annuler et revenir au mode simple
-            </Button>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <Button onClick={onStartVisualSelection} variant="primary" size="md" fullWidth className="shadow-none">
+                <MousePointer2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                Sélection directe
+              </Button>
+              <Button onClick={onCancelCustomMode} variant="secondary" size="md" fullWidth>
+                Revenir au mode simple
+              </Button>
+            </div>
           </div>
         </motion.div>
       )}
@@ -343,25 +196,18 @@ export function PlanningModeSelector({
       {isFinalStepVisible && (
         <motion.div
           key="planning-final-step"
-          className="max-w-3xl mx-auto mb-8 sm:mb-12 sticky top-4 sm:top-24 z-30"
+          className="sticky top-4 z-30 mx-auto mb-8 max-w-4xl sm:top-24 sm:mb-10"
           initial="hidden"
           animate="visible"
           exit="hidden"
           variants={fadeInUp}
           transition={transition}
         >
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/95 backdrop-blur-md p-4 sm:p-5 shadow-lg shadow-emerald-500/10">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold font-display text-lg sm:text-xl shadow-md shadow-emerald-500/20 flex-shrink-0">
-                2
-              </div>
-              <div className="flex-1">
-                <h4 className="text-base sm:text-lg font-bold text-emerald-900 mb-1 font-display">Dernière étape</h4>
-                <p className="text-sm text-emerald-800 font-medium">
-                  Cliquez sur une date pour placer les <span className="font-bold">{secondBlockDays} jours restants</span>
-                </p>
-              </div>
-            </div>
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-soft">
+            <p className="text-sm font-bold text-emerald-950">Deuxième période</p>
+            <p className="mt-1 text-sm font-medium leading-relaxed text-emerald-800">
+              Cliquez sur une date pour placer les {secondBlockDays} jours restants.
+            </p>
           </div>
         </motion.div>
       )}

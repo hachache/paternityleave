@@ -8,8 +8,6 @@ interface LegalInfoProps {
 export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
   const standard = LEAVE_SCENARIOS.standard;
   const multiples = LEAVE_SCENARIOS['multiple-births'];
-  const hospitalized = LEAVE_SCENARIOS['hospitalized-newborn'];
-  const adoption = LEAVE_SCENARIOS.adoption;
   const multiplesBonus = multiples.fractionableDays - standard.fractionableDays;
 
   return (
@@ -81,11 +79,15 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
           </li>
           <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">Hospitalisation</span>
-            <span className="font-medium">report possible jusqu'à {hospitalized.limitMonthsAfterBirth} mois après la naissance</span>
+            <span className="font-medium">
+              congé spécifique et reports possibles selon justificatifs, non calculés automatiquement ici
+            </span>
           </li>
-          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
-            <span className="font-bold text-slate-900 min-w-[4rem] text-base">Adoption</span>
-            <span className="font-medium">{adoption.fractionableDays} jours calendaires fractionnables à prendre dans les {adoption.limitMonthsAfterBirth} mois suivant l'arrivée</span>
+          <li className="flex gap-3 items-start p-3 bg-amber-50/70 rounded-xl border border-amber-100">
+            <span className="font-bold text-amber-900 min-w-[4rem] text-base">Adoption</span>
+            <span className="font-medium text-amber-900">
+              régime spécifique non simulé ici. Consultez la fiche Service-Public dédiée au congé d’adoption.
+            </span>
           </li>
           <li className="flex gap-3 items-start p-3 bg-blue-50/60 rounded-xl hover:bg-blue-50 transition-apple-smooth border border-blue-100">
             <span className="font-bold text-blue-700 min-w-[4rem] text-base">+1 à 2 mois</span>

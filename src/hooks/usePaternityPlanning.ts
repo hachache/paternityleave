@@ -186,7 +186,7 @@ export function usePaternityPlanning() {
     setSuccessMessage(null);
 
     if (!birthDate || !mandatoryPeriod) return;
-    const eventName = scenario.id === 'adoption' ? "l'arrivée au foyer" : 'la naissance';
+    const eventName = 'la naissance';
 
     if (visualSelectionMode && selectionStep === 'selecting-start') {
       if (normalized < birthDate) {
@@ -486,17 +486,22 @@ export function usePaternityPlanning() {
     isPaternityPlanComplete,
     celebrationPendingOnPlanningComplete,
     supplementaryLeaveEnabled: supplementary.enabled,
+    supplementaryLeavePrematureExpectedAfterMinDate: supplementary.prematureExpectedAfterMinDate,
     supplementaryLeaveDuration: supplementary.duration,
     supplementaryLeaveMode: supplementary.mode,
+    supplementaryLeaveFirstStartDate: supplementary.firstStartDate,
     supplementaryLeaveSecondStartDate: supplementary.secondStartDate,
     supplementaryLeaveEligibility: supplementary.eligibility,
+    supplementaryLeaveStartInfo: supplementary.startInfo,
     supplementaryLeaveStartDate: supplementary.startDate,
     supplementaryLeavePeriod: supplementary.firstPeriod,
     supplementaryLeavePeriods: supplementary.periods,
     supplementaryLeaveError: supplementary.error,
     setSupplementaryLeaveEnabled: supplementary.setEnabled,
+    setSupplementaryLeavePrematureExpectedAfterMinDate: supplementary.setPrematureExpectedAfterMinDate,
     setSupplementaryLeaveDuration: supplementary.setDuration,
     setSupplementaryLeaveMode: supplementary.setMode,
+    setSupplementaryLeaveFirstStartDate: supplementary.setFirstStartDate,
     setSupplementaryLeaveSecondStartDate: supplementary.setSecondStartDate
   };
 }

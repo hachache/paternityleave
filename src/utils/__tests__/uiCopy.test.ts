@@ -59,29 +59,32 @@ describe('copies UI métier', () => {
     expect(planningStep?.hint).not.toContain('2 périodes minimum');
   });
 
-  it('adapte les libellés principaux au scénario adoption', () => {
-    const adoption = LEAVE_SCENARIOS.adoption;
-    const vocabulary = getScenarioVocabulary(adoption);
-    const progressSteps = buildProgressSteps(adoption.fractionableDays, adoption);
-    const legendItems = getCalendarLegendItems(adoption);
+  it('garde le scénario adoption hors du simulateur paternité classique', () => {
+    const vocabulary = getScenarioVocabulary(LEAVE_SCENARIOS.standard);
+    const progressSteps = buildProgressSteps(
+      LEAVE_SCENARIOS.standard.fractionableDays,
+      LEAVE_SCENARIOS.standard
+    );
+    const legendItems = getCalendarLegendItems(LEAVE_SCENARIOS.standard);
     const checklist = buildChecklist({
       planningStep: 1,
       totalPlannedDays: 0,
       hasBirthDate: false,
       hasMandatory: false,
       remainingBlocks: 0,
-      fractionableDays: adoption.fractionableDays,
+      fractionableDays: LEAVE_SCENARIOS.standard.fractionableDays,
       isEligibleForSupplementaryLeave: false,
       supplementaryLeaveConfigured: false,
       supplementaryLeaveActivationHint: null,
       supplementaryLeaveDaysUntilActivation: null,
-      scenario: adoption
+      scenario: LEAVE_SCENARIOS.standard
     });
 
-    expect(vocabulary.eventDateLabel).toBe("Date d'arrivée au foyer");
-    expect(progressSteps[0].label).toBe("Date d'arrivée au foyer");
-    expect(legendItems[0].label).toBe("Date d'arrivée au foyer");
-    expect(checklist[0].label).toContain("date d'arrivée au foyer");
+    expect(Object.keys(LEAVE_SCENARIOS)).not.toContain('adoption');
+    expect(vocabulary.eventDateLabel).toBe('Date de naissance');
+    expect(progressSteps[0].label).toBe('Date de naissance');
+    expect(legendItems[0].label).toBe('Date de naissance');
+    expect(checklist[0].label).toContain('date de naissance');
   });
 
   it('pointe vers les références légales officielles à jour', () => {

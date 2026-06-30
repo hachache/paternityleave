@@ -16,10 +16,10 @@ function scrollToSection(sectionId: string) {
 export function PostPlanningNavBar({ showSupplementaryLink }: PostPlanningNavBarProps) {
   return (
     <nav
-      className="sticky top-3 sm:top-20 z-30 mb-8 max-w-3xl mx-auto scroll-mt-28"
+      className="sticky top-20 z-30 mx-auto mb-8 hidden max-w-4xl scroll-mt-28 sm:block"
       aria-label="Navigation après planification"
     >
-      <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 sm:p-2 shadow-md shadow-slate-200/40 backdrop-blur-md">
+      <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
         <p className="px-2.5 sm:px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
           Suite de votre dossier
         </p>

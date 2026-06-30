@@ -54,14 +54,14 @@ export const ARTICLE_L1225_35_1: LegalSource = {
  * 
  * Définit les délais de prise du congé :
  * - 6 mois pour naissances simples et multiples
- * - 12 mois en cas d'hospitalisation
+ * - Report possible dans certains cas spécifiques (hospitalisation de l'enfant, décès de la mère)
  */
 export const ARTICLE_L1225_35_2: LegalSource = {
   type: 'code-travail',
   title: 'Période de référence',
   article: 'Article L1225-35-2',
   url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000043923132',
-  description: 'Congé à prendre dans les 6 mois (ou 12 mois en cas d\'hospitalisation)',
+  description: 'Congé à prendre dans les 6 mois, sauf report spécifique justifié',
   dateApplication: '1er juillet 2021'
 };
 

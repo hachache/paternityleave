@@ -16,6 +16,8 @@ export type SupplementaryLeaveMode = 'consecutive' | 'split';
 
 export interface SupplementaryLeaveEligibility {
   isEligibleBirthDate: boolean;
+  isPrematureBirthBefore2026: boolean;
+  isPrematureExpectedAfterMinDate: boolean;
   /** La demande peut être préparée/envoyée à partir du 1er juin 2026. */
   isRequestWindowOpen: boolean;
   isAvailableNow: boolean;
@@ -34,6 +36,19 @@ export interface SupplementaryLeaveEligibility {
   reason: string | null;
 }
 
+export type SupplementaryLeaveNoticeRule = 'reduced-15-days' | 'standard-1-month';
+
+export interface SupplementaryLeaveEarliestStartInfo {
+  startDate: Date;
+  noticeDate: Date;
+  noticeRule: SupplementaryLeaveNoticeRule;
+  noticeReason: string;
+}
+
+export interface SupplementaryLeaveEligibilityOptions {
+  prematureExpectedAfterMinDate?: boolean;
+}
+
 export const SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE = startOfDay(new Date(2026, 0, 1));
 export const SUPPLEMENTARY_LEAVE_REQUEST_DATE = startOfDay(new Date(2026, 5, 1));
 export const SUPPLEMENTARY_LEAVE_ACTIVATION_DATE = startOfDay(new Date(2026, 6, 1));
@@ -49,7 +64,8 @@ function getExtendedWindowDays(scenario?: LeaveScenarioConfig): number {
 
 export function getSupplementaryLeaveLimitDate(
   birthDate: Date,
-  scenario?: LeaveScenarioConfig
+  scenario?: LeaveScenarioConfig,
+  options: SupplementaryLeaveEligibilityOptions = {}
 ): Date {
   const normalizedBirth = startOfDay(birthDate);
   const extensionDays = getExtendedWindowDays(scenario);
@@ -58,6 +74,13 @@ export function getSupplementaryLeaveLimitDate(
     SUPPLEMENTARY_LEAVE_TRANSITION_LIMIT_DATE,
     extensionDays
   );
+
+  if (
+    options.prematureExpectedAfterMinDate &&
+    isBefore(normalizedBirth, SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE)
+  ) {
+    return transitionLimit;
+  }
 
   if (
     !isBefore(normalizedBirth, SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE) &&
@@ -101,22 +124,60 @@ function getDaysUntilRequestWindow(today: Date, requestDate: Date): number | nul
 
 export function getSupplementaryLeaveEarliestStartDate(
   initialLeaveEndDate: Date,
-  activationDate: Date = SUPPLEMENTARY_LEAVE_ACTIVATION_DATE
+  activationDate: Date = SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
+  birthDate?: Date | null,
+  today: Date = new Date()
 ): Date {
+  return getSupplementaryLeaveEarliestStartInfo(
+    initialLeaveEndDate,
+    activationDate,
+    birthDate,
+    today
+  ).startDate;
+}
+
+export function getSupplementaryLeaveEarliestStartInfo(
+  initialLeaveEndDate: Date,
+  activationDate: Date = SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
+  birthDate?: Date | null,
+  today: Date = new Date()
+): SupplementaryLeaveEarliestStartInfo {
   const dayAfterInitialLeave = addDays(startOfDay(initialLeaveEndDate), 1);
   const normalizedActivation = startOfDay(activationDate);
-
-  return isBefore(dayAfterInitialLeave, normalizedActivation)
+  const normalizedToday = startOfDay(today);
+  const baseStart = isBefore(dayAfterInitialLeave, normalizedActivation)
     ? normalizedActivation
     : dayAfterInitialLeave;
+  const normalizedBirth = birthDate ? startOfDay(birthDate) : null;
+  const eventOneMonthLimit = normalizedBirth ? addMonths(normalizedBirth, 1) : null;
+  const followsInitialLeaveImmediately = baseStart.getTime() === dayAfterInitialLeave.getTime();
+  const startsWithinMonthAfterEvent = Boolean(
+    eventOneMonthLimit && !isAfter(baseStart, eventOneMonthLimit)
+  );
+  const useReducedNotice = followsInitialLeaveImmediately && startsWithinMonthAfterEvent;
+  const noticeDate = useReducedNotice
+    ? addDays(normalizedToday, 15)
+    : addMonths(normalizedToday, 1);
+  const startDate = isBefore(baseStart, noticeDate) ? noticeDate : baseStart;
+
+  return {
+    startDate,
+    noticeDate,
+    noticeRule: useReducedNotice ? 'reduced-15-days' : 'standard-1-month',
+    noticeReason: useReducedNotice
+      ? 'Préavis réduit de 15 jours appliqué car le congé projeté suit immédiatement le congé initial et débute dans le mois suivant la naissance.'
+      : 'Préavis standard d’un mois appliqué car les conditions strictes du délai réduit de 15 jours ne sont pas réunies.'
+  };
 }
 
 export function getSupplementaryLeaveEligibility(
   birthDate: Date | null,
   scenario?: LeaveScenarioConfig,
-  today: Date = new Date()
+  today: Date = new Date(),
+  options: SupplementaryLeaveEligibilityOptions = {}
 ): SupplementaryLeaveEligibility {
   const normalizedToday = startOfDay(today);
+  const prematureExpectedAfterMinDate = Boolean(options.prematureExpectedAfterMinDate);
   const isRequestWindowOpen = !isBefore(normalizedToday, SUPPLEMENTARY_LEAVE_REQUEST_DATE);
   const isAvailableNow = !isBefore(normalizedToday, SUPPLEMENTARY_LEAVE_ACTIVATION_DATE);
   const daysUntilActivation = getDaysUntilActivation(
@@ -131,6 +192,8 @@ export function getSupplementaryLeaveEligibility(
   if (!birthDate) {
     return {
       isEligibleBirthDate: false,
+      isPrematureBirthBefore2026: false,
+      isPrematureExpectedAfterMinDate: false,
       isRequestWindowOpen,
       isAvailableNow,
       canPlan: false,
@@ -141,19 +204,23 @@ export function getSupplementaryLeaveEligibility(
       requestDate: SUPPLEMENTARY_LEAVE_REQUEST_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
-      reason: 'Définissez d’abord la date de naissance ou d’arrivée au foyer.'
+      reason: 'Définissez d’abord la date de naissance.'
     };
   }
 
   const normalizedBirth = startOfDay(birthDate);
-  const isEligibleBirthDate = !isBefore(
+  const isPrematureBirthBefore2026 = isBefore(
     normalizedBirth,
     SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE
   );
+  const isEligibleBirthDate =
+    !isPrematureBirthBefore2026 || prematureExpectedAfterMinDate;
 
   if (!isEligibleBirthDate) {
     return {
       isEligibleBirthDate: false,
+      isPrematureBirthBefore2026,
+      isPrematureExpectedAfterMinDate: false,
       isRequestWindowOpen,
       isAvailableNow,
       canPlan: false,
@@ -165,13 +232,15 @@ export function getSupplementaryLeaveEligibility(
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
       limitDate: null,
       reason:
-        'Réservé aux enfants nés/adoptés à partir du 1er janvier 2026 (hors cas prématuré non simulé).'
+        'Réservé aux enfants nés à partir du 1er janvier 2026, sauf naissance prématurée en 2025 avec date prévue à partir du 1er janvier 2026.'
     };
   }
 
   if (!isRequestWindowOpen) {
     return {
       isEligibleBirthDate: true,
+      isPrematureBirthBefore2026,
+      isPrematureExpectedAfterMinDate: prematureExpectedAfterMinDate,
       isRequestWindowOpen,
       isAvailableNow,
       canPlan: false,
@@ -181,7 +250,7 @@ export function getSupplementaryLeaveEligibility(
       minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
       requestDate: SUPPLEMENTARY_LEAVE_REQUEST_DATE,
       activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
-      limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario),
+      limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario, options),
       reason:
         'Demande possible à partir du 1er juin 2026. Le congé ne pourra débuter qu’au 1er juillet 2026.'
     };
@@ -189,6 +258,8 @@ export function getSupplementaryLeaveEligibility(
 
   return {
     isEligibleBirthDate: true,
+    isPrematureBirthBefore2026,
+    isPrematureExpectedAfterMinDate: prematureExpectedAfterMinDate,
     isRequestWindowOpen: true,
     isAvailableNow,
     canPlan: true,
@@ -198,7 +269,7 @@ export function getSupplementaryLeaveEligibility(
     minBirthDate: SUPPLEMENTARY_LEAVE_MIN_BIRTH_DATE,
     requestDate: SUPPLEMENTARY_LEAVE_REQUEST_DATE,
     activationDate: SUPPLEMENTARY_LEAVE_ACTIVATION_DATE,
-    limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario),
+    limitDate: getSupplementaryLeaveLimitDate(normalizedBirth, scenario, options),
     reason: null
   };
 }

@@ -12,8 +12,7 @@ export interface LeaveBlock {
 export type LeaveScenarioId =
   | 'standard'
   | 'multiple-births'
-  | 'hospitalized-newborn'
-  | 'adoption';
+  | 'hospitalized-newborn';
 
 export interface LeaveScenarioConfig {
   id: LeaveScenarioId;
@@ -60,14 +59,7 @@ export const LEAVE_SCENARIOS: Record<LeaveScenarioId, LeaveScenarioConfig> = {
   'hospitalized-newborn': {
     id: 'hospitalized-newborn',
     label: 'Hospitalisation du nouveau-ne',
-    description: '21 jours calendaires fractionnables pouvant etre reportes jusqu\'a 12 mois apres la naissance.',
-    fractionableDays: 21,
-    limitMonthsAfterBirth: 12
-  },
-  adoption: {
-    id: 'adoption',
-    label: 'Adoption',
-    description: '21 jours calendaires fractionnables a prendre dans les 6 mois suivant l\'arrivee de l\'enfant.',
+    description: '21 jours calendaires fractionnables. Les reports ou conges specifiques lies a une hospitalisation doivent etre verifies avec la CPAM ou l’employeur.',
     fractionableDays: 21,
     limitMonthsAfterBirth: 6
   }
@@ -224,7 +216,7 @@ export function getSixMonthsLimit(birthDate: Date): Date {
  * - Incluent les samedis, dimanches et jours feries
  * - Minimum 5 jours calendaires consecutifs par bloc
  * - Maximum 2 blocs (donc minimum 5j + 5j si 2 blocs)
- * - A prendre dans le delai legal (6 ou 12 mois selon situation)
+ * - A prendre dans le delai legal de 6 mois, sauf report specifique justifie
  * 
  * @returns { valid: boolean, error?: string, warning?: string, analysis? } Resultat de validation
  */
@@ -239,7 +231,7 @@ export function validateRemainingBlock(
   scenario: LeaveScenarioConfig
 ): { valid: boolean; error?: string; warning?: string; analysis?: ReturnType<typeof analyzePeriod> } {
   const usageLimit = getLimitDate(birthDate, scenario.limitMonthsAfterBirth);
-  const eventName = scenario.id === 'adoption' ? "l'arrivée au foyer" : 'la naissance';
+  const eventName = 'la naissance';
 
   // Les jours fractionnables ne peuvent pas être posés AVANT la naissance
   if (isBefore(start, birthDate)) {

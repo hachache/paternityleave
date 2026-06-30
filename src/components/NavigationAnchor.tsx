@@ -134,12 +134,12 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
             key={section.id}
             href={`#${section.id}`}
             className={`
-              relative isolate px-2 sm:px-3 md:px-5 py-3 sm:py-2 rounded-xl text-xs sm:text-sm md:text-sm
-              font-semibold whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[44px]
+              relative isolate px-2 sm:px-3 md:px-5 py-3 sm:py-2 rounded-full text-xs sm:text-sm md:text-sm
+              font-normal whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[44px]
               ${
                 isActive
                   ? 'text-white'
-                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
+                  : 'text-slate-700 hover:text-slate-950 hover:bg-white'
               }
             `}
             style={{
@@ -157,7 +157,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
           >
             {isActive && (
               <motion.div
-                className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-brand-600 to-brand-700 shadow-lg"
+                className="absolute inset-0 -z-10 rounded-full bg-brand-600"
                 layoutId="nav-active-pill"
                 transition={shouldReduce ? { duration: 0 } : springs.soft}
               />
@@ -183,7 +183,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
         >
           <nav
             aria-label="Navigation de la page"
-            className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl bg-white/95 backdrop-blur-lg border border-slate-200/80 shadow-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start"
+            className="pointer-events-auto flex w-full max-w-md justify-between gap-1 rounded-full border border-slate-200 bg-[#f5f5f7]/95 px-1.5 py-1.5 shadow-none backdrop-blur-xl sm:w-auto sm:max-w-none sm:justify-start sm:gap-1 sm:px-2 sm:py-2"
             style={{
               transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
             }}

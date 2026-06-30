@@ -304,7 +304,7 @@ export function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center text-sm sm:h-12 sm:text-base rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
+      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center rounded-lg border border-transparent text-sm font-normal transition-colors duration-200 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 sm:text-base ';
 
       if (!isCurrentMonthDay) {
         // Make non-current month days much fainter
@@ -314,13 +314,13 @@ export function Calendar({
       const hasLeaveType = ['birth', 'employer', 'mandatory', 'remaining'].includes(metadata.type || '');
 
       if (metadata.type === 'birth') {
-        classes += ' bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/30 ring-2 ring-slate-900 ring-offset-2';
+        classes += ' bg-[#1d1d1f] text-white font-semibold ring-1 ring-[#1d1d1f] ring-offset-2';
       } else if (metadata.type === 'employer') {
-        classes += ' bg-brand-300 text-white shadow-sm';
+        classes += ' bg-brand-300 text-white';
       } else if (metadata.type === 'mandatory') {
-        classes += ' bg-brand-600 text-white shadow-md shadow-brand-600/30';
+        classes += ' bg-brand-600 text-white';
       } else if (metadata.type === 'remaining') {
-        classes += ' bg-success-500 text-white cursor-pointer hover:bg-success-600 hover:-translate-y-0.5 shadow-md shadow-success-500/30';
+        classes += ' bg-success-500 text-white cursor-pointer hover:bg-success-600';
       } else if (metadata.selectable && isCurrentMonthDay) {
         classes += ' cursor-pointer text-slate-700 hover:bg-brand-50 hover:text-brand-700';
       } else {
@@ -353,22 +353,22 @@ export function Calendar({
   const dayTransition = shouldReduce ? { duration: 0 } : springs.snappy;
 
   return (
-    <div className="rounded-2xl sm:rounded-[1.5rem] border border-white bg-white/90 backdrop-blur-xl p-1 min-[360px]:p-3.5 sm:p-8 shadow-soft relative">
+    <div className="relative rounded-[18px] border border-slate-200 bg-white p-4 shadow-none sm:p-5">
       {!birthDate && (
         <motion.div
-          className="mb-5 rounded-2xl bg-brand-50 p-4 sm:p-5 border border-brand-100"
+          className="mb-5 rounded-xl border border-slate-200 bg-[#fafafc] p-4 sm:p-5"
           initial="hidden"
           animate="visible"
           variants={fadeInUp}
           transition={transition}
         >
-          <p className="text-sm sm:text-base text-brand-800 text-center font-medium">
+          <p className="text-center text-sm font-normal leading-relaxed tracking-[-0.01em] text-slate-700 sm:text-base">
             Sélectionnez la {vocabulary.eventDateActionLabel} pour démarrer le calcul.
           </p>
         </motion.div>
       )}
 
-      <div className="flex items-center justify-between mb-5 sm:mb-8">
+      <div className="mb-5 flex items-center justify-between sm:mb-6">
         <button
           type="button"
           onClick={previousMonth}
@@ -378,7 +378,7 @@ export function Calendar({
           <ChevronLeft className="h-6 w-6" />
         </button>
 
-        <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900 capitalize tracking-tight">
+        <h2 className="font-display text-lg font-semibold capitalize tracking-[-0.018em] text-[#1d1d1f] sm:text-xl">
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
 
@@ -392,7 +392,7 @@ export function Calendar({
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 mb-3 sm:mb-4">
+      <div className="mb-3 grid grid-cols-7 gap-1 sm:mb-4 sm:gap-1.5 md:gap-2">
         {weekDays.map(day => (
           <div key={day} className="text-center text-[10px] sm:text-xs uppercase tracking-wider font-bold text-slate-400 py-1.5 sm:py-2">
             {day}
@@ -400,12 +400,11 @@ export function Calendar({
         ))}
       </div>
 
-      <AnimatePresence mode="popLayout" custom={monthDirection}>
+      <AnimatePresence custom={monthDirection}>
         <motion.div
           key={format(currentMonth, 'yyyy-MM')}
           role="grid"
-          className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 md:gap-3"
-          layout
+          className="grid grid-cols-7 gap-1 sm:gap-1.5 md:gap-2"
           custom={monthDirection}
           variants={monthGridVariants}
           initial="enter"
@@ -442,7 +441,6 @@ export function Calendar({
                 aria-label={ariaLabel}
                 aria-disabled={!metadata.selectable && metadata.action === 'static'}
                 aria-current={isTodayDate ? 'date' : undefined}
-                layout
                 whileTap={metadata.selectable && !shouldReduce ? { scale: 0.92 } : undefined}
                 transition={dayTransition}
                 onFocus={handleCellFocus}

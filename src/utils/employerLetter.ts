@@ -52,16 +52,8 @@ function buildHeader(identity: EmployerLetterIdentity): string {
   return `${lieu}, le ${dateRedaction}\n${fullName}\n${adresse}\n${fonction}`;
 }
 
-function buildEventSentence(
-  birthDate: Date,
-  currentDate: Date,
-  scenario: LeaveScenarioConfig
-): string {
+function buildEventSentence(birthDate: Date, currentDate: Date): string {
   const date = formatDate(birthDate);
-
-  if (scenario.id === 'adoption') {
-    return `J'ai le plaisir de vous informer que mon enfant est arrivé au foyer le ${date}.`;
-  }
 
   if (isAfter(startOfDay(birthDate), startOfDay(currentDate))) {
     return `J'ai le plaisir de vous informer que mon enfant doit naître le ${date}.`;
@@ -70,15 +62,7 @@ function buildEventSentence(
   return `J'ai le plaisir de vous informer que mon enfant est né le ${date}.`;
 }
 
-function buildSupportDocumentSentence(
-  birthDate: Date,
-  currentDate: Date,
-  scenario: LeaveScenarioConfig
-): string {
-  if (scenario.id === 'adoption') {
-    return "Vous trouverez ci-joint le justificatif d'adoption ou d'arrivée au foyer de l'enfant.";
-  }
-
+function buildSupportDocumentSentence(birthDate: Date, currentDate: Date): string {
   if (isAfter(startOfDay(birthDate), startOfDay(currentDate))) {
     return 'Vous trouverez ci-joint le certificat médical attestant la date prévue de la naissance.';
   }
@@ -88,13 +72,8 @@ function buildSupportDocumentSentence(
 
 function buildPaternityParagraphs(input: GenerateEmployerLetterInput): string[] {
   const paragraphs: string[] = [];
-  const isAdoption = input.scenario.id === 'adoption';
-  const leaveName = isAdoption
-    ? "congé lié à l'accueil de l'enfant"
-    : "congé de paternité et d'accueil de l'enfant";
-  const employerLabel = isAdoption
-    ? "Congé lié à l'arrivée de l'enfant à la charge de l'employeur"
-    : "Congé de naissance à la charge de l'employeur";
+  const leaveName = "congé de paternité et d'accueil de l'enfant";
+  const employerLabel = "Congé de naissance à la charge de l'employeur";
 
   paragraphs.push(
     `Pour cette occasion, je souhaite bénéficier du ${leaveName}, selon le planning suivant :`
@@ -154,10 +133,8 @@ function buildSupplementaryParagraph(
   ].join('\n');
 }
 
-function buildNoticeSentence(scenario: LeaveScenarioConfig): string {
-  const leaveName = scenario.id === 'adoption'
-    ? "du congé lié à l'accueil de l'enfant"
-    : "du congé de paternité et d'accueil de l'enfant";
+function buildNoticeSentence(): string {
+  const leaveName = "du congé de paternité et d'accueil de l'enfant";
 
   return `Je vous informe au moins un mois avant le début de la ou des périodes ${leaveName} mentionnées ci-dessus.`;
 }
@@ -168,7 +145,7 @@ export function generateEmployerLetter(input: GenerateEmployerLetterInput): stri
   const paragraphs = [
     buildHeader(input.identity),
     'Madame, Monsieur,',
-    buildEventSentence(input.birthDate, currentDate, input.scenario),
+    buildEventSentence(input.birthDate, currentDate),
     ...buildPaternityParagraphs(input)
   ];
 
@@ -182,7 +159,7 @@ export function generateEmployerLetter(input: GenerateEmployerLetterInput): stri
     paragraphs.push(supplementaryParagraph);
   }
 
-  paragraphs.push(buildNoticeSentence(input.scenario));
+  paragraphs.push(buildNoticeSentence());
 
   if (supplementaryParagraph) {
     paragraphs.push(
@@ -191,7 +168,7 @@ export function generateEmployerLetter(input: GenerateEmployerLetterInput): stri
   }
 
   paragraphs.push(
-    buildSupportDocumentSentence(input.birthDate, currentDate, input.scenario),
+    buildSupportDocumentSentence(input.birthDate, currentDate),
     "Je vous prie d'agréer, Madame, Monsieur, l'expression de ma considération distinguée."
   );
 

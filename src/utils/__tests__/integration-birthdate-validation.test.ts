@@ -137,7 +137,7 @@ describe('Integration : Validation date naissance + calcul periodes', () => {
       expect(validation.valid).toBe(true);
       expect(validation.warning).toContain('6 mois');
       
-      // Peut encore utiliser si cas d'hospitalisation (12 mois)
+      // Le simulateur reste consultable mais signale que le délai standard est dépassé.
     });
 
     it('Scenario 5 : Date absurde (naissance dans 3 ans)', () => {
@@ -157,4 +157,3 @@ describe('Integration : Validation date naissance + calcul periodes', () => {
     });
   });
 });
-

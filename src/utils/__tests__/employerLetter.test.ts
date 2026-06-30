@@ -78,19 +78,6 @@ describe('generateEmployerLetter', () => {
     expect(letter).not.toContain('doit naître');
   });
 
-  it("adapte le courrier au scénario d'adoption", () => {
-    const letter = generateEmployerLetter(
-      baseInput({
-        scenario: LEAVE_SCENARIOS.adoption
-      })
-    );
-
-    expect(letter).toContain('mon enfant est arrivé au foyer le 01/07/2026');
-    expect(letter).toContain("congé lié à l'accueil de l'enfant");
-    expect(letter).toContain("périodes du congé lié à l'accueil de l'enfant");
-    expect(letter).toContain("justificatif d'adoption ou d'arrivée au foyer");
-  });
-
   it('affiche 28 jours calendaires pour une naissance multiple', () => {
     const mandatoryPeriod = baseInput().mandatoryPeriod;
     const letter = generateEmployerLetter(

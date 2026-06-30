@@ -14,12 +14,13 @@ Derniere revision contexte : 2026-05-21.
 - Periode obligatoire : 4 jours calendaires immediatement apres le conge de naissance.
 - Jours fractionnables standard : 21 jours calendaires.
 - Naissances multiples : 28 jours calendaires fractionnables.
-- Hospitalisation du nouveau-ne : delai etendu selon le scenario configure.
-- Adoption : scenario separe, avec regles affichees dans l'interface.
+- Hospitalisation du nouveau-ne : scenario prudent avec verification CPAM/employeur si report ou prolongation.
+- Adoption : regime specifique non simule par le calculateur paternite classique.
 
 ## Conge supplementaire de naissance 2026
 Regles connues a verifier avant modification :
-- Enfants nes ou arrives au foyer a partir du 1 janvier 2026.
+- Enfants nes a partir du 1 janvier 2026, ou prematures nes en 2025 si la naissance etait medicalement prevue a partir du 1 janvier 2026.
+- Les enfants adoptes peuvent aussi etre concernes par le conge supplementaire 2026, mais le simulateur paternite classique ne modelise pas le conge d'adoption.
 - Demande / planification possible a partir du 1 juin 2026, pour respecter le preavis employeur d'1 mois.
 - Mobilisable effectivement a partir du 1 juillet 2026 : aucune periode ne doit commencer avant cette date.
 - Duree : 1 ou 2 mois par parent.

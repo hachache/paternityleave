@@ -24,7 +24,7 @@ const defaultLabels: BirthDateValidationLabels = {
  * Valide une date de naissance pour le conge de paternite.
  * 
  * LEGISLATION : Article L1225-35 du Code du travail
- * - Les jours fractionnables doivent etre pris dans les 6 mois (standard) ou 12 mois (hospitalisation)
+ * - Les jours fractionnables doivent etre pris dans les 6 mois, sauf report specifique justifie
  * - Le conge de naissance (3j employeur) est pris immediatement apres la naissance
  * 
  * LIMITES RAISONNABLES :
@@ -94,7 +94,7 @@ export function validateBirthDate(
       return {
         valid: true,
         context: 'past',
-        warning: `Attention : cette ${labels.eventName} date de plus de 6 mois. Le delai legal standard est depasse, sauf cas d'hospitalisation du nouveau-ne (12 mois).`
+        warning: `Attention : cette ${labels.eventName} date de plus de 6 mois. Le delai legal standard est depasse, sauf report specifique justifie (hospitalisation de l'enfant ou deces de la mere).`
       };
     }
 

@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { LEAVE_SCENARIOS, LeaveScenarioConfig, LeaveScenarioId } from '../utils/paternityLeave';
 import { FRACTIONABLE_PERIODS_HINT } from '../utils/scenarioVocabulary';
-import { springs, useAppMotion } from '../lib/motion';
+import { fadeIn, springs, useAppMotion } from '../lib/motion';
 
 interface ScenarioSelectorProps {
   selectedScenario: LeaveScenarioId;
@@ -10,108 +10,109 @@ interface ScenarioSelectorProps {
 
 function formatScenarioDetails(config: LeaveScenarioConfig) {
   const additionalDays = config.fractionableDays - LEAVE_SCENARIOS.standard.fractionableDays;
-  const hasBonus = additionalDays > 0;
+  const isHospitalization = config.id === 'hospitalized-newborn';
 
   return {
-    totalText: `${config.fractionableDays} jours fractionnables`,
-    bonusText: hasBonus ? `+${additionalDays} jours` : undefined,
-    limitText: `À poser dans les ${config.limitMonthsAfterBirth} mois`
+    totalText: `${config.fractionableDays} jours`,
+    bonusText: additionalDays > 0 ? `+${additionalDays} jours` : null,
+    limitText: isHospitalization ? `${config.limitMonthsAfterBirth} mois simulés` : `${config.limitMonthsAfterBirth} mois`,
+    cautionText: isHospitalization
+      ? 'Les reports liés à une hospitalisation doivent être vérifiés avec justificatif auprès de la CPAM ou de l’employeur.'
+      : null,
+    periodHint: FRACTIONABLE_PERIODS_HINT
   };
 }
 
 export function ScenarioSelector({ selectedScenario, onScenarioChange }: ScenarioSelectorProps) {
   const scenarios = Object.values(LEAVE_SCENARIOS);
+  const selectedConfig = LEAVE_SCENARIOS[selectedScenario];
+  const selectedDetails = formatScenarioDetails(selectedConfig);
   const { shouldReduce } = useAppMotion();
-  const cardTransition = shouldReduce ? { duration: 0 } : springs.snappy;
+  const selectionTransition = shouldReduce ? { duration: 0 } : springs.gentle;
 
   return (
-    <div role="radiogroup" aria-label="Choix de la situation" className="grid grid-cols-2 gap-2.5 sm:gap-4 auto-rows-auto sm:auto-rows-fr">
-      {scenarios.map(config => {
-        const isSelected = config.id === selectedScenario;
-        const details = formatScenarioDetails(config);
+    <div className="space-y-3.5">
+      <fieldset className="grid gap-2">
+        <legend className="sr-only">Choix de la situation</legend>
+        {scenarios.map(config => {
+          const isSelected = config.id === selectedScenario;
+          const details = formatScenarioDetails(config);
+          const inputId = `scenario-${config.id}`;
 
-        return (
-          <motion.button
-            key={config.id}
-            type="button"
-            role="radio"
-            aria-checked={isSelected}
-            onClick={() => onScenarioChange(config.id)}
-            whileHover={shouldReduce ? undefined : { y: -2 }}
-            whileTap={shouldReduce ? undefined : { scale: 0.98 }}
-            transition={cardTransition}
-            className={`group relative rounded-2xl sm:rounded-3xl p-3 sm:p-6 text-left transition-all duration-300 h-full flex flex-col border ${isSelected ? 'col-span-2 sm:col-span-1' : ''} ${
-              isSelected
-                ? 'border-brand-500 bg-brand-50/50 shadow-md shadow-brand-500/10 sm:border-transparent sm:shadow-lg'
-                : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
-            }`}
-          >
-            {isSelected && (
-              <motion.div
-                layoutId="scenario-active-border"
-                className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl border-2 border-brand-500 hidden sm:block"
-                transition={cardTransition}
+          return (
+            <motion.label
+              key={config.id}
+              htmlFor={inputId}
+              layout
+              transition={selectionTransition}
+              whileHover={shouldReduce ? undefined : { y: -1 }}
+              className={`group flex min-h-12 items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors duration-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand-500 sm:min-h-12 sm:py-3 ${
+                isSelected
+                  ? 'border-brand-600 bg-[#fbfdff] text-[#1d1d1f]'
+                  : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+              }`}
+            >
+              <input
+                id={inputId}
+                type="radio"
+                name="leave-scenario"
+                value={config.id}
+                checked={isSelected}
+                onChange={() => onScenarioChange(config.id)}
+                className="h-4 w-4 shrink-0 accent-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
               />
-            )}
-            {/* Selection Indicator */}
-            <div className={`flex items-start justify-between gap-3 sm:gap-4 ${isSelected ? 'mb-2 sm:mb-4' : 'mb-0 sm:mb-4'}`}>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className={`text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-1.5 sm:mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-500'}`}>
-                    {config.label}
-                  </p>
-                  {config.id === 'standard' && (
-                    <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-600">
-                      Courant
-                    </span>
-                  )}
-                </div>
-                <p className={`text-xs sm:text-lg text-slate-700 font-medium leading-relaxed ${isSelected ? 'line-clamp-2 sm:line-clamp-none' : 'hidden sm:block sm:line-clamp-none'}`}>
-                  {config.description}
-                </p>
-              </div>
-              <div
-                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 items-center justify-center transition-colors duration-300 ${isSelected ? 'flex' : 'hidden sm:flex'} ${
-                  isSelected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-200 group-hover:border-brand-300'
-                }`}
-              >
-                <AnimatePresence initial={false}>
-                  {isSelected && (
-                    <motion.span
-                      key="selected-check"
-                      className="text-xs font-bold"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      transition={cardTransition}
-                    >
-                      ✓
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold leading-snug tracking-[-0.018em] text-[#1d1d1f]">
+                  {config.label}
+                </span>
+                <span className="mt-0.5 block text-xs font-normal text-slate-500">
+                  {details.totalText}{details.bonusText ? ` · ${details.bonusText}` : ''}
+                </span>
+              </span>
+              {config.id === 'standard' && (
+                <span className="rounded-full bg-[#fafafc] px-2 py-1 text-[10px] font-normal tracking-[-0.01em] text-brand-600 ring-1 ring-slate-200">
+                  Courant
+                </span>
+              )}
+            </motion.label>
+          );
+        })}
+      </fieldset>
 
-            <div className={`mt-auto pt-2.5 sm:pt-4 border-t border-slate-100/50 grid grid-cols-2 gap-2 sm:gap-3 ${isSelected ? '' : 'hidden sm:grid'}`}>
-              <div className={`rounded-xl p-2.5 sm:p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
-                <p className="font-bold text-slate-900 text-xs sm:text-sm">{details.totalText}</p>
-                {details.bonusText && (
-                  <p className="text-xs font-bold text-emerald-600 mt-0.5">{details.bonusText}</p>
-                )}
-              </div>
-              <div className={`rounded-xl p-2.5 sm:p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
-                <p className="font-bold text-slate-900 text-xs sm:text-sm">{details.limitText}</p>
-                <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide sm:hidden">
-                  1 ou 2 périodes
-                </p>
-                <p className="hidden sm:block text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide">
-                  {FRACTIONABLE_PERIODS_HINT}
-                </p>
-              </div>
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={selectedConfig.id}
+          layout
+          className="rounded-xl border border-slate-200 bg-[#fafafc] p-3.5"
+          initial={shouldReduce ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          variants={fadeIn}
+          transition={selectionTransition}
+        >
+          <p className="text-[13px] font-normal leading-relaxed tracking-[-0.01em] text-slate-700 sm:text-sm">
+            {selectedConfig.description}
+          </p>
+          <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
+            <div className="min-w-0 rounded-lg bg-white px-3 py-2.5 ring-1 ring-slate-200">
+              <dt className="truncate text-[10px] font-semibold uppercase tracking-[0.06em] text-slate-400">Fractionnable</dt>
+              <dd className="mt-1 font-semibold text-[#1d1d1f]">{selectedDetails.totalText}</dd>
             </div>
-          </motion.button>
-        );
-      })}
+            <div className="min-w-0 rounded-lg bg-white px-3 py-2.5 ring-1 ring-slate-200">
+              <dt className="truncate text-[10px] font-semibold uppercase tracking-[0.06em] text-slate-400">Délai</dt>
+              <dd className="mt-1 font-semibold text-[#1d1d1f]">{selectedDetails.limitText}</dd>
+            </div>
+          </dl>
+          <p className="mt-2.5 text-[11px] font-normal leading-relaxed text-slate-500">
+            {selectedDetails.periodHint}
+          </p>
+          {selectedDetails.cautionText && (
+            <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-normal leading-relaxed text-amber-900">
+              {selectedDetails.cautionText}
+            </p>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

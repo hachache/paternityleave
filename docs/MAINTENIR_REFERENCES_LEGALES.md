@@ -253,11 +253,11 @@ Mettre à jour l'historique des versions :
    - [ ] Fractionnement valide
 
 3. **Hospitalisation**
-   - [ ] Délai étendu appliqué
-   - [ ] Jours bonus corrects
+   - [ ] Message de prudence affiché
+   - [ ] Aucun report automatique non justifié
 
 4. **Adoption**
-   - [ ] Règles spécifiques appliquées
+   - [ ] Régime spécifique clairement exclu du calcul paternité
 
 5. **Edge Cases**
    - [ ] Naissance un férié
@@ -397,4 +397,3 @@ Et ajouter un avertissement dans l'UI si nécessaire.
 **Maintenu par** : L'équipe de développement  
 **Dernière mise à jour** : Octobre 2024  
 **Prochaine révision prévue** : Janvier 2025
-
