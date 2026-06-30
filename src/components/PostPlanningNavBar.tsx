@@ -19,7 +19,7 @@ export function PostPlanningNavBar({ showSupplementaryLink }: PostPlanningNavBar
       className="sticky top-20 z-30 mx-auto mb-8 hidden max-w-4xl scroll-mt-28 sm:block"
       aria-label="Navigation après planification"
     >
-      <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+      <div className="rounded-[18px] border border-slate-200 bg-white/95 p-2 shadow-card backdrop-blur">
         <p className="px-2.5 sm:px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
           Suite de votre dossier
         </p>

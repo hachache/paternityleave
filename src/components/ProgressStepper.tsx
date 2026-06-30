@@ -35,7 +35,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
       variants={slideUp}
       transition={transition}
     >
-      <div className="relative overflow-hidden rounded-[18px] border border-slate-200 bg-white p-3.5 shadow-none sm:p-5">
+      <div className="relative overflow-hidden rounded-[18px] border border-slate-200 bg-white p-3.5 shadow-card sm:p-5">
 
         <div className="flex items-center justify-between relative">
           <div
@@ -43,7 +43,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
             style={{ top: '20px' }}
           >
             <motion.div
-              className="h-full rounded-full bg-brand-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]"
+              className="h-full rounded-full bg-brand-500"
               animate={{ width: `${progressPercent}%` }}
               transition={progressTransition}
             />

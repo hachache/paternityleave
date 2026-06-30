@@ -41,7 +41,9 @@ export default {
         },
       },
       boxShadow: {
-        'soft': '0 1px 2px rgba(0, 0, 0, 0.03)',
+        'soft': '0 1px 2px rgba(15, 23, 42, 0.04)',
+        'card': '0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 20px -12px rgba(15, 23, 42, 0.1)',
+        'elevated': '0 18px 48px -20px rgba(15, 23, 42, 0.24)',
         'glass': '0 1px 2px rgba(0, 0, 0, 0.04)',
         'glow': '0 0 0 1px rgba(0, 102, 204, 0.18)',
       },

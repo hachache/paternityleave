@@ -227,7 +227,7 @@ function App() {
       </a>
 
       <main id={mainContentId} className="flex-1 relative z-10">
-        <div className="container mx-auto max-w-[1120px] px-4 py-5 pt-6 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-8 sm:pt-14 sm:pb-12">
+        <div className="container mx-auto max-w-[1120px] px-4 py-5 pt-5 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-8 sm:pt-14 sm:pb-12">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -242,7 +242,7 @@ function App() {
               showSupplementaryLink={isPaternityPlanComplete && showSupplementarySetup}
             />
 
-            <div className="mx-auto mb-10 grid max-w-[1080px] items-start gap-5 sm:mb-12 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] lg:gap-7">
+            <div className="mx-auto mb-8 grid max-w-[1080px] items-start gap-4 sm:mb-12 sm:gap-5 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] lg:gap-7">
               <motion.div
                 className="min-w-0 lg:sticky lg:top-24"
                 variants={fadeInUp}
@@ -392,7 +392,7 @@ function App() {
               variants={fadeInUp}
               transition={transition}
             >
-              <div className="rounded-2xl border border-brand-200 bg-white p-4 shadow-soft sm:p-5">
+              <div className="rounded-[18px] border border-brand-200 bg-white/95 p-4 shadow-card backdrop-blur sm:p-5">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-lg font-bold text-white shadow-sm sm:h-12 sm:w-12 sm:text-xl">

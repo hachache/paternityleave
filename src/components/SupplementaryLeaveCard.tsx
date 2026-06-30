@@ -118,13 +118,13 @@ export function SupplementaryLeaveCard({
   );
 
   return (
-    <section className="rounded-[18px] border border-slate-200 bg-white p-4 shadow-none sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex gap-4">
+    <section className="rounded-[18px] border border-slate-200 bg-white p-4 shadow-card sm:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 gap-3 sm:gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1d1d1f] text-white sm:h-11 sm:w-11">
             <CalendarDays className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <h2 className="text-lg sm:text-xl font-semibold font-display text-[#1d1d1f]">
                 Congé supplémentaire 2026
@@ -152,15 +152,13 @@ export function SupplementaryLeaveCard({
           aria-label="Activer la projection du congé supplémentaire 2026"
           disabled={!canPlan}
           onClick={handleToggle}
-          className={`inline-flex h-8 w-14 shrink-0 items-center self-end rounded-full border p-1 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto ${
-            enabled
-              ? 'border-brand-600 bg-brand-600'
-              : 'border-slate-200 bg-slate-100'
+          className={`mt-1 inline-flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+            enabled ? 'bg-brand-600' : 'bg-slate-300'
           }`}
         >
           <span
-            className={`h-6 w-6 rounded-full bg-white transition-transform duration-200 ${
-              enabled ? 'translate-x-6' : 'translate-x-0'
+            className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+              enabled ? 'translate-x-5' : 'translate-x-0'
             }`}
           />
         </button>
@@ -263,14 +261,14 @@ export function SupplementaryLeaveCard({
                       type="button"
                       disabled={!canPlan}
                       onClick={() => onDurationChange(typedValue)}
-                      className={`rounded-lg border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`rounded-lg border px-3 sm:px-4 py-3 text-left transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                         selected
-                          ? 'border-[#1d1d1f] bg-[#1d1d1f] text-white'
+                          ? 'border-brand-600 bg-brand-600 text-white'
                           : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-[#fafafc]'
                       }`}
                     >
                       <span className="block text-base font-semibold">{value} mois</span>
-                      <span className={`mt-1 block text-xs font-medium ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
+                      <span className={`mt-1 block text-xs font-medium ${selected ? 'text-brand-100' : 'text-slate-500'}`}>
                         {value === 1 ? 'Projection courte' : 'Projection complète'}
                       </span>
                     </button>
@@ -308,14 +306,14 @@ export function SupplementaryLeaveCard({
                           type="button"
                           disabled={!canPlan}
                           onClick={() => onModeChange(option)}
-                          className={`rounded-lg border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`rounded-lg border px-3 sm:px-4 py-3 text-left transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                             selected
-                              ? 'border-[#1d1d1f] bg-[#1d1d1f] text-white'
+                              ? 'border-brand-600 bg-brand-600 text-white'
                               : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-[#fafafc]'
                           }`}
                         >
                           <span className="block text-sm font-semibold">{label}</span>
-                          <span className={`mt-1 block text-xs font-medium ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
+                          <span className={`mt-1 block text-xs font-medium ${selected ? 'text-brand-100' : 'text-slate-500'}`}>
                             {hint}
                           </span>
                         </button>

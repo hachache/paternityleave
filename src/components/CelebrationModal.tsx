@@ -57,13 +57,7 @@ export function CelebrationModal({
     previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
 
     const focusDialog = () => {
-      if (!dialogRef.current) return;
-      const focusable =
-        dialogRef.current.querySelector<HTMLElement>('[data-autofocus]') ??
-        dialogRef.current.querySelector<HTMLElement>(
-          'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'
-        );
-      focusable?.focus();
+      dialogRef.current?.focus();
     };
 
     const frame = requestAnimationFrame(focusDialog);
@@ -151,7 +145,7 @@ export function CelebrationModal({
             onClick={() => dismissWithAnimation(onClose)}
           >
             <motion.div
-              className="relative max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-[18px] bg-white p-5 shadow-soft sm:p-8"
+              className="relative max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-[18px] bg-white p-5 shadow-elevated sm:p-8"
               initial={shouldReduce ? false : { opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
@@ -207,7 +201,6 @@ export function CelebrationModal({
                       onClick={() => dismissWithAnimation(onGoToSupplementary)}
                       variant="primary"
                       fullWidth
-                      data-autofocus
                     >
                       Configurer le congé supplémentaire
                     </Button>
@@ -216,7 +209,6 @@ export function CelebrationModal({
                     onClick={() => dismissWithAnimation(onGoToLetter)}
                     variant={showSupplementaryAction ? 'outline' : 'primary'}
                     fullWidth
-                    data-autofocus={!showSupplementaryAction}
                   >
                     {showSupplementaryAction ? 'Générer le courrier employeur' : 'Générer le courrier'}
                   </Button>

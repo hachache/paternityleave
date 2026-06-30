@@ -35,7 +35,7 @@
 
 @layer components {
   .premium-card {
-    @apply relative overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-none transition-colors duration-200;
+    @apply relative overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-card transition-[border-color,box-shadow] duration-200;
   }
 
   @media (hover: hover) {
