@@ -168,12 +168,12 @@ function App() {
 
   const handleShowLegalReferences = () => {
     setShowLegalReferences(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: shouldReduce ? 'auto' : 'smooth' });
   };
 
   const handleHideLegalReferences = () => {
     setShowLegalReferences(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: shouldReduce ? 'auto' : 'smooth' });
   };
 
   const handleGoToSupplementaryLeave = () => {
@@ -468,7 +468,7 @@ function App() {
                 fullWidth
                 className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
               >
-                <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+                <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
                 Recommencer la planification
               </Button>
             </motion.div>
@@ -603,7 +603,7 @@ function App() {
           </div>
 
           {/* Signature Badge */}
-          <div className="flex items-center gap-2 px-5 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm transition-transform hover:scale-105 hover:bg-white">
+          <div className="flex items-center gap-2 px-5 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm transition-colors duration-200 hover:bg-white">
             <span className="text-xs text-slate-500 font-medium">Créé par</span>
             <a
               href="https://www.linkedin.com/in/hedi-a-2382551a1/"
@@ -621,7 +621,7 @@ function App() {
             <span>© {currentYear}</span>
             <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => window.scrollTo({ top: 0, behavior: shouldReduce ? 'auto' : 'smooth' })}
               className="inline-flex min-h-10 items-center px-2 transition-colors hover:text-brand-600"
             >
               Remonter ↑

@@ -183,7 +183,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
         >
           <nav
             aria-label="Navigation de la page"
-            className="pointer-events-auto flex w-full max-w-md justify-between gap-1 rounded-full border border-slate-200 bg-[#f5f5f7]/95 px-1.5 py-1.5 shadow-none backdrop-blur-xl sm:w-auto sm:max-w-none sm:justify-start sm:gap-1 sm:px-2 sm:py-2"
+            className="pointer-events-auto flex w-full max-w-md justify-between gap-1 rounded-full border border-slate-200 bg-[#f5f5f7]/95 px-1.5 py-1.5 shadow-none backdrop-blur-md sm:w-auto sm:max-w-none sm:justify-start sm:gap-1 sm:px-2 sm:py-2"
             style={{
               transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
             }}

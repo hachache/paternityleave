@@ -22,7 +22,7 @@ export function HeroHeader({ hasBirthDate, onResetRequest }: HeroHeaderProps) {
           onClick={onResetRequest}
           className={`group flex min-h-10 min-w-10 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-0 py-0 text-sm font-normal text-slate-600 transition-colors duration-200 hover:border-slate-300 hover:text-brand-600 active:scale-95 sm:px-4 sm:py-2 ${!hasBirthDate ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         >
-          <RotateCcw className="w-4 h-4 group-hover:-rotate-180 transition-transform duration-500" />
+          <RotateCcw className="w-4 h-4 transition-transform duration-200 group-hover:-rotate-45" />
           <span className="hidden sm:inline">Réinitialiser</span>
         </button>
       </div>
@@ -32,7 +32,7 @@ export function HeroHeader({ hasBirthDate, onResetRequest }: HeroHeaderProps) {
           type="button"
           onClick={onResetRequest}
           aria-label="Réinitialiser le simulateur"
-          className={`relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-950 text-white shadow-card transition-transform duration-200 hover:scale-[1.01] active:scale-95 sm:h-16 sm:w-16 ${hasBirthDate ? 'cursor-pointer' : 'cursor-default'}`}
+          className={`relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-950 text-white shadow-card transition-colors duration-200 active:scale-95 sm:h-16 sm:w-16 ${hasBirthDate ? 'cursor-pointer hover:bg-slate-800' : 'cursor-default'}`}
           title={hasBirthDate ? 'Cliquer pour réinitialiser' : 'Calendrier'}
         >
           <CalendarIcon className="h-5 w-5 sm:h-8 sm:w-8" strokeWidth={1.75} aria-hidden="true" />

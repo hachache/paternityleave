@@ -11,7 +11,7 @@ export function ScrollIndicator({ show }: ScrollIndicatorProps) {
   // Track whether indicator should be visually shown,
   // but keep a fixed-height wrapper to avoid layout shifts.
   const [visible, setVisible] = useState(false);
-  const { shouldReduce, transition } = useAppMotion();
+  const { transition } = useAppMotion();
 
   useEffect(() => {
     setVisible(show);
@@ -37,12 +37,7 @@ export function ScrollIndicator({ show }: ScrollIndicatorProps) {
   return (
     <div className="flex justify-center mb-6 h-8" aria-hidden={!visible}>
       <motion.div animate={{ opacity: visible ? 1 : 0 }} transition={transition}>
-        <motion.div
-          animate={shouldReduce ? undefined : { y: [0, -4, 0] }}
-          transition={shouldReduce ? undefined : { duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <ChevronDown className="w-6 h-6 text-slate-400" />
-        </motion.div>
+        <ChevronDown className="w-6 h-6 text-slate-400" />
       </motion.div>
     </div>
   );

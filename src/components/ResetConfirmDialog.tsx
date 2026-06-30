@@ -23,7 +23,7 @@ export function ResetConfirmDialog({ open, onCancel, onConfirm }: ResetConfirmDi
       transition={transition}
     >
       <motion.div
-        className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 transform transition-all border border-white/50"
+        className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 transform border border-white/50"
         initial={{ opacity: 0, scale: shouldReduce ? 1 : 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={transition}

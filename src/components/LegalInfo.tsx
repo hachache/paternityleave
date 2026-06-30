@@ -11,14 +11,14 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
   const multiplesBonus = multiples.fractionableDays - standard.fractionableDays;
 
   return (
-    <details className="bg-white border border-slate-200 rounded-2xl shadow-md hover:shadow-lg transition-apple-smooth">
-      <summary className="cursor-pointer p-6 hover:bg-slate-100 transition-apple-smooth flex items-center gap-3 active:scale-[0.99] rounded-2xl">
+    <details className="bg-white border border-slate-200 rounded-2xl shadow-soft transition-[border-color,box-shadow] duration-200 hover:border-slate-300">
+      <summary className="cursor-pointer p-6 hover:bg-slate-100 transition-colors duration-200 flex items-center gap-3 active:scale-[0.99] rounded-2xl">
         <div className="p-2 rounded-xl bg-slate-900 text-white">
           <BookOpen className="w-5 h-5 flex-shrink-0" />
         </div>
         <span className="text-base font-bold text-slate-800">Cadre légal</span>
       </summary>
-      <div className="px-6 pb-6 animate-slide-in space-y-4">
+      <div className="px-6 pb-6 space-y-4">
         {/* Avertissement perimetre de l'application */}
         <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-xl flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -42,7 +42,7 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
         </div>
 
         <ul className="space-y-3 text-sm text-slate-700">
-          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
+          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl transition-colors duration-200 hover:bg-white">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">3 jours</span>
             <div className="flex-1">
               <span className="font-medium">ouvrables à la charge de l'employeur</span>
@@ -51,7 +51,7 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
               </p>
             </div>
           </li>
-          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
+          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl transition-colors duration-200 hover:bg-white">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">4 jours</span>
             <div className="flex-1">
               <span className="font-medium">calendaires obligatoires immédiatement après</span>
@@ -60,7 +60,7 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
               </p>
             </div>
           </li>
-          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
+          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl transition-colors duration-200 hover:bg-white">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">{standard.fractionableDays} jours</span>
             <div className="flex-1">
               <span className="font-medium">
@@ -71,13 +71,13 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
               </p>
             </div>
           </li>
-          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
+          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl transition-colors duration-200 hover:bg-white">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">+{multiplesBonus} jours</span>
             <div className="flex-1">
               <span className="font-medium">calendaires en cas de naissances multiples (soit {multiples.fractionableDays} jours fractionnables)</span>
             </div>
           </li>
-          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl hover:bg-white transition-apple-smooth">
+          <li className="flex gap-3 items-start p-3 bg-white/60 rounded-xl transition-colors duration-200 hover:bg-white">
             <span className="font-bold text-slate-900 min-w-[4rem] text-base">Hospitalisation</span>
             <span className="font-medium">
               congé spécifique et reports possibles selon justificatifs, non calculés automatiquement ici
@@ -89,7 +89,7 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
               régime spécifique non simulé ici. Consultez la fiche Service-Public dédiée au congé d’adoption.
             </span>
           </li>
-          <li className="flex gap-3 items-start p-3 bg-blue-50/60 rounded-xl hover:bg-blue-50 transition-apple-smooth border border-blue-100">
+          <li className="flex gap-3 items-start p-3 bg-blue-50/60 rounded-xl transition-colors duration-200 hover:bg-blue-50 border border-blue-100">
             <span className="font-bold text-blue-700 min-w-[4rem] text-base">+1 à 2 mois</span>
             <div className="flex-1">
               <span className="font-medium text-blue-900">
@@ -110,7 +110,7 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
             <button
               type="button"
               onClick={onShowLegalReferences}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-all hover:shadow-md font-medium text-sm"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-colors duration-200 font-medium text-sm"
             >
               <Scale className="w-4 h-4" />
               Consulter toutes les références légales

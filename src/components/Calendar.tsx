@@ -372,7 +372,7 @@ export function Calendar({
         <button
           type="button"
           onClick={previousMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-2.5 rounded-xl text-slate-500 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois précédent"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -385,7 +385,7 @@ export function Calendar({
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-2.5 rounded-xl text-slate-500 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois suivant"
         >
           <ChevronRight className="h-6 w-6" />

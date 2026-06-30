@@ -1,6 +1,8 @@
 import { useReducedMotion } from 'framer-motion';
 import type { Transition, Variants } from 'framer-motion';
 
+export const appleEase = [0.16, 1, 0.3, 1] as const;
+
 export const springs = {
   soft: { type: 'spring', stiffness: 260, damping: 26 },
   snappy: { stiffness: 400, damping: 30 },
@@ -38,6 +40,6 @@ export function useAppMotion(): { shouldReduce: boolean; transition: Transition 
 
   return {
     shouldReduce,
-    transition: shouldReduce ? { duration: 0 } : springs.soft
+    transition: shouldReduce ? { duration: 0 } : { duration: 0.32, ease: appleEase }
   };
 }

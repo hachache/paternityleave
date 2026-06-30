@@ -93,7 +93,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
                 </motion.div>
 
                 <div
-                  className={`mt-2 sm:mt-3 text-center transition-all duration-500 px-0.5 ${
+                  className={`mt-2 sm:mt-3 text-center transition-[opacity,transform,color] duration-300 px-0.5 ${
                     isCurrent ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-80'
                   }`}
                 >

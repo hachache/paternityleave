@@ -257,7 +257,7 @@ export function LegalReferences() {
               href={ref.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`block p-5 border-2 rounded-xl hover:shadow-md transition-all ${getCategoryColor(ref.category)}`}
+              className={`block p-5 border-2 rounded-xl transition-[border-color,background-color,box-shadow] duration-200 hover:shadow-md ${getCategoryColor(ref.category)}`}
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
@@ -305,7 +305,7 @@ export function LegalReferences() {
               href={ref.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`block p-5 border-2 rounded-xl hover:shadow-md transition-all ${getCategoryColor(ref.category)}`}
+              className={`block p-5 border-2 rounded-xl transition-[border-color,background-color,box-shadow] duration-200 hover:shadow-md ${getCategoryColor(ref.category)}`}
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
