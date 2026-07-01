@@ -1,7 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import { LEAVE_SCENARIOS, LeaveScenarioConfig, LeaveScenarioId } from '../utils/paternityLeave';
 import { FRACTIONABLE_PERIODS_HINT } from '../utils/scenarioVocabulary';
-import { springs, useAppMotion } from '../lib/motion';
 
 interface ScenarioSelectorProps {
   selectedScenario: LeaveScenarioId;
@@ -21,8 +19,6 @@ function formatScenarioDetails(config: LeaveScenarioConfig) {
 
 export function ScenarioSelector({ selectedScenario, onScenarioChange }: ScenarioSelectorProps) {
   const scenarios = Object.values(LEAVE_SCENARIOS);
-  const { shouldReduce } = useAppMotion();
-  const cardTransition = shouldReduce ? { duration: 0 } : springs.snappy;
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const currentIndex = scenarios.findIndex(s => s.id === selectedScenario);
@@ -54,16 +50,13 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
         const details = formatScenarioDetails(config);
 
         return (
-          <motion.button
+          <button
             key={config.id}
             type="button"
             role="radio"
             aria-checked={isSelected}
             onClick={() => onScenarioChange(config.id)}
-            whileHover={shouldReduce ? undefined : { y: -2 }}
-            whileTap={shouldReduce ? undefined : { scale: 0.98 }}
-            transition={cardTransition}
-            className={`group relative rounded-2xl sm:rounded-3xl p-3 sm:p-6 text-left transition-[background-color,border-color,box-shadow,transform] duration-200 h-full flex flex-col border ${isSelected ? 'col-span-2 sm:col-span-1' : ''} ${
+            className={`group relative rounded-2xl sm:rounded-card p-3 sm:p-6 text-left transition-colors duration-200 h-full flex flex-col border active:scale-[0.98] hover-lift ${
               isSelected
                 ? 'border-brand-500 bg-brand-50/50 shadow-md shadow-brand-500/10 sm:border-transparent sm:shadow-lg'
                 : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
@@ -71,7 +64,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
           >
             {isSelected && (
               <div
-                className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl border-2 border-brand-500 hidden sm:block"
+                className="pointer-events-none absolute inset-0 rounded-card border-2 border-brand-500 hidden sm:block"
               />
             )}
             {/* Selection Indicator */}
@@ -87,7 +80,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                     </span>
                   )}
                 </div>
-                <p className={`text-xs sm:text-lg text-slate-700 font-medium leading-relaxed ${isSelected ? 'line-clamp-2 sm:line-clamp-none' : 'hidden sm:block sm:line-clamp-none'}`}>
+                <p className={`text-xs sm:text-lg text-slate-700 font-medium leading-relaxed ${isSelected ? 'line-clamp-2 sm:line-clamp-none' : 'line-clamp-2 sm:line-clamp-none'}`}>
                   {config.description}
                 </p>
               </div>
@@ -96,24 +89,11 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                   isSelected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-200 group-hover:border-brand-300'
                 }`}
               >
-                <AnimatePresence initial={false}>
-                  {isSelected && (
-                    <motion.span
-                      key="selected-check"
-                      className="text-xs font-bold"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      transition={cardTransition}
-                    >
-                      ✓
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+                {isSelected && <span className="text-xs font-bold">✓</span>}
               </div>
             </div>
 
-            <div className={`mt-auto pt-2.5 sm:pt-4 border-t border-slate-100/50 grid grid-cols-2 gap-2 sm:gap-3 ${isSelected ? '' : 'hidden sm:grid'}`}>
+            <div className="mt-auto pt-2.5 sm:pt-4 border-t border-slate-100/50 grid grid-cols-1 min-[420px]:grid-cols-2 gap-2 sm:gap-3">
               <div className={`rounded-xl p-2.5 sm:p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
                 <p className="font-bold text-slate-900 text-xs sm:text-sm">{details.totalText}</p>
                 {details.bonusText && (
@@ -130,7 +110,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                 </p>
               </div>
             </div>
-          </motion.button>
+          </button>
         );
       })}
     </div>

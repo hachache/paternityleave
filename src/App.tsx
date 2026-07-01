@@ -1,11 +1,8 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Linkedin, Trash2 } from 'lucide-react';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { useScrollOrchestrator } from './hooks/useScrollOrchestrator';
 import { Calendar } from './components/Calendar';
-import { Summary } from './components/Summary';
-import { LegalInfo } from './components/LegalInfo';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { ProgressStepper } from './components/ProgressStepper';
@@ -13,17 +10,19 @@ import { CalendarLegend } from './components/CalendarLegend';
 import { SectionCard } from './components/SectionCard';
 import { NextStepsCard } from './components/NextStepsCard';
 import { NavigationAnchor } from './components/NavigationAnchor';
-import { PostPlanningNavBar } from './components/PostPlanningNavBar';
 import { ScenarioSelector } from './components/ScenarioSelector';
 import { Button } from './components/Button';
 import { ResetConfirmDialog } from './components/ResetConfirmDialog';
 import { HeroHeader } from './components/HeroHeader';
 import { PlanningModeSelector } from './components/PlanningModeSelector';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
-import { fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
+import { useAppMotion } from './lib/motion';
+import { scrollToTop } from './lib/scroll';
 
 // Lazy-loaded components (non-critiques pour l'affichage initial)
 const LetterGenerator = lazy(() => import('./components/LetterGenerator').then(m => ({ default: m.LetterGenerator })));
+const Summary = lazy(() => import('./components/Summary').then(m => ({ default: m.Summary })));
+const LegalInfo = lazy(() => import('./components/LegalInfo').then(m => ({ default: m.LegalInfo })));
 const LegalReferences = lazy(() => import('./components/LegalReferences').then(m => ({ default: m.LegalReferences })));
 const SupplementaryLeaveCard = lazy(() => import('./components/SupplementaryLeaveCard').then(m => ({ default: m.SupplementaryLeaveCard })));
 const CelebrationModal = lazy(() => import('./components/CelebrationModal').then(m => ({ default: m.CelebrationModal })));
@@ -31,7 +30,7 @@ const CelebrationModal = lazy(() => import('./components/CelebrationModal').then
 /** Skeleton de chargement pour les composants lazy */
 function LazyFallback({ height = 'h-64' }: { height?: string }) {
   return (
-    <div className={`${height} rounded-2xl sm:rounded-[1.5rem] bg-white/60 border border-slate-200 animate-pulse flex items-center justify-center`}>
+    <div className={`${height} rounded-card bg-white/60 border border-slate-200 animate-pulse flex items-center justify-center`}>
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-slate-200" />
         <div className="w-32 h-3 rounded-full bg-slate-200" />
@@ -46,7 +45,7 @@ function App() {
   const [calendarHighlight, setCalendarHighlight] = useState(false);
   const calendarHighlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
-  const { allowDecorativeMotion, shouldReduce, transition } = useAppMotion();
+  const { shouldReduce } = useAppMotion();
   const {
     birthDate,
     employerPeriod,
@@ -130,63 +129,63 @@ function App() {
     skipAutoScrollOnPlanningComplete: celebrationPendingOnPlanningComplete
   });
 
-  const handleSelectBirthDate = (date: Date) => {
+  const handleSelectBirthDate = useCallback((date: Date) => {
     selectBirthDate(date);
     // Scrolling is deferred until planning section is mounted (effect below)
-  };
+  }, [selectBirthDate]);
 
-  const handleSelectRemainingDay = (date: Date) => {
+  const handleSelectRemainingDay = useCallback((date: Date) => {
     selectRemainingDay(date);
-  };
+  }, [selectRemainingDay]);
 
-  const handleResetRequest = () => {
+  const handleResetRequest = useCallback(() => {
     requestReset();
-  };
+  }, [requestReset]);
 
-  const handleResetConfirm = () => {
+  const handleResetConfirm = useCallback(() => {
     confirmReset();
-  };
+  }, [confirmReset]);
 
-  const handleResetCancel = () => {
+  const handleResetCancel = useCallback(() => {
     cancelReset();
-  };
+  }, [cancelReset]);
 
-  const handleRemoveBlock = (index: number) => {
+  const handleRemoveBlock = useCallback((index: number) => {
     removeBlock(index);
-  };
+  }, [removeBlock]);
 
-  const handleClearAllBlocks = () => {
+  const handleClearAllBlocks = useCallback(() => {
     setShowClearBlocksConfirm(true);
-  };
+  }, []);
 
-  const handleClearAllBlocksConfirm = () => {
+  const handleClearAllBlocksConfirm = useCallback(() => {
     clearAllBlocks();
     setShowClearBlocksConfirm(false);
-  };
+  }, [clearAllBlocks]);
 
-  const handleClearAllBlocksCancel = () => {
+  const handleClearAllBlocksCancel = useCallback(() => {
     setShowClearBlocksConfirm(false);
-  };
+  }, []);
 
-  const handleStartVisualSelection = () => {
+  const handleStartVisualSelection = useCallback(() => {
     startVisualSelection();
     scheduleSmoothScroll(calendarRef);
-  };
+  }, [calendarRef, scheduleSmoothScroll, startVisualSelection]);
 
-  const handleActivateCustomMode = () => {
+  const handleActivateCustomMode = useCallback(() => {
     setCustomMode(true);
     scheduleSmoothScroll(customModeRef);
-  };
+  }, [customModeRef, scheduleSmoothScroll, setCustomMode]);
 
-  const handleCancelCustomMode = () => {
+  const handleCancelCustomMode = useCallback(() => {
     setCustomMode(false);
-  };
+  }, [setCustomMode]);
 
-  const handleCustomFirstBlockDaysChange = (days: number) => {
+  const handleCustomFirstBlockDaysChange = useCallback((days: number) => {
     setCustomFirstBlockDays(days);
-  };
+  }, [setCustomFirstBlockDays]);
 
-  const handleFocusCalendar = () => {
+  const handleFocusCalendar = useCallback(() => {
     scheduleSmoothScroll(calendarRef);
     setCalendarHighlight(true);
     if (calendarHighlightTimer.current) {
@@ -196,7 +195,7 @@ function App() {
       setCalendarHighlight(false);
       calendarHighlightTimer.current = null;
     }, 2500);
-  };
+  }, [calendarRef, scheduleSmoothScroll]);
 
   useEffect(() => {
     return () => {
@@ -206,32 +205,32 @@ function App() {
     };
   }, []);
 
-  const handleCancelVisualSelection = () => {
+  const handleCancelVisualSelection = useCallback(() => {
     cancelVisualSelection();
-  };
+  }, [cancelVisualSelection]);
 
-  const handleShowLegalReferences = () => {
+  const handleShowLegalReferences = useCallback(() => {
     setShowLegalReferences(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    scrollToTop(shouldReduce);
+  }, [shouldReduce]);
 
-  const handleHideLegalReferences = () => {
+  const handleHideLegalReferences = useCallback(() => {
     setShowLegalReferences(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    scrollToTop(shouldReduce);
+  }, [shouldReduce]);
 
-  const handleGoToSupplementaryLeave = () => {
+  const handleGoToSupplementaryLeave = useCallback(() => {
     hideCelebration();
     scheduleSmoothScroll(supplementaryLeaveRef);
-  };
+  }, [hideCelebration, scheduleSmoothScroll, supplementaryLeaveRef]);
 
-  const handleGoToLetter = () => {
+  const handleGoToLetter = useCallback(() => {
     hideCelebration();
     scheduleSmoothScroll(letterRef);
-  };
+  }, [hideCelebration, letterRef, scheduleSmoothScroll]);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    scrollToTop(true);
   }, [showLegalReferences]);
 
   // If showing legal references, render that view instead
@@ -274,26 +273,17 @@ function App() {
 
       <main id={mainContentId} className="flex-1 relative z-10">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
-          <motion.div
-            className="space-y-0"
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer(shouldReduce ? 0 : 0.04)}
-          >
+          <div className="space-y-0">
             <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
-            <ScrollIndicator show={birthDate !== null} />
+            <ScrollIndicator show={birthDate !== null && !hasScrolledPastStart} />
 
             <NavigationAnchor
               show={birthDate !== null && hasScrolledPastStart}
               showSupplementaryLink={isPaternityPlanComplete && isEligibleForSupplementaryLeave}
             />
 
-            <motion.div
-              className="max-w-3xl mx-auto mb-8 sm:mb-12"
-              variants={fadeInUp}
-              transition={transition}
-            >
+            <div className="reveal max-w-3xl mx-auto mb-8 sm:mb-12">
               <SectionCard
                 title="Votre situation"
                 description="Adaptez le calendrier à votre cas spécifique"
@@ -301,39 +291,26 @@ function App() {
               >
                 <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={handleScenarioChange} />
               </SectionCard>
-            </motion.div>
+            </div>
 
-            <motion.div className="max-w-3xl mx-auto mb-8 sm:mb-12" variants={fadeInUp} transition={transition}>
+            <div className="reveal max-w-3xl mx-auto mb-8 sm:mb-12">
               <ProgressStepper
                 currentStep={planningStep}
                 fractionableDays={totalFractionableDays}
                 scenario={scenario}
               />
               {birthDate && (
-                <motion.p
-                  className={`mt-4 text-center text-sm font-medium text-slate-500 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm ${
-                    shouldReduce ? 'bg-white' : 'bg-white/50 backdrop-blur-sm'
-                  }`}
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeIn}
-                  transition={transition}
-                >
+                <p className="reveal-subtle mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm">
                   {totalPlannedDays} / {totalFractionableDays} jours planifiés
-                </motion.p>
+                </p>
               )}
-            </motion.div>
+            </div>
 
-            <motion.div
+            <div
               ref={calendarRef}
               id="calendar"
-              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-2xl sm:rounded-[2rem] transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
-              variants={fadeInUp}
-              transition={transition}
+              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
             >
-              {allowDecorativeMotion && (
-                <div className="absolute inset-0 -z-10 hidden bg-brand-500/5 blur-3xl rounded-[2rem] transform scale-105 sm:block"></div>
-              )}
               <Calendar
                 birthDate={birthDate}
                 onSelectBirthDate={handleSelectBirthDate}
@@ -345,13 +322,9 @@ function App() {
                 scenario={scenario}
               />
               <CalendarLegend scenario={scenario} />
-            </motion.div>
+            </div>
 
-            <motion.div
-              className="max-w-3xl mx-auto mb-12"
-              variants={fadeInUp}
-              transition={transition}
-            >
+            <div className="reveal max-w-3xl mx-auto mb-12">
               <SectionCard
                 title="Prochaines étapes"
                 description="Votre guide pour finaliser la demande"
@@ -373,23 +346,25 @@ function App() {
                   scenario={scenario}
                 />
               </SectionCard>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
-        <Suspense fallback={<LazyFallback height="h-48" />}>
-          <CelebrationModal
-            show={showCelebration}
-            onClose={() => {
-              hideCelebration();
-              schedulePostPlanningScroll();
-            }}
-            totalFractionableDays={totalFractionableDays}
-            scenario={scenario}
-            showSupplementaryAction={isEligibleForSupplementaryLeave}
-            onGoToSupplementary={handleGoToSupplementaryLeave}
-            onGoToLetter={handleGoToLetter}
-          />
-        </Suspense>
+        {showCelebration && (
+          <Suspense fallback={null}>
+            <CelebrationModal
+              show={showCelebration}
+              onClose={() => {
+                hideCelebration();
+                schedulePostPlanningScroll();
+              }}
+              totalFractionableDays={totalFractionableDays}
+              scenario={scenario}
+              showSupplementaryAction={isEligibleForSupplementaryLeave}
+              onGoToSupplementary={handleGoToSupplementaryLeave}
+              onGoToLetter={handleGoToLetter}
+            />
+          </Suspense>
+        )}
 
         <ResetConfirmDialog
           open={showResetConfirm}
@@ -414,13 +389,9 @@ function App() {
         />
 
         {(error || (successMessage && !visualSelectionMode)) && (
-          <motion.div
+          <div
             key="feedback"
-            className="max-w-3xl mx-auto space-y-4 mb-8 overflow-hidden"
-            initial={isCoarsePointer ? false : 'hidden'}
-            animate="visible"
-            variants={fadeInUp}
-            transition={transition}
+            className="reveal-subtle max-w-3xl mx-auto space-y-4 mb-8 overflow-hidden"
           >
             {error && (
               <FeedbackBanner
@@ -437,56 +408,50 @@ function App() {
                 message={successMessage}
               />
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Bannière d'instruction pour le mode sélection visuelle */}
         {visualSelectionMode && selectionStep !== 'idle' && (
-          <motion.div
+          <div
             key="visual-selection-banner"
-            className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30 overflow-hidden"
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            transition={transition}
+            className="reveal-subtle fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 max-w-3xl sm:sticky sm:inset-x-auto sm:bottom-auto sm:top-24 sm:z-30 sm:mx-auto sm:mb-6 overflow-hidden"
           >
-            <div className={`rounded-2xl border border-brand-200 p-4 sm:p-5 shadow-lg shadow-brand-900/5 ring-1 ring-black/5 ${
-              shouldReduce ? 'bg-white' : 'bg-white/95 backdrop-blur-xl'
-            }`}>
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-lg sm:text-xl shadow-md shadow-brand-500/20">
-                      {selectionStep === 'selecting-start' ? '1' : '2'}
-                    </div>
+            <div className="rounded-card border border-brand-200 bg-white/95 backdrop-blur-md p-4 sm:p-5 shadow-card ring-1 ring-black/5">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-lg sm:text-xl shadow-md shadow-brand-500/20">
+                    {selectionStep === 'selecting-start' ? '1' : '2'}
                   </div>
-                  <div className="flex-1">
-                    <h4 className="text-base sm:text-lg font-bold text-brand-900 mb-1 font-display">
-                      {selectionStep === 'selecting-start'
-                        ? 'Sélectionnez le DÉBUT'
-                        : 'Sélectionnez la FIN'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-brand-700 font-medium">
-                      {selectionStep === 'selecting-start'
-                        ? 'Cliquez sur la première date de votre période'
-                        : `Cliquez sur la dernière date (min. 5 jours)`}
-                    </p>
-                    {selectionStartDate && selectionStep === 'selecting-end' && (
-                      <div className="mt-2 inline-flex px-3 py-1 bg-white rounded-lg text-xs font-bold text-brand-700 shadow-sm border border-brand-100">
-                        Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                      </div>
-                    )}
-                  </div>
-                  <Button
-                    onClick={handleCancelVisualSelection}
-                    variant="secondary"
-                    size="sm"
-                    className="bg-white hover:bg-white shadow-sm"
-                  >
-                    Annuler
-                  </Button>
                 </div>
+                <div className="flex-1">
+                  <h4 className="text-base sm:text-lg font-bold text-brand-900 mb-1 font-display">
+                    {selectionStep === 'selecting-start'
+                      ? 'Sélectionnez le DÉBUT'
+                      : 'Sélectionnez la FIN'}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-brand-700 font-medium">
+                    {selectionStep === 'selecting-start'
+                      ? 'Cliquez sur la première date de votre période'
+                      : `Cliquez sur la dernière date (min. 5 jours)`}
+                  </p>
+                  {selectionStartDate && selectionStep === 'selecting-end' && (
+                    <div className="mt-2 inline-flex px-3 py-1 bg-white rounded-lg text-xs font-bold text-brand-700 shadow-sm border border-brand-100">
+                      Début : {selectionStartDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    </div>
+                  )}
+                </div>
+                <Button
+                  onClick={handleCancelVisualSelection}
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white hover:bg-white shadow-sm"
+                >
+                  Annuler
+                </Button>
               </div>
-          </motion.div>
+            </div>
+          </div>
         )}
 
         <PlanningModeSelector
@@ -511,13 +476,9 @@ function App() {
 
         {/* Bouton Effacer tous les blocs */}
         {remainingBlocks.length > 0 && (
-          <motion.div
+          <div
             key="clear-all-blocks"
-            className="max-w-3xl mx-auto mb-12 overflow-hidden"
-            initial={isCoarsePointer ? false : 'hidden'}
-            animate="visible"
-            variants={fadeIn}
-            transition={transition}
+            className="reveal-subtle max-w-3xl mx-auto mb-12 overflow-hidden"
           >
             <Button
               onClick={handleClearAllBlocks}
@@ -526,35 +487,18 @@ function App() {
               fullWidth
               className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
             >
-              <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+              <Trash2 className="mr-2 h-4 w-4 hover-scale-icon" aria-hidden="true" />
               Effacer mes périodes
             </Button>
-          </motion.div>
-        )}
-
-        {isPaternityPlanComplete && (
-          <motion.div
-            key="post-planning-nav"
-            className="overflow-hidden"
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            transition={transition}
-          >
-            <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
-          </motion.div>
+          </div>
         )}
 
         {birthDate && isPaternityPlanComplete && (
-          <motion.div
+          <div
             key="supplementary-leave-card"
             ref={supplementaryLeaveRef}
             id="conge-supplementaire"
-            className="max-w-3xl mx-auto mb-12 overflow-hidden"
-            initial={isCoarsePointer ? false : 'hidden'}
-            animate="visible"
-            variants={fadeInUp}
-            transition={transition}
+            className="reveal-subtle content-auto max-w-3xl mx-auto mb-12 overflow-hidden"
           >
             <Suspense fallback={<LazyFallback height="h-[400px]" />}>
               <SupplementaryLeaveCard
@@ -575,44 +519,38 @@ function App() {
                 onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
               />
             </Suspense>
-          </motion.div>
+          </div>
         )}
 
         {birthDate && (
-          <motion.div
+          <div
             key="summary"
-            className="max-w-3xl mx-auto mb-12 overflow-hidden"
+            className="reveal-subtle content-auto max-w-3xl mx-auto mb-12 overflow-hidden"
             id="summary"
-            initial={isCoarsePointer ? false : 'hidden'}
-            animate="visible"
-            variants={fadeInUp}
-            transition={transition}
           >
-            <Summary
-              birthDate={birthDate}
-              employerPeriod={employerPeriod}
-              mandatoryPeriod={mandatoryPeriod}
-              remainingBlocks={remainingBlocks}
-              onRemoveBlock={handleRemoveBlock}
-              totalFractionableDays={totalFractionableDays}
-              scenario={scenario}
-              supplementaryLeavePeriods={supplementaryLeavePeriods}
-              supplementaryLeaveDuration={supplementaryLeaveDuration}
-              supplementaryLeaveMode={supplementaryLeaveMode}
-            />
-          </motion.div>
+            <Suspense fallback={<LazyFallback height="h-[420px]" />}>
+              <Summary
+                birthDate={birthDate}
+                employerPeriod={employerPeriod}
+                mandatoryPeriod={mandatoryPeriod}
+                remainingBlocks={remainingBlocks}
+                onRemoveBlock={handleRemoveBlock}
+                totalFractionableDays={totalFractionableDays}
+                scenario={scenario}
+                supplementaryLeavePeriods={supplementaryLeavePeriods}
+                supplementaryLeaveDuration={supplementaryLeaveDuration}
+                supplementaryLeaveMode={supplementaryLeaveMode}
+              />
+            </Suspense>
+          </div>
         )}
 
         {birthDate && mandatoryPeriod && (
-          <motion.div
+          <div
             key="letter-generator"
             ref={letterRef}
-            className="max-w-3xl mx-auto mb-12 overflow-hidden"
+            className="reveal-subtle content-auto max-w-3xl mx-auto mb-12 overflow-hidden"
             id="letter"
-            initial={isCoarsePointer ? false : 'hidden'}
-            animate="visible"
-            variants={fadeInUp}
-            transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
           >
             <Suspense fallback={<LazyFallback height="h-[600px]" />}>
               <LetterGenerator
@@ -626,11 +564,13 @@ function App() {
                 supplementaryLeaveMode={supplementaryLeaveMode}
               />
             </Suspense>
-          </motion.div>
+          </div>
         )}
 
-          <div className="mt-24 max-w-3xl mx-auto mb-16" id="legal">
-            <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
+          <div className="content-auto mt-24 max-w-3xl mx-auto mb-16" id="legal">
+            <Suspense fallback={<LazyFallback height="h-40" />}>
+              <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
+            </Suspense>
           </div>
         </div>
       </main>
@@ -648,7 +588,7 @@ function App() {
           </div>
 
           {/* Signature Badge */}
-          <div className="flex items-center gap-2 px-5 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm transition-transform hover:scale-105 hover:bg-white">
+          <div className="flex items-center gap-2 px-5 py-2 bg-slate-50 rounded-full border border-slate-100 shadow-sm transition-colors hover:bg-white">
             <span className="text-xs text-slate-500 font-medium">Créé par</span>
             <a
               href="https://www.linkedin.com/in/hedi-a-2382551a1/"
@@ -666,7 +606,7 @@ function App() {
             <span>© {currentYear}</span>
             <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => scrollToTop(shouldReduce)}
               className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-brand-600"
             >
               Remonter ↑

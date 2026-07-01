@@ -1,4 +1,4 @@
-import { useReducedMotion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import type { Transition, Variants } from 'framer-motion';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 
@@ -16,7 +16,12 @@ export const fadeInUp: Variants = {
 };
 
 export const expandIn: Variants = {
-  hidden: { opacity: 0, y: 8 },
+  hidden: { opacity: 0, y: -6 },
+  visible: { opacity: 1, y: 0 }
+};
+
+export const collapseFade: Variants = {
+  hidden: { opacity: 0, y: -4 },
   visible: { opacity: 1, y: 0 }
 };
 
@@ -75,12 +80,23 @@ export function getAppMotionPolicy({
 }
 
 export function useAppMotion(): AppMotionPolicy {
-  const prefersReducedMotion = Boolean(useReducedMotion());
+  const [shouldReduce, setShouldReduce] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const isNarrowViewport = useMediaQuery('(max-width: 900px)');
 
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setShouldReduce(media.matches);
+    updatePreference();
+    media.addEventListener('change', updatePreference);
+    return () => media.removeEventListener('change', updatePreference);
+  }, []);
+
   return getAppMotionPolicy({
-    prefersReducedMotion,
+    prefersReducedMotion: shouldReduce,
     isCoarsePointer,
     isNarrowViewport
   });

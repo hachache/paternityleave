@@ -140,7 +140,7 @@ export function usePaternityPlanning() {
     return 3;
   }, [birthDate, mandatoryPeriod, totalFractionableDays, totalPlannedDays]);
 
-  const selectBirthDate = (date: Date) => {
+  const selectBirthDate = useCallback((date: Date) => {
     const normalized = startOfDay(date);
     
     // Validation complete de la date de naissance
@@ -180,9 +180,9 @@ export function usePaternityPlanning() {
     setShowCelebration(false);
     hasShownCelebration.current = false;
     resetSupplementary();
-  };
+  }, [resetSupplementary, scenario]);
 
-  const selectRemainingDay = (date: Date) => {
+  const selectRemainingDay = useCallback((date: Date) => {
     const normalized = startOfDay(date);
     setError(null);
     setSuccessMessage(null);
@@ -390,36 +390,49 @@ export function usePaternityPlanning() {
       const blocDays = autoBlock.days;
       setSuccessMessage(`Bloc de ${blocDays} jours planifié. ${totalFractionableDays - totalUsedDays - autoBlock.days} jours restants.`);
     }
-  };
+  }, [
+    birthDate,
+    customFirstBlockDays,
+    customMode,
+    employerPeriod,
+    mandatoryPeriod,
+    maxFirstBlockLength,
+    remainingBlocks,
+    scenario,
+    selectionStartDate,
+    selectionStep,
+    totalFractionableDays,
+    visualSelectionMode
+  ]);
 
-  const handleScenarioChange = (id: LeaveScenarioId) => {
+  const handleScenarioChange = useCallback((id: LeaveScenarioId) => {
     if (birthDate || remainingBlocks.length > 0) {
       pendingScenarioRef.current = id;
       setShowScenarioConfirm(true);
     } else {
       setScenarioId(id);
     }
-  };
+  }, [birthDate, remainingBlocks.length]);
 
-  const confirmScenarioChange = () => {
+  const confirmScenarioChange = useCallback(() => {
     if (pendingScenarioRef.current) {
       setScenarioId(pendingScenarioRef.current);
       pendingScenarioRef.current = null;
     }
     setShowScenarioConfirm(false);
-  };
+  }, []);
 
-  const cancelScenarioChange = () => {
+  const cancelScenarioChange = useCallback(() => {
     pendingScenarioRef.current = null;
     setShowScenarioConfirm(false);
-  };
+  }, []);
 
-  const requestReset = () => {
+  const requestReset = useCallback(() => {
     if (!birthDate) return;
     setShowResetConfirm(true);
-  };
+  }, [birthDate]);
 
-  const confirmReset = () => {
+  const confirmReset = useCallback(() => {
     setBirthDate(null);
     setEmployerPeriod(null);
     setMandatoryPeriod(null);
@@ -434,18 +447,18 @@ export function usePaternityPlanning() {
     setSelectionStep('idle');
     setSelectionStartDate(null);
     resetSupplementary();
-  };
+  }, [resetSupplementary]);
 
-  const cancelReset = () => {
+  const cancelReset = useCallback(() => {
     setShowResetConfirm(false);
-  };
+  }, []);
 
-  const removeBlock = (index: number) => {
+  const removeBlock = useCallback((index: number) => {
     setRemainingBlocks(prev => prev.filter((_, i) => i !== index));
     hasShownCelebration.current = false;
-  };
+  }, []);
 
-  const clearAllBlocks = () => {
+  const clearAllBlocks = useCallback(() => {
     setRemainingBlocks([]);
     setError(null);
     setSuccessMessage(null);
@@ -455,25 +468,25 @@ export function usePaternityPlanning() {
     setSelectionStartDate(null);
     hasShownCelebration.current = false;
     resetSupplementary();
-  };
+  }, [resetSupplementary]);
 
-  const startVisualSelection = () => {
+  const startVisualSelection = useCallback(() => {
     setVisualSelectionMode(true);
     setSelectionStep('selecting-start');
     setSuccessMessage('Mode sélection visuelle activé. Cliquez sur la date de DÉBUT de votre première période.');
-  };
+  }, []);
 
-  const cancelVisualSelection = () => {
+  const cancelVisualSelection = useCallback(() => {
     setVisualSelectionMode(false);
     setSelectionStep('idle');
     setSelectionStartDate(null);
     setError(null);
     setSuccessMessage(null);
-  };
+  }, []);
 
-  const hideCelebration = () => {
+  const hideCelebration = useCallback(() => {
     setShowCelebration(false);
-  };
+  }, []);
 
   return {
     birthDate,

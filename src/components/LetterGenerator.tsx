@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Mail, Copy, Check } from 'lucide-react';
@@ -6,7 +6,7 @@ import { LeaveBlock, LeaveScenarioConfig } from '../utils/paternityLeave';
 import { SupplementaryLeaveDuration, SupplementaryLeaveMode } from '../utils/supplementaryBirthLeave';
 import { generateEmployerLetter } from '../utils/employerLetter';
 import { Button } from './Button';
-import { fadeIn, staggerContainer, useAppMotion } from '../lib/motion';
+import { fadeIn, useAppMotion } from '../lib/motion';
 
 interface LetterGeneratorProps {
   birthDate: Date;
@@ -75,7 +75,7 @@ export function LetterGenerator({
     supplementaryLeavePeriods
   ]);
 
-  const previewLines = useMemo(() => baseLetter.split('\n'), [baseLetter]);
+  const deferredLetter = useDeferredValue(baseLetter);
 
   useEffect(() => {
     if (!copied) return;
@@ -218,18 +218,10 @@ export function LetterGenerator({
                 className="relative z-10 whitespace-pre-line"
                 initial={shouldReduce ? false : 'hidden'}
                 animate="visible"
-                variants={staggerContainer(shouldReduce ? 0 : 0.03)}
+                variants={fadeIn}
+                transition={shouldReduce ? { duration: 0 } : { duration: 0.16 }}
               >
-                {previewLines.map((line, index) => (
-                  <motion.span
-                    key={index}
-                    className="block min-h-[1em]"
-                    variants={fadeIn}
-                    transition={{ ...(shouldReduce ? { duration: 0 } : { duration: 0.2 }) }}
-                  >
-                    {line || '\u00a0'}
-                  </motion.span>
-                ))}
+                {deferredLetter}
               </motion.div>
             </div>
           </div>
