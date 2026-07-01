@@ -22,6 +22,7 @@ export function HeroHeader({ hasBirthDate, onResetRequest }: HeroHeaderProps) {
         <button
           type="button"
           onClick={onResetRequest}
+          aria-label="Réinitialiser le planificateur"
           className={`flex h-11 w-11 sm:h-auto sm:w-auto items-center justify-center gap-2 rounded-xl border border-white bg-white/80 px-2.5 py-2 text-sm font-medium text-slate-600 shadow-sm backdrop-blur-md transition-all duration-300 hover:bg-white hover:text-brand-600 hover:shadow-lg active:scale-95 sm:px-4 group ${!hasBirthDate ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         >
           <RotateCcw className="w-4 h-4 shrink-0 group-hover:-rotate-180 transition-transform duration-500" />

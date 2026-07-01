@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { memo } from 'react';
 import { Calendar, CheckCircle2, Clock, Trash2 } from 'lucide-react';
 import { LeaveBlock, LeaveScenarioConfig, countCalendarDays } from '../utils/paternityLeave';
 import { SupplementaryLeaveDuration, SupplementaryLeaveMode } from '../utils/supplementaryBirthLeave';
@@ -18,7 +19,7 @@ interface SummaryProps {
   supplementaryLeaveMode?: SupplementaryLeaveMode;
 }
 
-export function Summary({
+export const Summary = memo(function Summary({
   birthDate,
   employerPeriod,
   mandatoryPeriod,
@@ -72,7 +73,7 @@ export function Summary({
             <div className="absolute -left-[21px] top-1 h-4 w-4 rounded-full border-2 border-white bg-slate-900 shadow-sm" />
             <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Point de départ</p>
             <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-slate-700" />
+              <Calendar className="w-5 h-5 text-slate-700" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-slate-500">{vocabulary.eventDateLabel}</p>
                 <p className="text-base font-bold text-slate-900 capitalize">
@@ -228,4 +229,4 @@ export function Summary({
       </div>
     </div>
   );
-}
+});

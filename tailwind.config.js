@@ -41,22 +41,6 @@ export default {
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-        'glow': '0 0 15px rgba(0, 113, 227, 0.3)',
-      },
-      animation: {
-        'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-        'shimmer': 'shimmer 2s linear infinite',
-      },
-      keyframes: {
-        pop: {
-          '0%': { transform: 'scale(0.95)' },
-          '40%': { transform: 'scale(1.02)' },
-          '100%': { transform: 'scale(1)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
       },
     },
   },

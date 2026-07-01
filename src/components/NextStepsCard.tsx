@@ -51,7 +51,7 @@ export function NextStepsCard({
             className={`absolute left-0 top-3 sm:top-4 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-sm font-bold shadow-sm ring-4 ring-white transition-all duration-500 ${
               item.status === 'done'
                 ? 'bg-emerald-500 text-white scale-100'
-                : 'bg-white text-slate-300 border-2 border-slate-100 group-hover:border-brand-200 group-hover:text-brand-300'
+                : 'bg-white text-slate-400 border-2 border-slate-100 group-hover:border-brand-200 group-hover:text-brand-300'
             }`}
           >
             {item.status === 'done' ? '✓' : item.index}

@@ -248,10 +248,11 @@ export function SupplementaryLeaveCard({
                         exit={{ opacity: 0, height: 0 }}
                         transition={transition}
                       >
-                        <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                        <label htmlFor="supplementary-second-start" className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
                           Début de la 2<sup>e</sup> période d&apos;1 mois
                         </label>
                         <input
+                          id="supplementary-second-start"
                           type="date"
                           value={toInputValue(secondStartDate)}
                           min={minDateValue || undefined}

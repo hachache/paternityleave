@@ -15,7 +15,7 @@ import {
 import { fr } from 'date-fns/locale';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { getFrenchHolidays, isFrenchHoliday, isWeekend } from '../utils/holidays';
 import {
@@ -42,7 +42,7 @@ interface CalendarProps {
 
 const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
-export function Calendar({
+export const Calendar = memo(function Calendar({
   birthDate,
   onSelectBirthDate,
   employerPeriod,
@@ -398,7 +398,7 @@ export function Calendar({
 
       <div className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 mb-3 sm:mb-4">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-[10px] sm:text-xs uppercase tracking-wider font-bold text-slate-400 py-1.5 sm:py-2">
+          <div key={day} className="text-center text-[10px] sm:text-xs uppercase tracking-wider font-bold text-slate-500 py-1.5 sm:py-2">
             {day}
           </div>
         ))}
@@ -478,4 +478,4 @@ export function Calendar({
       </AnimatePresence>
     </div>
   );
-}
+});

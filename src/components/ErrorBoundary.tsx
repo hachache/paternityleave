@@ -85,7 +85,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
             {this.state.error && (
               <details className="mt-8 text-left">
-                <summary className="cursor-pointer text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors">
+                <summary className="cursor-pointer text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors">
                   Détails techniques
                 </summary>
                 <pre className="mt-2 rounded-xl bg-slate-100 p-4 text-xs text-slate-700 overflow-x-auto border border-slate-200">

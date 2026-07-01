@@ -1,4 +1,4 @@
-import { forwardRef, ButtonHTMLAttributes } from 'react';
+import { forwardRef, memo, type ButtonHTMLAttributes } from 'react';
 import { LucideIcon } from 'lucide-react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';

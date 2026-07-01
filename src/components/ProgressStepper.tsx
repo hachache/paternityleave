@@ -42,6 +42,11 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
           <div
             className="absolute left-0 right-0 h-0.5 rounded-full bg-slate-100"
             style={{ top: '20px' }}
+            role="progressbar"
+            aria-valuenow={Math.round(progressPercent)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progression du planning"
           >
             <motion.div
               className="h-full rounded-full bg-brand-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]"
@@ -63,7 +68,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
                     border-2
                     ${isCompleted ? 'bg-brand-500 border-brand-500 text-white shadow-md shadow-brand-500/20 scale-90' : ''}
                     ${isCurrent ? 'bg-white border-brand-500 text-brand-600 shadow-lg shadow-brand-500/15 scale-105 ring-4 ring-brand-500/10' : ''}
-                    ${isPending ? 'bg-white border-slate-100 text-slate-300 scale-90' : ''}
+                    ${isPending ? 'bg-white border-slate-200 text-slate-400 scale-90' : ''}
                   `}
                   variants={isCurrent ? activeStepVariants : undefined}
                   initial={isCurrent ? 'initial' : false}
@@ -103,7 +108,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
                     text-[10px] sm:text-xs font-bold tracking-wide uppercase leading-tight
                     ${isCompleted ? 'text-brand-600' : ''}
                     ${isCurrent ? 'text-slate-900' : ''}
-                    ${isPending ? 'text-slate-300' : ''}
+                    ${isPending ? 'text-slate-400' : ''}
                   `}
                   >
                     <span className="hidden lg:inline">{step.label}</span>

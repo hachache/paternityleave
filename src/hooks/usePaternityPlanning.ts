@@ -26,6 +26,8 @@ export function usePaternityPlanning() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showScenarioConfirm, setShowScenarioConfirm] = useState(false);
+  const pendingScenarioRef = useRef<LeaveScenarioId | null>(null);
   const [customMode, setCustomMode] = useState(false);
   const [scenarioId, setScenarioId] = useState<LeaveScenarioId>(DEFAULT_LEAVE_SCENARIO_ID);
   const [customFirstBlockDays, setCustomFirstBlockDays] = useState(() => {
@@ -390,6 +392,28 @@ export function usePaternityPlanning() {
     }
   };
 
+  const handleScenarioChange = (id: LeaveScenarioId) => {
+    if (birthDate || remainingBlocks.length > 0) {
+      pendingScenarioRef.current = id;
+      setShowScenarioConfirm(true);
+    } else {
+      setScenarioId(id);
+    }
+  };
+
+  const confirmScenarioChange = () => {
+    if (pendingScenarioRef.current) {
+      setScenarioId(pendingScenarioRef.current);
+      pendingScenarioRef.current = null;
+    }
+    setShowScenarioConfirm(false);
+  };
+
+  const cancelScenarioChange = () => {
+    pendingScenarioRef.current = null;
+    setShowScenarioConfirm(false);
+  };
+
   const requestReset = () => {
     if (!birthDate) return;
     setShowResetConfirm(true);
@@ -459,6 +483,7 @@ export function usePaternityPlanning() {
     error,
     successMessage,
     showResetConfirm,
+    showScenarioConfirm,
     customMode,
     customFirstBlockDays,
     visualSelectionMode,
@@ -481,6 +506,9 @@ export function usePaternityPlanning() {
     scenario,
     scenarioId,
     setScenarioId,
+    handleScenarioChange,
+    confirmScenarioChange,
+    cancelScenarioChange,
     setCustomMode,
     setCustomFirstBlockDays,
     isPaternityPlanComplete,

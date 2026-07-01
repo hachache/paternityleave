@@ -42,6 +42,7 @@ function LazyFallback({ height = 'h-64' }: { height?: string }) {
 
 function App() {
   const [showLegalReferences, setShowLegalReferences] = useState(false);
+  const [showClearBlocksConfirm, setShowClearBlocksConfirm] = useState(false);
   const [calendarHighlight, setCalendarHighlight] = useState(false);
   const calendarHighlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
@@ -54,6 +55,7 @@ function App() {
     error,
     successMessage,
     showResetConfirm,
+    showScenarioConfirm,
     customMode,
     customFirstBlockDays,
     visualSelectionMode,
@@ -86,6 +88,9 @@ function App() {
     cancelVisualSelection,
     hideCelebration,
     setScenarioId,
+    handleScenarioChange,
+    confirmScenarioChange,
+    cancelScenarioChange,
     setCustomMode,
     setCustomFirstBlockDays,
     setSupplementaryLeaveEnabled,
@@ -150,7 +155,16 @@ function App() {
   };
 
   const handleClearAllBlocks = () => {
+    setShowClearBlocksConfirm(true);
+  };
+
+  const handleClearAllBlocksConfirm = () => {
     clearAllBlocks();
+    setShowClearBlocksConfirm(false);
+  };
+
+  const handleClearAllBlocksCancel = () => {
+    setShowClearBlocksConfirm(false);
   };
 
   const handleStartVisualSelection = () => {
@@ -284,7 +298,7 @@ function App() {
                 description="Adaptez le calendrier à votre cas spécifique"
                 accent="brand"
               >
-                <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={setScenarioId} />
+                <ScenarioSelector selectedScenario={scenarioId} onScenarioChange={handleScenarioChange} />
               </SectionCard>
             </motion.div>
 
@@ -360,7 +374,7 @@ function App() {
             </motion.div>
           </motion.div>
 
-        <Suspense fallback={null}>
+        <Suspense fallback={<LazyFallback height="h-48" />}>
           <CelebrationModal
             show={showCelebration}
             onClose={() => {
@@ -379,6 +393,22 @@ function App() {
           open={showResetConfirm}
           onCancel={handleResetCancel}
           onConfirm={handleResetConfirm}
+        />
+
+        <ResetConfirmDialog
+          open={showScenarioConfirm}
+          onCancel={() => cancelScenarioChange()}
+          onConfirm={() => confirmScenarioChange()}
+          title="Changer de situation ?"
+          description="Modifier votre situation (naissance standard, multiples, adoption…) réinitialisera votre planning actuel. Cette action est irréversible."
+        />
+
+        <ResetConfirmDialog
+          open={showClearBlocksConfirm}
+          onCancel={handleClearAllBlocksCancel}
+          onConfirm={handleClearAllBlocksConfirm}
+          title="Effacer toutes les périodes ?"
+          description="Toutes vos périodes planifiées seront supprimées. Votre date de naissance sera conservée."
         />
 
         <AnimatePresence>
@@ -501,7 +531,7 @@ function App() {
                 className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
               >
                 <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
-                Recommencer la planification
+                Effacer mes périodes
               </Button>
             </motion.div>
           )}

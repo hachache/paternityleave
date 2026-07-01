@@ -1,4 +1,4 @@
-import type { ChangeEvent, RefObject } from 'react';
+import { memo, type ChangeEvent, type RefObject } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowUp,
@@ -46,7 +46,7 @@ function getSliderPercentage(value: number, max: number) {
   return ((value - 5) / (max - 5)) * 100;
 }
 
-export function PlanningModeSelector({
+export const PlanningModeSelector = memo(function PlanningModeSelector({
   isChoiceVisible,
   isCustomModeVisible,
   isFinalStepVisible,
@@ -367,4 +367,4 @@ export function PlanningModeSelector({
       )}
     </AnimatePresence>
   );
-}
+});

@@ -203,7 +203,7 @@ export function LetterGenerator({
         {/* Prévisualisation "Papier" */}
         <div className="mt-6 sm:mt-8">
           <div className="bg-slate-100 rounded-2xl sm:rounded-3xl p-3 sm:p-8 border border-slate-200/60 shadow-inner">
-            <div className="bg-white rounded-xl shadow-md sm:shadow-xl shadow-slate-300/20 p-5 sm:p-12 min-h-[320px] sm:min-h-[400px] flex flex-col text-slate-800 text-xs sm:text-base font-serif leading-relaxed relative max-w-3xl mx-auto">
+            <div id="letter-preview-text" className="bg-white rounded-xl shadow-md sm:shadow-xl shadow-slate-300/20 p-5 sm:p-12 min-h-[320px] sm:min-h-[400px] flex flex-col text-slate-800 text-xs sm:text-base font-serif leading-relaxed relative max-w-3xl mx-auto">
               {/* Grain texture overlay (subtle) */}
               <div className="absolute inset-0 bg-slate-50 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")' }}></div>
               
@@ -244,6 +244,10 @@ export function LetterGenerator({
           </motion.div>
         )}
 
+        <div aria-live="polite" className="sr-only" role="status">
+          {copied ? 'Courrier copié dans le presse-papier' : ''}
+        </div>
+
         {copyError && (
           <motion.div
             role="status"
@@ -254,9 +258,25 @@ export function LetterGenerator({
             variants={fadeIn}
             transition={transition}
           >
-            <p className="text-sm text-red-800 font-medium">
-              Impossible de copier. Sélectionnez le texte manuellement.
+            <p className="text-sm text-red-800 font-medium mb-3">
+              Impossible de copier automatiquement.
             </p>
+            <button
+              type="button"
+              onClick={() => {
+                const textEl = document.getElementById('letter-preview-text');
+                if (textEl) {
+                  const range = document.createRange();
+                  range.selectNodeContents(textEl);
+                  const selection = window.getSelection();
+                  selection?.removeAllRanges();
+                  selection?.addRange(range);
+                }
+              }}
+              className="text-sm font-semibold text-red-700 underline hover:text-red-900 transition-colors"
+            >
+              Sélectionner tout le texte manuellement
+            </button>
           </motion.div>
         )}
 
@@ -267,7 +287,6 @@ export function LetterGenerator({
             size="lg"
             fullWidth
             className={`shadow-md transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-0.5'}`}
-            aria-live="polite"
           >
             <AnimatePresence mode="wait" initial={false}>
               {copied ? (
