@@ -127,6 +127,7 @@ export function LetterGenerator({
                 placeholder="Paris"
                 required
                 aria-describedby="letter-lieu-hint"
+                autoComplete="address-level2"
                 className="input-modern w-full"
               />
               <p id="letter-lieu-hint" className="text-[10px] text-slate-400 mt-1">Exemple : Paris, Lyon, etc.</p>
@@ -139,6 +140,8 @@ export function LetterGenerator({
                 value={dateRedaction}
                 onChange={(e) => setDateRedaction(e.target.value)}
                 placeholder="01/01/2024"
+                inputMode="numeric"
+                autoComplete="off"
                 className="input-modern w-full"
               />
             </div>
@@ -155,6 +158,7 @@ export function LetterGenerator({
                 placeholder="Jean"
                 required
                 aria-describedby="letter-prenom-hint"
+                autoComplete="given-name"
                 className="input-modern w-full"
               />
               <p id="letter-prenom-hint" className="text-[10px] text-slate-400 mt-1">Votre prénom tel qu'il apparaîtra sur le courrier</p>
@@ -169,6 +173,7 @@ export function LetterGenerator({
                 placeholder="Dupont"
                 required
                 aria-describedby="letter-nom-hint"
+                autoComplete="family-name"
                 className="input-modern w-full"
               />
               <p id="letter-nom-hint" className="text-[10px] text-slate-400 mt-1">Votre nom de famille</p>
@@ -183,6 +188,7 @@ export function LetterGenerator({
               value={adresse}
               onChange={(e) => setAdresse(e.target.value)}
               placeholder="123 Rue de la République, 75001 Paris"
+              autoComplete="street-address"
               className="input-modern w-full"
             />
           </div>
@@ -195,6 +201,7 @@ export function LetterGenerator({
               value={fonction}
               onChange={(e) => setFonction(e.target.value)}
               placeholder="Développeur"
+              autoComplete="organization-title"
               className="input-modern w-full"
             />
           </div>
