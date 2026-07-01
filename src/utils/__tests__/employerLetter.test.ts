@@ -52,9 +52,9 @@ describe('generateEmployerLetter', () => {
 
     expect(letter).toContain('mon enfant doit naître le 01/07/2026');
     expect(letter).toContain("Congé de naissance à la charge de l'employeur : 3 jours ouvrables");
-    expect(letter).toContain('Période obligatoire : 4 jours calendaires, du 04/07/2026 au 07/07/2026, soit 4 jours calendaires.');
-    expect(letter).toContain('Période fractionnable : 21 jours calendaires au total.');
-    expect(letter).toContain('Période fractionnable 1 : du 08/07/2026 au 28/07/2026, soit 21 jours calendaires.');
+    expect(letter).toContain('Période obligatoire de 4 jours calendaires, du 04/07/2026 au 07/07/2026, soit 4 jours calendaires.');
+    // Single block covering all days: no separate total line
+    expect(letter).toContain('Période fractionnable de 21 jours calendaires, du 08/07/2026 au 28/07/2026, soit 21 jours calendaires.');
     expect(letter).toContain('certificat médical attestant la date prévue de la naissance');
   });
 
@@ -87,7 +87,7 @@ describe('generateEmployerLetter', () => {
 
     expect(letter).toContain('mon enfant est arrivé au foyer le 01/07/2026');
     expect(letter).toContain("congé lié à l'accueil de l'enfant");
-    expect(letter).toContain("périodes du congé lié à l'accueil de l'enfant");
+    expect(letter).toContain("le début du congé lié à l'accueil de l'enfant");
     expect(letter).toContain("justificatif d'adoption ou d'arrivée au foyer");
   });
 
@@ -100,7 +100,7 @@ describe('generateEmployerLetter', () => {
       })
     );
 
-    expect(letter).toContain('Période fractionnable : 28 jours calendaires au total.');
+    expect(letter).toContain('Période fractionnable de 28 jours calendaires, du');
     expect(letter).toContain('soit 28 jours calendaires.');
   });
 
@@ -115,9 +115,9 @@ describe('generateEmployerLetter', () => {
     );
 
     expect(letter).toContain("congé supplémentaire de naissance");
-    expect(letter).toContain("bénéficier d'un mois de congé supplémentaire de naissance, pris en une seule fois");
-    expect(letter).toContain('Période supplémentaire 1 : du 01/08/2026 au 31/08/2026, soit 31 jours calendaires.');
-    expect(letter).toContain('le délai de prévenance applicable est fixé par les textes entre 15 jours et 1 mois');
+    expect(letter).toContain("bénéficier du congé supplémentaire de naissance pour une durée d'un mois, pris en une seule période");
+    expect(letter).toContain('Période 1 : du 01/08/2026 au 31/08/2026, soit 31 jours calendaires.');
+    expect(letter).toContain("le délai de prévenance est d'un mois (ou de 15 jours en cas de succession immédiate");
   });
 
   it("affiche le congé supplémentaire 2026 en 2 mois fractionnés", () => {
@@ -131,9 +131,9 @@ describe('generateEmployerLetter', () => {
       })
     );
 
-    expect(letter).toContain("bénéficier de 2 mois de congé supplémentaire de naissance, fractionné en 2 périodes d'un mois");
-    expect(letter).toContain('Période supplémentaire 1 : du 01/08/2026 au 31/08/2026, soit 31 jours calendaires.');
-    expect(letter).toContain('Période supplémentaire 2 : du 01/10/2026 au 31/10/2026, soit 31 jours calendaires.');
+    expect(letter).toContain("bénéficier du congé supplémentaire de naissance pour une durée de deux mois, fractionné en deux périodes d'un mois chacune");
+    expect(letter).toContain('Période 1 : du 01/08/2026 au 31/08/2026, soit 31 jours calendaires.');
+    expect(letter).toContain('Période 2 : du 01/10/2026 au 31/10/2026, soit 31 jours calendaires.');
   });
 
   it('corrige la ponctuation pour un seul bloc et plusieurs blocs', () => {
@@ -149,8 +149,9 @@ describe('generateEmployerLetter', () => {
 
     expect(oneBlockLetter).not.toContain(' ;');
     expect(twoBlocksLetter).not.toContain(' ;');
-    expect(twoBlocksLetter).toContain('Période fractionnable 1');
-    expect(twoBlocksLetter).toContain('Période fractionnable 2');
+    // Multi-block mode numbers periods as "Période 1", "Période 2"
+    expect(twoBlocksLetter).toContain('Période 1 :');
+    expect(twoBlocksLetter).toContain('Période 2 :');
   });
 
   it("n'affiche pas la mention 2026 quand le congé supplémentaire n'est pas activé", () => {

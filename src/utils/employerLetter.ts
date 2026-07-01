@@ -108,21 +108,34 @@ function buildPaternityParagraphs(input: GenerateEmployerLetterInput): string[] 
 
   if (input.mandatoryPeriod) {
     paragraphs.push(
-      `Période obligatoire : 4 jours calendaires, ${formatPeriod(input.mandatoryPeriod)}.`
+      `Période obligatoire de 4 jours calendaires, ${formatPeriod(input.mandatoryPeriod)}.`
     );
   }
 
   if (input.remainingBlocks.length > 0) {
-    const blocks = input.remainingBlocks
-      .map((block, index) => `Période fractionnable ${index + 1} : ${formatPeriod(block)}.`)
-      .join('\n');
-
-    paragraphs.push(
-      `Période fractionnable : ${input.scenario.fractionableDays} jours calendaires au total.\n${blocks}`
+    const totalFractionableDays = input.scenario.fractionableDays;
+    const totalPlacedDays = input.remainingBlocks.reduce(
+      (sum, block) => sum + countCalendarDays(block.start, block.end),
+      0
     );
+
+    // When there's only one block covering all days, don't repeat the total
+    if (input.remainingBlocks.length === 1 && totalPlacedDays >= totalFractionableDays) {
+      paragraphs.push(
+        `Période fractionnable de ${totalFractionableDays} jours calendaires, ${formatPeriod(input.remainingBlocks[0])}.`
+      );
+    } else {
+      const blocks = input.remainingBlocks
+        .map((block, index) => `Période ${index + 1} : ${formatPeriod(block)}.`)
+        .join('\n');
+
+      paragraphs.push(
+        `Période fractionnable : ${totalFractionableDays} jours calendaires au total, répartis comme suit :\n${blocks}`
+      );
+    }
   } else {
     paragraphs.push(
-      `Période fractionnable : ${input.scenario.fractionableDays} jours calendaires au total, dates à compléter.`
+      `Période fractionnable : ${input.scenario.fractionableDays} jours calendaires au total, dont les dates restent à préciser.`
     );
   }
 
@@ -139,27 +152,34 @@ function buildSupplementaryParagraph(
   }
 
   const selectedDuration = duration ?? (periods.length > 1 ? 2 : 1);
-  const durationText = selectedDuration === 1 ? "d'un mois" : 'de 2 mois';
+  const durationText = selectedDuration === 1 ? "d'un mois" : 'de deux mois';
   const modeText =
     mode === 'split' && periods.length > 1
-      ? "fractionné en 2 périodes d'un mois"
-      : 'pris en une seule fois';
+      ? "fractionné en deux périodes d'un mois chacune"
+      : 'pris en une seule période';
   const periodLines = periods
-    .map((period, index) => `Période supplémentaire ${index + 1} : ${formatPeriod(period)}.`)
+    .map((period, index) => `Période ${index + 1} : ${formatPeriod(period)}.`)
     .join('\n');
 
   return [
-    `Conformément aux articles L. 1225-46-2 et suivants du Code du travail (LFSS 2026, art. 99-V), je souhaite également bénéficier ${durationText} de congé supplémentaire de naissance, ${modeText}.`,
+    `Par ailleurs, conformément aux articles L. 1225-46-2 et suivants du Code du travail (LFSS 2026, art. 99-V), je souhaite bénéficier du congé supplémentaire de naissance pour une durée ${durationText}, ${modeText}.`,
     periodLines
   ].join('\n');
 }
 
-function buildNoticeSentence(scenario: LeaveScenarioConfig): string {
-  const leaveName = scenario.id === 'adoption'
+function buildNoticeParagraph(input: GenerateEmployerLetterInput, hasSupplementary: boolean): string {
+  const isAdoption = input.scenario.id === 'adoption';
+  const leaveName = isAdoption
     ? "du congé lié à l'accueil de l'enfant"
     : "du congé de paternité et d'accueil de l'enfant";
 
-  return `Je vous informe au moins un mois avant le début de la ou des périodes ${leaveName} mentionnées ci-dessus.`;
+  let notice = `Conformément aux dispositions légales en vigueur, je vous informe au moins un mois avant le début ${leaveName}.`;
+
+  if (hasSupplementary) {
+    notice += ` Pour le congé supplémentaire de naissance, le délai de prévenance est d'un mois (ou de 15 jours en cas de succession immédiate avec le congé initial), conformément aux articles L. 1225-46-2 et suivants du Code du travail.`;
+  }
+
+  return notice;
 }
 
 export function generateEmployerLetter(input: GenerateEmployerLetterInput): string {
@@ -182,13 +202,7 @@ export function generateEmployerLetter(input: GenerateEmployerLetterInput): stri
     paragraphs.push(supplementaryParagraph);
   }
 
-  paragraphs.push(buildNoticeSentence(input.scenario));
-
-  if (supplementaryParagraph) {
-    paragraphs.push(
-      "Pour le congé supplémentaire de naissance, le délai de prévenance applicable est fixé par les textes entre 15 jours et 1 mois selon que le congé suit immédiatement ou non le congé initial mentionné ci-dessus, sous réserve des modalités prévues par les textes d'application."
-    );
-  }
+  paragraphs.push(buildNoticeParagraph(input, Boolean(supplementaryParagraph)));
 
   paragraphs.push(
     buildSupportDocumentSentence(input.birthDate, currentDate, input.scenario),
