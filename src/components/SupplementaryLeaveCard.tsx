@@ -157,10 +157,10 @@ export function SupplementaryLeaveCard({
         {enabled && (
           <motion.div
             key="supplementary-configuration"
-            className="overflow-hidden origin-top"
-            initial={shouldReduce ? false : { opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
-            exit={{ opacity: 0, scaleY: 0 }}
+            className="overflow-hidden"
+            initial={shouldReduce ? false : { opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
             transition={transition}
           >
             <div className="mt-5">
@@ -198,10 +198,10 @@ export function SupplementaryLeaveCard({
               {isSplitAvailable && (
                 <motion.div
                   key="supplementary-mode"
-                  className="mt-5 overflow-hidden origin-top"
-                  initial={shouldReduce ? false : { opacity: 0, scaleY: 0 }}
-                  animate={{ opacity: 1, scaleY: 1 }}
-                  exit={{ opacity: 0, scaleY: 0 }}
+                  className="mt-5 overflow-hidden"
+                  initial={shouldReduce ? false : { opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
                   transition={transition}
                 >
                   <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
@@ -242,10 +242,10 @@ export function SupplementaryLeaveCard({
                     {isSplitActive && (
                       <motion.div
                         key="supplementary-second-date"
-                        className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4 origin-top"
-                        initial={shouldReduce ? false : { opacity: 0, scaleY: 0 }}
-                        animate={{ opacity: 1, scaleY: 1 }}
-                        exit={{ opacity: 0, scaleY: 0 }}
+                        className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                        initial={shouldReduce ? false : { opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
                         transition={transition}
                       >
                         <label htmlFor="supplementary-second-start" className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
