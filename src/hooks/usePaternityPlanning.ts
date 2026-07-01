@@ -110,18 +110,10 @@ export function usePaternityPlanning() {
       setBirthDate(null);
       setCustomFirstBlockDays(computeDefaultFirstBlock(scenario));
       setRemainingBlocks([]);
+      setError(null);
       setSuccessMessage(null);
       setShowCelebration(false);
       resetSupplementary();
-
-      if (totalPlannedDays > totalFractionableDays) {
-        setError(
-          `Le scénario sélectionné prévoit ${totalFractionableDays} jours fractionnables. Votre planning a été réinitialisé.`
-        );
-      } else {
-        setError(null);
-      }
-
       hasShownCelebration.current = false;
     }
   }, [
@@ -129,8 +121,6 @@ export function usePaternityPlanning() {
     resetSupplementary,
     scenario,
     scenarioId,
-    totalFractionableDays,
-    totalPlannedDays
   ]);
 
   const planningStep = useMemo(() => {

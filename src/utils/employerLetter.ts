@@ -38,8 +38,12 @@ function formatCalendarDays(days: number): string {
   return `${days} jour${days > 1 ? 's' : ''} calendaire${days > 1 ? 's' : ''}`;
 }
 
-function formatPeriod(block: LeaveBlock): string {
-  return `du ${formatDate(block.start)} au ${formatDate(block.end)}, soit ${formatCalendarDays(countCalendarDays(block.start, block.end))}`;
+function formatBlockDates(block: LeaveBlock): string {
+  return `du ${formatDate(block.start)} au ${formatDate(block.end)}`;
+}
+
+function formatBlockWithCount(block: LeaveBlock): string {
+  return `${formatBlockDates(block)}, soit ${formatCalendarDays(countCalendarDays(block.start, block.end))}`;
 }
 
 function buildHeader(identity: EmployerLetterIdentity): string {
@@ -108,7 +112,7 @@ function buildPaternityParagraphs(input: GenerateEmployerLetterInput): string[] 
 
   if (input.mandatoryPeriod) {
     paragraphs.push(
-      `Période obligatoire de 4 jours calendaires, ${formatPeriod(input.mandatoryPeriod)}.`
+      `Période obligatoire de 4 jours calendaires, ${formatBlockDates(input.mandatoryPeriod)}.`
     );
   }
 
@@ -122,11 +126,11 @@ function buildPaternityParagraphs(input: GenerateEmployerLetterInput): string[] 
     // When there's only one block covering all days, don't repeat the total
     if (input.remainingBlocks.length === 1 && totalPlacedDays >= totalFractionableDays) {
       paragraphs.push(
-        `Période fractionnable de ${totalFractionableDays} jours calendaires, ${formatPeriod(input.remainingBlocks[0])}.`
+        `Période fractionnable de ${totalFractionableDays} jours calendaires, ${formatBlockDates(input.remainingBlocks[0])}.`
       );
     } else {
       const blocks = input.remainingBlocks
-        .map((block, index) => `Période ${index + 1} : ${formatPeriod(block)}.`)
+        .map((block, index) => `Période ${index + 1} : ${formatBlockWithCount(block)}.`)
         .join('\n');
 
       paragraphs.push(
@@ -158,7 +162,7 @@ function buildSupplementaryParagraph(
       ? "fractionné en deux périodes d'un mois chacune"
       : 'pris en une seule période';
   const periodLines = periods
-    .map((period, index) => `Période ${index + 1} : ${formatPeriod(period)}.`)
+    .map((period, index) => `Période ${index + 1} : ${formatBlockWithCount(period)}.`)
     .join('\n');
 
   return [
@@ -173,10 +177,10 @@ function buildNoticeParagraph(input: GenerateEmployerLetterInput, hasSupplementa
     ? "du congé lié à l'accueil de l'enfant"
     : "du congé de paternité et d'accueil de l'enfant";
 
-  let notice = `Conformément aux dispositions légales en vigueur, je vous informe au moins un mois avant le début ${leaveName}.`;
+  let notice = `Conformément aux dispositions légales en vigueur, je vous adresse ma demande au moins un mois avant le début ${leaveName}.`;
 
   if (hasSupplementary) {
-    notice += ` Pour le congé supplémentaire de naissance, le délai de prévenance est d'un mois (ou de 15 jours en cas de succession immédiate avec le congé initial), conformément aux articles L. 1225-46-2 et suivants du Code du travail.`;
+    notice += ` Pour le congé supplémentaire de naissance, ce délai de prévenance d'un mois s'applique également (ramené à 15 jours en cas de succession immédiate avec le congé initial), conformément aux articles L. 1225-46-2 et suivants du Code du travail.`;
   }
 
   return notice;

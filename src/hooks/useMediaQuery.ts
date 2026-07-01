@@ -18,9 +18,6 @@ export function useMediaQuery(query: string): boolean {
       setMatches(event.matches);
     };
 
-    // Initialiser l'état
-    setMatches(mediaQuery.matches);
-
     // Écouter les changements
     mediaQuery.addEventListener('change', handleChange);
 

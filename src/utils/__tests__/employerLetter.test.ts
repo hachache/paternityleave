@@ -52,9 +52,9 @@ describe('generateEmployerLetter', () => {
 
     expect(letter).toContain('mon enfant doit naître le 01/07/2026');
     expect(letter).toContain("Congé de naissance à la charge de l'employeur : 3 jours ouvrables");
-    expect(letter).toContain('Période obligatoire de 4 jours calendaires, du 04/07/2026 au 07/07/2026, soit 4 jours calendaires.');
-    // Single block covering all days: no separate total line
-    expect(letter).toContain('Période fractionnable de 21 jours calendaires, du 08/07/2026 au 28/07/2026, soit 21 jours calendaires.');
+    expect(letter).toContain('Période obligatoire de 4 jours calendaires, du 04/07/2026 au 07/07/2026.');
+    // Single block covering all days: no separate total line and no "soit X jours" redundancy
+    expect(letter).toContain('Période fractionnable de 21 jours calendaires, du 08/07/2026 au 28/07/2026.');
     expect(letter).toContain('certificat médical attestant la date prévue de la naissance');
   });
 
@@ -101,7 +101,7 @@ describe('generateEmployerLetter', () => {
     );
 
     expect(letter).toContain('Période fractionnable de 28 jours calendaires, du');
-    expect(letter).toContain('soit 28 jours calendaires.');
+    expect(letter).not.toContain('soit 28 jours calendaires.');
   });
 
   it('affiche le congé supplémentaire 2026 en 1 mois seulement quand il est configuré', () => {
@@ -117,7 +117,7 @@ describe('generateEmployerLetter', () => {
     expect(letter).toContain("congé supplémentaire de naissance");
     expect(letter).toContain("bénéficier du congé supplémentaire de naissance pour une durée d'un mois, pris en une seule période");
     expect(letter).toContain('Période 1 : du 01/08/2026 au 31/08/2026, soit 31 jours calendaires.');
-    expect(letter).toContain("le délai de prévenance est d'un mois (ou de 15 jours en cas de succession immédiate");
+    expect(letter).toContain("ce délai de prévenance d'un mois s'applique également (ramené à 15 jours en cas de succession immédiate");
   });
 
   it("affiche le congé supplémentaire 2026 en 2 mois fractionnés", () => {

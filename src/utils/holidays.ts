@@ -142,24 +142,25 @@ export function countHolidaysInRange(startDate: Date, endDate: Date): number {
   const years = new Set<number>();
   let current = new Date(startDate);
   const end = new Date(endDate);
-  
+
+  // Première passe : collecter les années uniques
   while (current <= end) {
     years.add(current.getFullYear());
     current.setDate(current.getDate() + 1);
   }
-  
+
   const allHolidays = Array.from(years).flatMap(year => getFrenchHolidays(year));
-  
+
+  // Seconde passe : compter les jours fériés
   let count = 0;
   current = new Date(startDate);
-  
   while (current <= end) {
     if (isFrenchHoliday(current, allHolidays)) {
       count++;
     }
     current.setDate(current.getDate() + 1);
   }
-  
+
   return count;
 }
 
