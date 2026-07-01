@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Linkedin, Trash2 } from 'lucide-react';
 import { useMediaQuery } from './hooks/useMediaQuery';
@@ -6,10 +6,7 @@ import { useScrollOrchestrator } from './hooks/useScrollOrchestrator';
 import { Calendar } from './components/Calendar';
 import { Summary } from './components/Summary';
 import { LegalInfo } from './components/LegalInfo';
-import { LegalReferences } from './components/LegalReferences';
-import { LetterGenerator } from './components/LetterGenerator';
 import { ScrollIndicator } from './components/ScrollIndicator';
-import { CelebrationModal } from './components/CelebrationModal';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { ProgressStepper } from './components/ProgressStepper';
 import { CalendarLegend } from './components/CalendarLegend';
@@ -18,13 +15,30 @@ import { NextStepsCard } from './components/NextStepsCard';
 import { NavigationAnchor } from './components/NavigationAnchor';
 import { PostPlanningNavBar } from './components/PostPlanningNavBar';
 import { ScenarioSelector } from './components/ScenarioSelector';
-import { SupplementaryLeaveCard } from './components/SupplementaryLeaveCard';
 import { Button } from './components/Button';
 import { ResetConfirmDialog } from './components/ResetConfirmDialog';
 import { HeroHeader } from './components/HeroHeader';
 import { PlanningModeSelector } from './components/PlanningModeSelector';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
 import { fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
+
+// Lazy-loaded components (non-critiques pour l'affichage initial)
+const LetterGenerator = lazy(() => import('./components/LetterGenerator').then(m => ({ default: m.LetterGenerator })));
+const LegalReferences = lazy(() => import('./components/LegalReferences').then(m => ({ default: m.LegalReferences })));
+const SupplementaryLeaveCard = lazy(() => import('./components/SupplementaryLeaveCard').then(m => ({ default: m.SupplementaryLeaveCard })));
+const CelebrationModal = lazy(() => import('./components/CelebrationModal').then(m => ({ default: m.CelebrationModal })));
+
+/** Skeleton de chargement pour les composants lazy */
+function LazyFallback({ height = 'h-64' }: { height?: string }) {
+  return (
+    <div className={`${height} rounded-2xl sm:rounded-[1.5rem] bg-white/60 border border-slate-200 animate-pulse flex items-center justify-center`}>
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-slate-200" />
+        <div className="w-32 h-3 rounded-full bg-slate-200" />
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [showLegalReferences, setShowLegalReferences] = useState(false);
@@ -226,7 +240,9 @@ function App() {
               ← Retour au planificateur
             </Button>
           </div>
-          <LegalReferences />
+          <Suspense fallback={<LazyFallback height="h-96" />}>
+            <LegalReferences />
+          </Suspense>
         </main>
       </div>
     );
@@ -344,18 +360,20 @@ function App() {
             </motion.div>
           </motion.div>
 
-        <CelebrationModal
-          show={showCelebration}
-          onClose={() => {
-            hideCelebration();
-            schedulePostPlanningScroll();
-          }}
-          totalFractionableDays={totalFractionableDays}
-          scenario={scenario}
-          showSupplementaryAction={isEligibleForSupplementaryLeave}
-          onGoToSupplementary={handleGoToSupplementaryLeave}
-          onGoToLetter={handleGoToLetter}
-        />
+        <Suspense fallback={null}>
+          <CelebrationModal
+            show={showCelebration}
+            onClose={() => {
+              hideCelebration();
+              schedulePostPlanningScroll();
+            }}
+            totalFractionableDays={totalFractionableDays}
+            scenario={scenario}
+            showSupplementaryAction={isEligibleForSupplementaryLeave}
+            onGoToSupplementary={handleGoToSupplementaryLeave}
+            onGoToLetter={handleGoToLetter}
+          />
+        </Suspense>
 
         <ResetConfirmDialog
           open={showResetConfirm}
@@ -517,21 +535,23 @@ function App() {
               variants={fadeIn}
               transition={transition}
             >
-              <SupplementaryLeaveCard
-                enabled={supplementaryLeaveEnabled}
-                duration={supplementaryLeaveDuration}
-                mode={supplementaryLeaveMode}
-                secondStartDate={supplementaryLeaveSecondStartDate}
-                eligibility={supplementaryLeaveEligibility}
-                startDate={supplementaryLeaveStartDate}
-                periods={supplementaryLeavePeriods}
-                error={supplementaryLeaveError}
-                scenario={scenario}
-                onEnabledChange={setSupplementaryLeaveEnabled}
-                onDurationChange={setSupplementaryLeaveDuration}
-                onModeChange={setSupplementaryLeaveMode}
-                onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
-              />
+              <Suspense fallback={<LazyFallback height="h-80" />}>
+                <SupplementaryLeaveCard
+                  enabled={supplementaryLeaveEnabled}
+                  duration={supplementaryLeaveDuration}
+                  mode={supplementaryLeaveMode}
+                  secondStartDate={supplementaryLeaveSecondStartDate}
+                  eligibility={supplementaryLeaveEligibility}
+                  startDate={supplementaryLeaveStartDate}
+                  periods={supplementaryLeavePeriods}
+                  error={supplementaryLeaveError}
+                  scenario={scenario}
+                  onEnabledChange={setSupplementaryLeaveEnabled}
+                  onDurationChange={setSupplementaryLeaveDuration}
+                  onModeChange={setSupplementaryLeaveMode}
+                  onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
+                />
+              </Suspense>
             </motion.div>
           )}
         </AnimatePresence>
@@ -577,16 +597,18 @@ function App() {
               variants={fadeIn}
               transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
             >
-              <LetterGenerator
-                birthDate={birthDate}
-                employerPeriod={employerPeriod}
-                mandatoryPeriod={mandatoryPeriod}
-                remainingBlocks={remainingBlocks}
-                scenario={scenario}
-                supplementaryLeavePeriods={supplementaryLeavePeriods}
-                supplementaryLeaveDuration={supplementaryLeaveDuration}
-                supplementaryLeaveMode={supplementaryLeaveMode}
-              />
+              <Suspense fallback={<LazyFallback height="h-96" />}>
+                <LetterGenerator
+                  birthDate={birthDate}
+                  employerPeriod={employerPeriod}
+                  mandatoryPeriod={mandatoryPeriod}
+                  remainingBlocks={remainingBlocks}
+                  scenario={scenario}
+                  supplementaryLeavePeriods={supplementaryLeavePeriods}
+                  supplementaryLeaveDuration={supplementaryLeaveDuration}
+                  supplementaryLeaveMode={supplementaryLeaveMode}
+                />
+              </Suspense>
             </motion.div>
           )}
         </AnimatePresence>

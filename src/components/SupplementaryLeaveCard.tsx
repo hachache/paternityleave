@@ -91,7 +91,7 @@ export function SupplementaryLeaveCard({
           </div>
           <div>
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-bold font-display text-slate-900">
+              <h2 id="supplementary-leave-title" className="text-lg sm:text-xl font-bold font-display text-slate-900">
                 Congé supplémentaire 2026
               </h2>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-600">
@@ -114,7 +114,7 @@ export function SupplementaryLeaveCard({
           type="button"
           role="switch"
           aria-checked={enabled}
-          aria-label="Activer la projection du congé supplémentaire 2026"
+          aria-labelledby="supplementary-leave-title"
           disabled={!canPlan}
           onClick={handleToggle}
           className={`inline-flex h-11 w-[4.25rem] shrink-0 items-center rounded-full border p-1.5 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${

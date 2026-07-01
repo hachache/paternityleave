@@ -316,9 +316,10 @@ export function Calendar({
       if (metadata.type === 'birth') {
         classes += ' bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/30 ring-2 ring-slate-900 ring-offset-2';
       } else if (metadata.type === 'employer') {
-        classes += ' bg-brand-300 text-white shadow-sm';
+        // Pattern diagonal + label "E" pour daltoniens (A1)
+        classes += ' bg-brand-300 text-white shadow-sm bg-[repeating-linear-gradient(45deg,transparent,transparent_3px,rgba(255,255,255,0.15)_3px,rgba(255,255,255,0.15)_6px)]';
       } else if (metadata.type === 'mandatory') {
-        classes += ' bg-brand-600 text-white shadow-md shadow-brand-600/30';
+        classes += ' bg-brand-600 text-white shadow-md shadow-brand-600/30 ring-1 ring-inset ring-white/20';
       } else if (metadata.type === 'remaining') {
         classes += ' bg-success-500 text-white cursor-pointer hover:bg-success-600 hover:-translate-y-0.5 shadow-md shadow-success-500/30';
       } else if (metadata.selectable && isCurrentMonthDay) {
@@ -328,7 +329,7 @@ export function Calendar({
         if (isCurrentMonthDay) classes += ' opacity-40';
       }
 
-      if (!hasLeaveType && (weekend || holiday) && isCurrentMonthDay) classes += ' bg-slate-50 text-slate-400';
+      if (!hasLeaveType && (weekend || holiday) && isCurrentMonthDay) classes += ' bg-slate-50 text-slate-500';
 
       return classes;
     },
@@ -362,8 +363,11 @@ export function Calendar({
           variants={fadeInUp}
           transition={transition}
         >
-          <p className="text-sm sm:text-base text-brand-800 text-center font-medium">
-            Sélectionnez la {vocabulary.eventDateActionLabel} pour démarrer le calcul.
+          <p className="text-sm sm:text-base text-brand-800 text-center font-semibold mb-1.5">
+            📅 Sélectionnez la {vocabulary.eventDateActionLabel} pour commencer
+          </p>
+          <p className="text-xs sm:text-sm text-brand-600 text-center font-medium">
+            C'est la première étape pour calculer votre planning personnalisé.
           </p>
         </motion.div>
       )}
@@ -430,12 +434,20 @@ export function Calendar({
                 : `sélectionner cette date comme ${vocabulary.eventDateActionLabel}`
             });
 
+            const typeLetter =
+              metadata.type === 'employer' ? 'E' :
+              metadata.type === 'mandatory' ? 'O' :
+              metadata.type === 'remaining' ? 'P' :
+              metadata.type === 'birth' ? 'N' :
+              '';
+
             return (
               <motion.button
                 key={dayKey}
                 ref={registerDayRef(dayKey)}
                 type="button"
                 data-date={dayKey}
+                data-day-type={metadata.type || 'none'}
                 className={getDayClasses(dayStart, metadata)}
                 tabIndex={isFocused ? 0 : -1}
                 title={metadata.reason}
@@ -447,7 +459,15 @@ export function Calendar({
                 transition={dayTransition}
                 onFocus={handleCellFocus}
               >
-                {dayStart.getDate()}
+                <span className="relative z-10">{dayStart.getDate()}</span>
+                {typeLetter && (
+                  <span
+                    className="absolute bottom-0.5 text-[8px] font-bold opacity-70 leading-none select-none"
+                    aria-hidden="true"
+                  >
+                    {typeLetter}
+                  </span>
+                )}
                 {isTodayDate && (
                   <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-brand-500"></span>
                 )}

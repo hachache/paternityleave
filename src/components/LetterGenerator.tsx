@@ -112,19 +112,24 @@ export function LetterGenerator({
       <div className="space-y-6 sm:space-y-8">
         {/* Formulaire */}
         <div className="space-y-5 sm:space-y-6">
-          <p className="text-sm text-slate-500 font-medium">* Remplissez ces champs pour personnaliser le modèle</p>
-          
+          <p className="text-sm text-slate-500 font-medium">
+            <span className="text-brand-600 font-bold" aria-hidden="true">*</span> Champs requis pour un courrier complet
+          </p>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="letter-lieu" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Lieu</label>
+              <label htmlFor="letter-lieu" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Lieu <span className="text-brand-600" aria-hidden="true">*</span></label>
               <input
                 id="letter-lieu"
                 type="text"
                 value={lieu}
                 onChange={(e) => setLieu(e.target.value)}
                 placeholder="Paris"
+                required
+                aria-describedby="letter-lieu-hint"
                 className="input-modern w-full"
               />
+              <p id="letter-lieu-hint" className="text-[10px] text-slate-400 mt-1">Exemple : Paris, Lyon, etc.</p>
             </div>
             <div>
               <label htmlFor="letter-date-redaction" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Date de rédaction</label>
@@ -141,26 +146,32 @@ export function LetterGenerator({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="letter-prenom" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Prénom</label>
+              <label htmlFor="letter-prenom" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Prénom <span className="text-brand-600" aria-hidden="true">*</span></label>
               <input
                 id="letter-prenom"
                 type="text"
                 value={prenom}
                 onChange={(e) => setPrenom(e.target.value)}
                 placeholder="Jean"
+                required
+                aria-describedby="letter-prenom-hint"
                 className="input-modern w-full"
               />
+              <p id="letter-prenom-hint" className="text-[10px] text-slate-400 mt-1">Votre prénom tel qu'il apparaîtra sur le courrier</p>
             </div>
             <div>
-              <label htmlFor="letter-nom" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nom</label>
+              <label htmlFor="letter-nom" className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nom <span className="text-brand-600" aria-hidden="true">*</span></label>
               <input
                 id="letter-nom"
                 type="text"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
                 placeholder="Dupont"
+                required
+                aria-describedby="letter-nom-hint"
                 className="input-modern w-full"
               />
+              <p id="letter-nom-hint" className="text-[10px] text-slate-400 mt-1">Votre nom de famille</p>
             </div>
           </div>
 
@@ -192,7 +203,7 @@ export function LetterGenerator({
         {/* Prévisualisation "Papier" */}
         <div className="mt-6 sm:mt-8">
           <div className="bg-slate-100 rounded-2xl sm:rounded-3xl p-3 sm:p-8 border border-slate-200/60 shadow-inner">
-            <div className="bg-white rounded-xl shadow-md sm:shadow-xl shadow-slate-300/20 p-5 sm:p-12 min-h-[320px] sm:min-h-[400px] max-h-[60vh] sm:max-h-none flex flex-col overflow-y-auto overscroll-contain sm:overflow-visible text-slate-800 text-xs sm:text-base font-serif leading-relaxed relative max-w-3xl mx-auto">
+            <div className="bg-white rounded-xl shadow-md sm:shadow-xl shadow-slate-300/20 p-5 sm:p-12 min-h-[320px] sm:min-h-[400px] flex flex-col text-slate-800 text-xs sm:text-base font-serif leading-relaxed relative max-w-3xl mx-auto">
               {/* Grain texture overlay (subtle) */}
               <div className="absolute inset-0 bg-slate-50 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")' }}></div>
               
@@ -216,6 +227,22 @@ export function LetterGenerator({
             </div>
           </div>
         </div>
+
+        {(!lieu || !nom || !prenom) && (
+          <motion.div
+            role="status"
+            aria-live="polite"
+            className="p-4 rounded-xl border border-amber-200 bg-amber-50"
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            transition={transition}
+          >
+            <p className="text-sm text-amber-800 font-medium">
+              ⚠️ Remplissez au moins le lieu, le prénom et le nom pour un courrier complet. Sans ces informations, des champs resteront vides dans le document.
+            </p>
+          </motion.div>
+        )}
 
         {copyError && (
           <motion.div

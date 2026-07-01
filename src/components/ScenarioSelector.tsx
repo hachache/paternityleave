@@ -62,7 +62,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                   </p>
                   {config.id === 'standard' && (
                     <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-600">
-                      Courant
+                      Standard
                     </span>
                   )}
                 </div>

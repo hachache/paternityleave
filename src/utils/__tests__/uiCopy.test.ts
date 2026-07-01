@@ -80,7 +80,7 @@ describe('copies UI métier', () => {
 
     expect(vocabulary.eventDateLabel).toBe("Date d'arrivée au foyer");
     expect(progressSteps[0].label).toBe("Date d'arrivée au foyer");
-    expect(legendItems[0].label).toBe("Date d'arrivée au foyer");
+    expect(legendItems[0].label).toBe("Date d'arrivée au foyer (N)");
     expect(checklist[0].label).toContain("date d'arrivée au foyer");
   });
 

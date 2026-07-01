@@ -159,7 +159,7 @@ export function Summary({
             ) : (
               <div className="p-6 rounded-xl border-2 border-dashed border-slate-200 text-center">
                 <p className="text-sm text-slate-500 font-medium">Aucune période planifiée</p>
-                <p className="text-xs text-slate-400 mt-1">Cliquez sur le calendrier pour ajouter vos jours</p>
+                <p className="text-xs text-slate-400 mt-1">Cliquez sur une date dans le calendrier pour placer une période (min. 5 jours consécutifs)</p>
               </div>
             )}
           </div>

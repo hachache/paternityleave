@@ -398,7 +398,7 @@ export function LegalReferences() {
                 Pour une documentation complète des références légales, consultez le fichier LEGAL.md du projet.
               </p>
               <a
-                href="https://github.com/yourusername/paternityleave/blob/main/LEGAL.md"
+                href="https://github.com/hediac/paternityleave/blob/main/LEGAL.md"
                 className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
                 <BookOpen className="w-4 h-4" />
