@@ -72,9 +72,10 @@ function App() {
     supplementaryLeaveEnabled,
     supplementaryLeaveDuration,
     supplementaryLeaveMode,
+    supplementaryLeaveFirstStartDate,
     supplementaryLeaveSecondStartDate,
     supplementaryLeaveEligibility,
-    supplementaryLeaveStartDate,
+    supplementaryLeaveEarliestStartDate,
     supplementaryLeavePeriods,
     supplementaryLeaveError,
     selectBirthDate,
@@ -96,6 +97,7 @@ function App() {
     setSupplementaryLeaveEnabled,
     setSupplementaryLeaveDuration,
     setSupplementaryLeaveMode,
+    setSupplementaryLeaveFirstStartDate,
     setSupplementaryLeaveSecondStartDate
   } = usePaternityPlanning();
 
@@ -573,13 +575,15 @@ function App() {
                   mode={supplementaryLeaveMode}
                   secondStartDate={supplementaryLeaveSecondStartDate}
                   eligibility={supplementaryLeaveEligibility}
-                  startDate={supplementaryLeaveStartDate}
+                  firstStartDate={supplementaryLeaveFirstStartDate}
+                  earliestStartDate={supplementaryLeaveEarliestStartDate}
                   periods={supplementaryLeavePeriods}
                   error={supplementaryLeaveError}
                   scenario={scenario}
                   onEnabledChange={setSupplementaryLeaveEnabled}
                   onDurationChange={setSupplementaryLeaveDuration}
                   onModeChange={setSupplementaryLeaveMode}
+                  onFirstStartDateChange={setSupplementaryLeaveFirstStartDate}
                   onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
                 />
               </Suspense>

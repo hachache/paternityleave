@@ -17,15 +17,17 @@ interface SupplementaryLeaveCardProps {
   enabled: boolean;
   duration: SupplementaryLeaveDuration;
   mode: SupplementaryLeaveMode;
+  firstStartDate: Date | null;
   secondStartDate: Date | null;
   eligibility: SupplementaryLeaveEligibility;
-  startDate: Date | null;
+  earliestStartDate: Date | null;
   periods: LeaveBlock[];
   error: string | null;
   scenario: LeaveScenarioConfig;
   onEnabledChange: (enabled: boolean) => void;
   onDurationChange: (duration: SupplementaryLeaveDuration) => void;
   onModeChange: (mode: SupplementaryLeaveMode) => void;
+  onFirstStartDateChange: (date: Date | null) => void;
   onSecondStartDateChange: (date: Date | null) => void;
 }
 
@@ -42,15 +44,17 @@ export function SupplementaryLeaveCard({
   enabled,
   duration,
   mode,
+  firstStartDate,
   secondStartDate,
   eligibility,
-  startDate,
+  earliestStartDate,
   periods,
   error,
   scenario,
   onEnabledChange,
   onDurationChange,
   onModeChange,
+  onFirstStartDateChange,
   onSecondStartDateChange
 }: SupplementaryLeaveCardProps) {
   const canPlan = eligibility.canPlan;
@@ -66,8 +70,9 @@ export function SupplementaryLeaveCard({
   const isSplitActive = mode === 'split' && isSplitAvailable;
   const hasPeriods = periods.length > 0;
   const periodsValidated = enabled && hasPeriods && !error;
-  const minDateValue = toInputValue(startDate);
+  const minDateValue = toInputValue(earliestStartDate);
   const maxDateValue = toInputValue(eligibility.limitDate);
+  const effectiveStartDate = firstStartDate ?? earliestStartDate;
   const vocabulary = getScenarioVocabulary(scenario);
   const { shouldReduce, transition } = useAppMotion();
 
@@ -178,7 +183,7 @@ export function SupplementaryLeaveCard({
             Début projeté
           </div>
           <p className="text-sm font-bold text-slate-900">
-            {startDate ? formatDate(startDate) : 'Après le planning initial'}
+            {effectiveStartDate ? formatDate(effectiveStartDate) : 'Après le planning initial'}
           </p>
         </div>
       </div>
@@ -223,6 +228,35 @@ export function SupplementaryLeaveCard({
                 })}
               </div>
             </div>
+
+            {/* First period start date picker */}
+            {earliestStartDate && (
+              <div className="mt-5">
+                <label htmlFor="supplementary-first-start" className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Début de la première période
+                </label>
+                <input
+                  id="supplementary-first-start"
+                  type="date"
+                  value={toInputValue(effectiveStartDate)}
+                  min={toInputValue(earliestStartDate)}
+                  max={toInputValue(eligibility.limitDate ?? undefined)}
+                  disabled={!canPlan}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    if (!value) {
+                      onFirstStartDateChange(null);
+                      return;
+                    }
+                    onFirstStartDateChange(startOfDay(new Date(value)));
+                  }}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                  Au plus tôt le {formatDate(earliestStartDate)}. Laissez vide pour utiliser la date la plus proche.
+                </p>
+              </div>
+            )}
 
             <AnimatePresence initial={false}>
               {isSplitAvailable && (

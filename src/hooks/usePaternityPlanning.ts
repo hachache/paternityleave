@@ -516,15 +516,17 @@ export function usePaternityPlanning() {
     supplementaryLeaveEnabled: supplementary.enabled,
     supplementaryLeaveDuration: supplementary.duration,
     supplementaryLeaveMode: supplementary.mode,
+    supplementaryLeaveFirstStartDate: supplementary.firstStartDate,
     supplementaryLeaveSecondStartDate: supplementary.secondStartDate,
     supplementaryLeaveEligibility: supplementary.eligibility,
-    supplementaryLeaveStartDate: supplementary.startDate,
+    supplementaryLeaveEarliestStartDate: supplementary.earliestStartDate,
     supplementaryLeavePeriod: supplementary.firstPeriod,
     supplementaryLeavePeriods: supplementary.periods,
     supplementaryLeaveError: supplementary.error,
     setSupplementaryLeaveEnabled: supplementary.setEnabled,
     setSupplementaryLeaveDuration: supplementary.setDuration,
     setSupplementaryLeaveMode: supplementary.setMode,
+    setSupplementaryLeaveFirstStartDate: supplementary.setFirstStartDate,
     setSupplementaryLeaveSecondStartDate: supplementary.setSecondStartDate
   };
 }
