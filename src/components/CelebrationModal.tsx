@@ -47,8 +47,8 @@ export function CelebrationModal({
       return;
     }
     setIsVisible(false);
-    setTimeout(action, isCoarsePointer ? 300 : 400);
-  }, [isCoarsePointer, shouldReduce]);
+    setTimeout(action, 250);
+  }, [shouldReduce]);
 
   useEffect(() => {
     setIsVisible(show);
@@ -132,6 +132,15 @@ export function CelebrationModal({
     }
   }, [show, isCoarsePointer]);
 
+  useEffect(() => {
+    if (show && isVisible) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [show, isVisible]);
+
   if (!show && !isVisible) return null;
 
   const subtitle = showSupplementaryAction
@@ -156,7 +165,7 @@ export function CelebrationModal({
               initial={shouldReduce ? false : { opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 15 }}
+              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 15 }}
               ref={dialogRef}
               role="dialog"
               aria-modal="true"
@@ -224,7 +233,7 @@ export function CelebrationModal({
                     <button
                       type="button"
                       onClick={() => dismissWithAnimation(onGoToSupplementary)}
-                      className="px-5 sm:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold w-full transition-colors"
+                      className="px-5 sm:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold w-full transition-colors active:scale-95 transition-transform"
                       data-autofocus
                     >
                       Configurer le congé supplémentaire
@@ -233,7 +242,7 @@ export function CelebrationModal({
                   <button
                     type="button"
                     onClick={() => dismissWithAnimation(onGoToLetter)}
-                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-colors ${
+                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-colors active:scale-95 transition-transform ${
                       showSupplementaryAction
                         ? 'bg-white border-2 border-slate-200 text-slate-800 hover:bg-slate-50'
                         : 'bg-emerald-600 hover:bg-emerald-700 text-white'

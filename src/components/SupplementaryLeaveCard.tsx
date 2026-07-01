@@ -17,15 +17,17 @@ interface SupplementaryLeaveCardProps {
   enabled: boolean;
   duration: SupplementaryLeaveDuration;
   mode: SupplementaryLeaveMode;
+  firstStartDate: Date | null;
   secondStartDate: Date | null;
   eligibility: SupplementaryLeaveEligibility;
-  startDate: Date | null;
+  earliestStartDate: Date | null;
   periods: LeaveBlock[];
   error: string | null;
   scenario: LeaveScenarioConfig;
   onEnabledChange: (enabled: boolean) => void;
   onDurationChange: (duration: SupplementaryLeaveDuration) => void;
   onModeChange: (mode: SupplementaryLeaveMode) => void;
+  onFirstStartDateChange: (date: Date | null) => void;
   onSecondStartDateChange: (date: Date | null) => void;
 }
 
@@ -42,15 +44,17 @@ export function SupplementaryLeaveCard({
   enabled,
   duration,
   mode,
+  firstStartDate,
   secondStartDate,
   eligibility,
-  startDate,
+  earliestStartDate,
   periods,
   error,
   scenario,
   onEnabledChange,
   onDurationChange,
   onModeChange,
+  onFirstStartDateChange,
   onSecondStartDateChange
 }: SupplementaryLeaveCardProps) {
   const canPlan = eligibility.canPlan;
@@ -66,8 +70,9 @@ export function SupplementaryLeaveCard({
   const isSplitActive = mode === 'split' && isSplitAvailable;
   const hasPeriods = periods.length > 0;
   const periodsValidated = enabled && hasPeriods && !error;
-  const minDateValue = toInputValue(startDate);
+  const minDateValue = toInputValue(earliestStartDate);
   const maxDateValue = toInputValue(eligibility.limitDate);
+  const effectiveStartDate = firstStartDate ?? earliestStartDate;
   const vocabulary = getScenarioVocabulary(scenario);
   const { shouldReduce, transition } = useAppMotion();
 
@@ -131,6 +136,36 @@ export function SupplementaryLeaveCard({
         </button>
       </div>
 
+      {/* Eligibility notice — shown when the toggle is disabled */}
+      {!canPlan && eligibility.reason && (
+        <div className="mt-5 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 flex gap-3">
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-bold text-amber-900 mb-1">
+              {eligibility.isEligibleBirthDate === false
+                ? 'Date de naissance non éligible'
+                : !eligibility.isRequestWindowOpen
+                  ? 'Demande pas encore ouverte'
+                  : 'Non disponible'}
+            </p>
+            <p className="text-sm font-medium text-amber-800 leading-relaxed">
+              {eligibility.reason}
+            </p>
+            {!eligibility.isEligibleBirthDate && (
+              <p className="mt-2 text-xs text-amber-700">
+                Le congé supplémentaire est réservé aux enfants nés ou adoptés à partir du{' '}
+                <strong>1er janvier 2026</strong>, conformément à la LFSS 2026 (article 99-V).
+              </p>
+            )}
+            {!eligibility.isRequestWindowOpen && eligibility.daysUntilRequestWindow !== null && (
+              <p className="mt-2 text-xs text-amber-700">
+                La demande pourra être préparée dans <strong>{eligibility.daysUntilRequestWindow} jours</strong>.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 sm:p-4">
           <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
@@ -148,7 +183,7 @@ export function SupplementaryLeaveCard({
             Début projeté
           </div>
           <p className="text-sm font-bold text-slate-900">
-            {startDate ? formatDate(startDate) : 'Après le planning initial'}
+            {effectiveStartDate ? formatDate(effectiveStartDate) : 'Après le planning initial'}
           </p>
         </div>
       </div>
@@ -178,7 +213,7 @@ export function SupplementaryLeaveCard({
                       type="button"
                       disabled={!canPlan}
                       onClick={() => onDurationChange(typedValue)}
-                      className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                         selected
                           ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                           : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -193,6 +228,35 @@ export function SupplementaryLeaveCard({
                 })}
               </div>
             </div>
+
+            {/* First period start date picker */}
+            {earliestStartDate && (
+              <div className="mt-5">
+                <label htmlFor="supplementary-first-start" className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Début de la première période
+                </label>
+                <input
+                  id="supplementary-first-start"
+                  type="date"
+                  value={toInputValue(effectiveStartDate)}
+                  min={toInputValue(earliestStartDate)}
+                  max={toInputValue(eligibility.limitDate ?? undefined)}
+                  disabled={!canPlan}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    if (!value) {
+                      onFirstStartDateChange(null);
+                      return;
+                    }
+                    onFirstStartDateChange(startOfDay(new Date(value)));
+                  }}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                  Au plus tôt le {formatDate(earliestStartDate)}. Laissez vide pour utiliser la date la plus proche.
+                </p>
+              </div>
+            )}
 
             <AnimatePresence initial={false}>
               {isSplitAvailable && (
@@ -223,7 +287,7 @@ export function SupplementaryLeaveCard({
                           type="button"
                           disabled={!canPlan}
                           onClick={() => onModeChange(option)}
-                          className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                             selected
                               ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                               : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'

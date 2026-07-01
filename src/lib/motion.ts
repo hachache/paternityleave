@@ -12,6 +12,11 @@ export const fadeInUp: Variants = {
   visible: { opacity: 1, y: 0 }
 };
 
+export const expandIn: Variants = {
+  hidden: { opacity: 0, height: 0 },
+  visible: { opacity: 1, height: 'auto' }
+};
+
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 }

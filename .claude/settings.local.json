@@ -12,7 +12,18 @@
       "Bash(git commit:*)",
       "Bash(git pull:*)",
       "Bash(npm install framer-motion)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Read(//dev/**)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git clone *)",
+      "Bash(npx vitest *)",
+      "Bash(git -C /Users/hachache/Documents/paternityleave rev-parse --show-toplevel)",
+      "Bash(cat \"$\\(git -C /Users/hachache/Documents/paternityleave rev-parse --show-toplevel\\)/.superpowers/sdd/progress.md\")"
     ],
     "deny": [],
     "ask": []

@@ -10,7 +10,7 @@ import {
   Zap
 } from 'lucide-react';
 import { Button } from './Button';
-import { fadeIn, fadeInUp, springs, useAppMotion } from '../lib/motion';
+import { fadeIn, fadeInUp, useAppMotion } from '../lib/motion';
 
 interface PlanningModeSelectorProps {
   isChoiceVisible: boolean;
@@ -64,7 +64,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
   onCustomFirstBlockDaysChange
 }: PlanningModeSelectorProps) {
   const sliderPercentage = getSliderPercentage(customFirstBlockDays, sliderMax);
-  const { shouldReduce, transition } = useAppMotion();
+  const { transition } = useAppMotion();
   const firstBlockPercentage = getRatioPercentage(customFirstBlockDays, totalFractionableDays);
   const secondBlockPercentage = getRatioPercentage(secondBlockDays, totalFractionableDays);
 
@@ -99,7 +99,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
             </div>
 
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-              <div className="relative flex flex-col rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-4 sm:p-6 shadow-sm shadow-brand-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/10">
+              <div className="relative flex flex-col rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-4 sm:p-6 shadow-sm shadow-brand-500/10 transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/10">
                 <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md shadow-brand-500/30">
                   <Star className="h-3 w-3" aria-hidden="true" />
                   Recommandé
@@ -143,7 +143,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                 </Button>
               </div>
 
-              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
                 <div className="mb-4 sm:mb-5 flex items-center gap-3">
                   <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-sm">
                     <Settings2 className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
@@ -163,16 +163,12 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                   </div>
                   <div className="flex gap-2">
                     <motion.div
-                      layout
-                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700 transition-all duration-300 ease-out"
                     >
                       {customFirstBlockDays}j
                     </motion.div>
                     <motion.div
-                      layout
-                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700 transition-all duration-300 ease-out"
                     >
                       {secondBlockDays}j
                     </motion.div>
@@ -267,9 +263,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                 <div className="flex gap-4 justify-center items-center">
                   <div className="flex flex-col items-center">
                     <motion.div
-                      layout
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-brand-600 text-white shadow-md shadow-brand-600/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-brand-600 text-white shadow-md shadow-brand-600/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2 transition-all duration-300 ease-out"
                     >
                       {customFirstBlockDays}
                     </motion.div>
@@ -278,9 +272,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                   <div className="text-2xl text-slate-300 font-light">+</div>
                   <div className="flex flex-col items-center">
                     <motion.div
-                      layout
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-emerald-500 text-white shadow-md shadow-emerald-500/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2"
-                      transition={shouldReduce ? { duration: 0 } : springs.soft}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-emerald-500 text-white shadow-md shadow-emerald-500/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2 transition-all duration-300 ease-out"
                     >
                       {secondBlockDays}
                     </motion.div>
@@ -291,16 +283,12 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
 
               <div className="h-4 bg-slate-200 rounded-full overflow-hidden mb-6 flex">
                 <motion.div
-                  layout
                   className="h-full bg-brand-500 transition-all duration-300 ease-out"
                   style={{ width: `${firstBlockPercentage}%` }}
-                  transition={shouldReduce ? { duration: 0 } : springs.soft}
                 />
                 <motion.div
-                  layout
                   className="h-full bg-emerald-500 transition-all duration-300 ease-out"
                   style={{ width: `${secondBlockPercentage}%` }}
-                  transition={shouldReduce ? { duration: 0 } : springs.soft}
                 />
               </div>
 

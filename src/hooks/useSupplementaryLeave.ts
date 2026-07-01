@@ -22,15 +22,17 @@ export interface SupplementaryLeaveState {
   enabled: boolean;
   duration: SupplementaryLeaveDuration;
   mode: SupplementaryLeaveMode;
+  firstStartDate: Date | null;
   secondStartDate: Date | null;
   eligibility: ReturnType<typeof getSupplementaryLeaveEligibility>;
-  startDate: Date | null;
+  earliestStartDate: Date | null;
   periods: LeaveBlock[];
   firstPeriod: LeaveBlock | null;
   error: string | null;
   setEnabled: (enabled: boolean) => void;
   setDuration: (duration: SupplementaryLeaveDuration) => void;
   setMode: (mode: SupplementaryLeaveMode) => void;
+  setFirstStartDate: (date: Date | null) => void;
   setSecondStartDate: (date: Date | null) => void;
   reset: () => void;
 }
@@ -50,6 +52,7 @@ export function useSupplementaryLeave({
   const [enabled, setEnabled] = useState(false);
   const [duration, setDuration] = useState<SupplementaryLeaveDuration>(1);
   const [mode, setMode] = useState<SupplementaryLeaveMode>('consecutive');
+  const [firstStartDate, setFirstStartDate] = useState<Date | null>(null);
   const [secondStartDate, setSecondStartDate] = useState<Date | null>(null);
 
   const eligibility = useMemo(
@@ -57,7 +60,7 @@ export function useSupplementaryLeave({
     [birthDate, scenario]
   );
 
-  const startDate = useMemo(() => {
+  const earliestStartDate = useMemo(() => {
     if (!paternityEndDate) return null;
     return getSupplementaryLeaveEarliestStartDate(
       paternityEndDate,
@@ -65,10 +68,20 @@ export function useSupplementaryLeave({
     );
   }, [eligibility.activationDate, paternityEndDate]);
 
+  /** Effective start date for the first period: user-chosen or earliest possible. */
+  const effectiveStartDate = useMemo(() => {
+    if (!earliestStartDate) return null;
+    if (firstStartDate && !isAfter(earliestStartDate, firstStartDate)) {
+      return firstStartDate;
+    }
+    return earliestStartDate;
+  }, [earliestStartDate, firstStartDate]);
+
   const reset = useCallback(() => {
     setEnabled(false);
     setDuration(1);
     setMode('consecutive');
+    setFirstStartDate(null);
     setSecondStartDate(null);
   }, []);
 
@@ -93,7 +106,7 @@ export function useSupplementaryLeave({
 
   const periods = useMemo<LeaveBlock[]>(() => {
     if (!enabled) return [];
-    if (!startDate) return [];
+    if (!effectiveStartDate) return [];
     if (!isPaternityPlanComplete) return [];
 
     const legalLimit = eligibility.limitDate;
@@ -102,15 +115,15 @@ export function useSupplementaryLeave({
     if (mode === 'split' && duration === 2) {
       if (!secondStartDate) return [];
       const validation = calculateSupplementaryLeaveSplitBlocks(
-        startDate,
+        effectiveStartDate,
         secondStartDate,
-        startDate,
+        earliestStartDate ?? effectiveStartDate,
         legalLimit
       );
       return validation.valid ? validation.blocks : [];
     }
 
-    const projected = calculateSupplementaryLeavePeriod(startDate, duration);
+    const projected = calculateSupplementaryLeavePeriod(effectiveStartDate, duration);
     if (isAfter(projected.end, legalLimit)) return [];
     return [projected];
   }, [
@@ -119,7 +132,8 @@ export function useSupplementaryLeave({
     enabled,
     mode,
     secondStartDate,
-    startDate,
+    effectiveStartDate,
+    earliestStartDate,
     isPaternityPlanComplete
   ]);
 
@@ -129,9 +143,9 @@ export function useSupplementaryLeave({
       return eligibility.reason;
     }
     if (!isPaternityPlanComplete) {
-      return 'Planifiez d’abord 100% du congé initial pour projeter ce congé.';
+      return "Planifiez d'abord 100% du congé initial pour projeter ce congé.";
     }
-    if (!startDate) {
+    if (!effectiveStartDate) {
       return 'Date de début indisponible.';
     }
     const legalLimit = eligibility.limitDate;
@@ -141,18 +155,18 @@ export function useSupplementaryLeave({
 
     if (mode === 'split' && duration === 2) {
       if (!secondStartDate) {
-        return 'Sélectionnez la date de début de la seconde période d’1 mois.';
+        return "Sélectionnez la date de début de la seconde période d'1 mois.";
       }
       const validation = calculateSupplementaryLeaveSplitBlocks(
-        startDate,
+        effectiveStartDate,
         secondStartDate,
-        startDate,
+        earliestStartDate ?? effectiveStartDate,
         legalLimit
       );
       return validation.error;
     }
 
-    const projected = calculateSupplementaryLeavePeriod(startDate, duration);
+    const projected = calculateSupplementaryLeavePeriod(effectiveStartDate, duration);
     if (isAfter(projected.end, legalLimit)) {
       return 'La période projetée dépasse le délai légal de prise.';
     }
@@ -165,7 +179,8 @@ export function useSupplementaryLeave({
     enabled,
     mode,
     secondStartDate,
-    startDate,
+    effectiveStartDate,
+    earliestStartDate,
     isPaternityPlanComplete
   ]);
 
@@ -173,15 +188,17 @@ export function useSupplementaryLeave({
     enabled,
     duration,
     mode,
+    firstStartDate,
     secondStartDate,
     eligibility,
-    startDate,
+    earliestStartDate,
     periods,
     firstPeriod: periods[0] ?? null,
     error,
     setEnabled,
     setDuration,
     setMode,
+    setFirstStartDate,
     setSecondStartDate,
     reset
   };

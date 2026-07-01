@@ -20,7 +20,7 @@ import { ResetConfirmDialog } from './components/ResetConfirmDialog';
 import { HeroHeader } from './components/HeroHeader';
 import { PlanningModeSelector } from './components/PlanningModeSelector';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
-import { fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
+import { expandIn, fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
 
 // Lazy-loaded components (non-critiques pour l'affichage initial)
 const LetterGenerator = lazy(() => import('./components/LetterGenerator').then(m => ({ default: m.LetterGenerator })));
@@ -72,9 +72,10 @@ function App() {
     supplementaryLeaveEnabled,
     supplementaryLeaveDuration,
     supplementaryLeaveMode,
+    supplementaryLeaveFirstStartDate,
     supplementaryLeaveSecondStartDate,
     supplementaryLeaveEligibility,
-    supplementaryLeaveStartDate,
+    supplementaryLeaveEarliestStartDate,
     supplementaryLeavePeriods,
     supplementaryLeaveError,
     selectBirthDate,
@@ -96,6 +97,7 @@ function App() {
     setSupplementaryLeaveEnabled,
     setSupplementaryLeaveDuration,
     setSupplementaryLeaveMode,
+    setSupplementaryLeaveFirstStartDate,
     setSupplementaryLeaveSecondStartDate
   } = usePaternityPlanning();
 
@@ -254,7 +256,7 @@ function App() {
               ← Retour au planificateur
             </Button>
           </div>
-          <Suspense fallback={<LazyFallback height="h-96" />}>
+          <Suspense fallback={<LazyFallback height="h-[600px]" />}>
             <LegalReferences />
           </Suspense>
         </main>
@@ -327,7 +329,7 @@ function App() {
             <motion.div
               ref={calendarRef}
               id="calendar"
-              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-2xl sm:rounded-[2rem] transition-shadow duration-500 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
+              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-2xl sm:rounded-[2rem] transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
               variants={fadeInUp}
               transition={transition}
             >
@@ -415,11 +417,11 @@ function App() {
           {(error || (successMessage && !visualSelectionMode)) && (
             <motion.div
               key="feedback"
-              className="max-w-3xl mx-auto space-y-4 mb-8"
+              className="max-w-3xl mx-auto space-y-4 mb-8 overflow-hidden"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               {error && (
@@ -446,11 +448,11 @@ function App() {
           {visualSelectionMode && selectionStep !== 'idle' && (
             <motion.div
               key="visual-selection-banner"
-              className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30"
+              className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30 overflow-hidden"
               initial="hidden"
               animate="visible"
               exit="hidden"
-              variants={fadeInUp}
+              variants={expandIn}
               transition={transition}
             >
               <div className="rounded-2xl border border-brand-200 bg-white/95 backdrop-blur-xl p-4 sm:p-5 shadow-lg shadow-brand-900/5 ring-1 ring-black/5">
@@ -516,11 +518,11 @@ function App() {
           {remainingBlocks.length > 0 && (
             <motion.div
               key="clear-all-blocks"
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               <Button
@@ -541,10 +543,11 @@ function App() {
           {isPaternityPlanComplete && (
             <motion.div
               key="post-planning-nav"
+              className="overflow-hidden"
               initial="hidden"
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
@@ -558,27 +561,29 @@ function App() {
               key="supplementary-leave-card"
               ref={supplementaryLeaveRef}
               id="conge-supplementaire"
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
-              <Suspense fallback={<LazyFallback height="h-80" />}>
+              <Suspense fallback={<LazyFallback height="h-[400px]" />}>
                 <SupplementaryLeaveCard
                   enabled={supplementaryLeaveEnabled}
                   duration={supplementaryLeaveDuration}
                   mode={supplementaryLeaveMode}
                   secondStartDate={supplementaryLeaveSecondStartDate}
                   eligibility={supplementaryLeaveEligibility}
-                  startDate={supplementaryLeaveStartDate}
+                  firstStartDate={supplementaryLeaveFirstStartDate}
+                  earliestStartDate={supplementaryLeaveEarliestStartDate}
                   periods={supplementaryLeavePeriods}
                   error={supplementaryLeaveError}
                   scenario={scenario}
                   onEnabledChange={setSupplementaryLeaveEnabled}
                   onDurationChange={setSupplementaryLeaveDuration}
                   onModeChange={setSupplementaryLeaveMode}
+                  onFirstStartDateChange={setSupplementaryLeaveFirstStartDate}
                   onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
                 />
               </Suspense>
@@ -590,12 +595,12 @@ function App() {
           {birthDate && (
             <motion.div
               key="summary"
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               id="summary"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               <Summary
@@ -619,15 +624,15 @@ function App() {
             <motion.div
               key="letter-generator"
               ref={letterRef}
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               id="letter"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
             >
-              <Suspense fallback={<LazyFallback height="h-96" />}>
+              <Suspense fallback={<LazyFallback height="h-[600px]" />}>
                 <LetterGenerator
                   birthDate={birthDate}
                   employerPeriod={employerPeriod}
@@ -681,7 +686,7 @@ function App() {
             <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex min-h-10 items-center px-2 transition-colors hover:text-brand-600"
+              className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-brand-600"
             >
               Remonter ↑
             </button>

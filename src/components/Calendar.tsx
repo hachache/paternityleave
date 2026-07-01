@@ -321,9 +321,9 @@ export const Calendar = memo(function Calendar({
       } else if (metadata.type === 'mandatory') {
         classes += ' bg-brand-600 text-white shadow-md shadow-brand-600/30 ring-1 ring-inset ring-white/20';
       } else if (metadata.type === 'remaining') {
-        classes += ' bg-success-500 text-white cursor-pointer hover:bg-success-600 hover:-translate-y-0.5 shadow-md shadow-success-500/30';
+        classes += ' bg-success-500 text-white cursor-pointer' + (isCoarsePointer ? '' : ' hover:bg-success-600 hover:-translate-y-0.5') + ' shadow-md shadow-success-500/30';
       } else if (metadata.selectable && isCurrentMonthDay) {
-        classes += ' cursor-pointer text-slate-700 hover:bg-brand-50 hover:text-brand-700';
+        classes += ' cursor-pointer text-slate-700' + (isCoarsePointer ? '' : ' hover:bg-brand-50 hover:text-brand-700');
       } else {
         classes += ' cursor-not-allowed';
         if (isCurrentMonthDay) classes += ' opacity-40';
@@ -333,7 +333,7 @@ export const Calendar = memo(function Calendar({
 
       return classes;
     },
-    [currentMonth, holidays]
+    [currentMonth, holidays, isCoarsePointer]
   );
 
   const monthGridVariants = {
@@ -409,7 +409,6 @@ export const Calendar = memo(function Calendar({
           key={format(currentMonth, 'yyyy-MM')}
           role="grid"
           className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 md:gap-3"
-          layout
           custom={monthDirection}
           variants={monthGridVariants}
           initial="enter"
@@ -454,7 +453,6 @@ export const Calendar = memo(function Calendar({
                 aria-label={ariaLabel}
                 aria-disabled={!metadata.selectable && metadata.action === 'static'}
                 aria-current={isTodayDate ? 'date' : undefined}
-                layout
                 whileTap={metadata.selectable && !shouldReduce ? { scale: 0.92 } : undefined}
                 transition={dayTransition}
                 onFocus={handleCellFocus}
