@@ -196,7 +196,7 @@ export function CelebrationModal({
             onClick={() => dismissWithAnimation(onClose)}
           >
             <motion.div
-              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-2xl bg-white/95 backdrop-blur-xl p-5 shadow-xl sm:rounded-3xl sm:p-8 relative border border-white/50"
+              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-2xl bg-white/95 backdrop-blur-xl p-6 shadow-xl sm:rounded-3xl sm:p-8 relative border border-white/50"
               initial={shouldReduce ? false : { opacity: 0, scale: 0.92, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: -5 }}

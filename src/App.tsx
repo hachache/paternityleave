@@ -291,7 +291,7 @@ function App() {
       </a>
 
       <main id={mainContentId} className="flex-1 relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
+        <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
           <div className="space-y-0">
             <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
@@ -321,8 +321,8 @@ function App() {
                 scenario={scenario}
               />
               {birthDate && (
-                <p className="reveal-subtle mt-4 text-center text-sm font-medium text-slate-500 bg-white/70 backdrop-blur-sm py-2 px-4 rounded-full inline-block mx-auto border border-white/80 shadow-sm">
-                  {totalPlannedDays} / {totalFractionableDays} jours planifiés
+                <p className="reveal-subtle mt-4 text-center text-sm font-medium text-slate-400 bg-white/70 backdrop-blur-sm py-2 px-4 rounded-full inline-block mx-auto border border-white/80 shadow-sm">
+                  <span className="font-bold text-slate-600">{totalPlannedDays}</span> / {totalFractionableDays} jours planifiés
                 </p>
               )}
             </div>
@@ -330,7 +330,7 @@ function App() {
             <div
               ref={calendarRef}
               id="calendar"
-              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
+              className={`mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
             >
               <Calendar
                 birthDate={birthDate}
@@ -440,7 +440,7 @@ function App() {
           {visualSelectionMode && selectionStep !== 'idle' && (
             <div
               key="visual-selection-banner"
-              className="reveal-subtle fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 max-w-3xl sm:sticky sm:inset-x-auto sm:bottom-auto sm:top-24 sm:z-30 sm:mx-auto sm:mb-6 overflow-hidden"
+              className="reveal-subtle fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 max-w-[calc(100vw-1.5rem)] sm:max-w-3xl sm:sticky sm:inset-x-auto sm:bottom-auto sm:top-24 sm:z-30 sm:mx-auto sm:mb-6"
             >
               <div className="rounded-card border border-brand-200 bg-white/90 backdrop-blur-xl p-4 sm:p-5 shadow-depth-lg ring-1 ring-black/5">
                 <div className="flex items-center gap-3 sm:gap-4">

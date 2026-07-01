@@ -101,9 +101,9 @@ export function LetterGenerator({
   };
 
   return (
-    <div className="rounded-2xl sm:rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-8 shadow-soft transition-[border-color,box-shadow] duration-200">
-      <h2 className="text-xl sm:text-2xl font-bold font-display text-slate-900 mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
-        <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-900 text-white shadow-md shadow-slate-900/10">
+    <div className="rounded-card border border-slate-200 bg-white p-5 sm:p-7 shadow-soft transition-[border-color,box-shadow] duration-200">
+      <h2 className="text-xl sm:text-[1.6rem] font-bold font-display text-slate-900 mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
+        <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900 text-white shadow-md shadow-slate-900/10">
           <Mail className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
         </div>
         Courrier de demande

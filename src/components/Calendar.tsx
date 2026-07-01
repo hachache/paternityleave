@@ -333,7 +333,7 @@ export const Calendar = memo(function Calendar({
       const weekend = isWeekend(date);
 
       // Classe de base
-      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center text-sm sm:h-12 sm:text-base rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation select-none ';
+      let classes = 'relative flex h-10 sm:h-12 w-full min-w-0 flex-col items-center justify-center text-sm sm:text-[0.9375rem] rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation select-none ';
 
       if (!isCurrentMonthDay) {
         classes += ' text-slate-200 opacity-20';
@@ -364,18 +364,18 @@ export const Calendar = memo(function Calendar({
   );
 
   return (
-    <div className="rounded-card border border-white bg-white/90 backdrop-blur-sm p-1 min-[360px]:p-3.5 sm:p-8 shadow-card relative">
+    <div className="rounded-card border border-white bg-white/90 backdrop-blur-sm p-3 sm:p-6 shadow-card relative">
       {!birthDate && (
-        <div className="reveal-subtle mb-5 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-50/50 p-4 sm:p-5 border border-brand-100/80 shadow-sm">
+        <div className="reveal-subtle mb-5 rounded-xl bg-gradient-to-br from-brand-50 to-brand-50/50 p-4 sm:p-5 border border-brand-100/80 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center text-lg shadow-sm shadow-brand-500/20">
+            <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center text-base shadow-sm shadow-brand-500/20">
               📅
             </div>
             <div>
-              <p className="text-sm sm:text-base text-brand-800 font-semibold mb-0.5">
+              <p className="text-sm sm:text-base text-brand-800 font-semibold">
                 Sélectionnez la {vocabulary.eventDateActionLabel} pour commencer
               </p>
-              <p className="text-xs sm:text-sm text-brand-600 font-medium">
+              <p className="text-xs sm:text-sm text-brand-600 font-medium mt-0.5">
                 C'est la première étape pour calculer votre planning personnalisé.
               </p>
             </div>
@@ -409,9 +409,9 @@ export const Calendar = memo(function Calendar({
       </div>
 
       {/* Jours de la semaine */}
-      <div className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 mb-3 sm:mb-4">
+      <div className="grid grid-cols-7 gap-0.5 min-[380px]:gap-1 sm:gap-2 mb-3 sm:mb-4">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-[10px] sm:text-xs uppercase tracking-wider font-bold text-slate-400 py-1.5 sm:py-2">
+          <div key={day} className="text-center text-[11px] sm:text-xs uppercase tracking-wider font-bold text-slate-400 py-1 sm:py-2">
             {day}
           </div>
         ))}
@@ -421,7 +421,7 @@ export const Calendar = memo(function Calendar({
       <div
         key={format(currentMonth, 'yyyy-MM')}
         role="grid"
-        className={`grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 md:gap-3 ${shouldReduce ? '' : 'reveal-subtle'}`}
+        className={`grid grid-cols-7 gap-0.5 min-[380px]:gap-1 sm:gap-2 ${shouldReduce ? '' : 'reveal-subtle'}`}
         onAnimationEnd={focusFocusedDay}
         onKeyDown={handleGridKeyDown}
         onClick={handleGridClick}
@@ -465,14 +465,14 @@ export const Calendar = memo(function Calendar({
               <span className="relative z-10">{dayStart.getDate()}</span>
               {typeLetter && (
                 <span
-                  className="absolute -bottom-0.5 text-[7px] font-bold opacity-60 leading-none select-none tracking-wider uppercase"
+                  className="absolute -bottom-[1px] text-[6px] sm:text-[7px] font-bold opacity-60 leading-none select-none tracking-wider uppercase"
                   aria-hidden="true"
                 >
                   {typeLetter}
                 </span>
               )}
               {isTodayDate && (
-                <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-brand-400 shadow-sm shadow-brand-400/50"></span>
+                <span className="absolute -bottom-[2px] sm:-bottom-1 w-[3px] h-[3px] sm:w-1 sm:h-1 rounded-full bg-brand-400 shadow-sm shadow-brand-400/50"></span>
               )}
             </button>
           );

@@ -26,7 +26,7 @@ export function FeedbackBanner({ tone, message, title }: FeedbackBannerProps) {
   return (
     <div
       role="alert"
-      className={`backdrop-blur-sm rounded-2xl border px-5 py-4 shadow-soft ${containerStyles[tone]}`}
+      className={`backdrop-blur-sm rounded-xl border px-4 py-4 shadow-soft ${containerStyles[tone]}`}
     >
       <div className="flex items-start gap-4">
         <div

@@ -41,13 +41,13 @@ export const Summary = memo(function Summary({
   const vocabulary = getScenarioVocabulary(scenario);
 
   return (
-    <div className="rounded-2xl sm:rounded-card border border-slate-200 bg-white p-4 sm:p-8 shadow-depth-md">
-      <header className="mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
-        <div className="p-2.5 sm:p-3 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-md shadow-brand-500/20">
+    <div className="rounded-card border border-slate-200 bg-white p-5 sm:p-7 shadow-depth-md">
+      <header className="mb-6 sm:mb-7 flex items-center gap-3 sm:gap-4">
+        <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-md shadow-brand-500/20">
           <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
         <div>
-          <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900">Récapitulatif</h2>
+          <h2 className="text-xl sm:text-[1.6rem] font-bold font-display text-slate-900">Récapitulatif</h2>
           <p className="text-sm sm:text-base text-slate-500 font-medium">Votre planning complet</p>
         </div>
       </header>

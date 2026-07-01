@@ -13,8 +13,8 @@ export function LegalInfo({ onShowLegalReferences }: LegalInfoProps) {
   const multiplesBonus = multiples.fractionableDays - standard.fractionableDays;
 
   return (
-    <details className="group bg-white border border-slate-200 rounded-2xl shadow-depth hover:shadow-depth-md transition-all duration-300">
-      <summary className="cursor-pointer p-5 sm:p-6 hover:bg-slate-50/50 transition-all duration-300 flex items-center gap-3 active:scale-[0.99] rounded-2xl list-none [&::-webkit-details-marker]:hidden">
+    <details className="group bg-white border border-slate-200 rounded-card shadow-depth hover:shadow-depth-md transition-all duration-300">
+      <summary className="cursor-pointer p-5 sm:p-6 hover:bg-slate-50/50 transition-all duration-300 flex items-center gap-3 active:scale-[0.99] rounded-card list-none [&::-webkit-details-marker]:hidden">
         <div className="p-2 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-sm">
           <BookOpen className="w-5 h-5 flex-shrink-0" />
         </div>

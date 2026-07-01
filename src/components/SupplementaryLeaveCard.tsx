@@ -88,22 +88,22 @@ export function SupplementaryLeaveCard({
   );
 
   return (
-    <section className="rounded-2xl sm:rounded-card border border-slate-200 bg-white p-4 sm:p-6 shadow-depth-md">
+    <section className="rounded-card border border-slate-200 bg-white p-5 sm:p-7 shadow-depth-md">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-4">
-          <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-md shadow-slate-900/20">
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-md shadow-slate-900/20">
             <CalendarDays className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
           </div>
           <div>
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <h2 id="supplementary-leave-title" className="text-lg sm:text-xl font-bold font-display text-slate-900">
+              <h2 id="supplementary-leave-title" className="text-xl sm:text-[1.5rem] font-bold font-display text-slate-900">
                 Congé supplémentaire 2026
               </h2>
               <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-600 shadow-sm">
                 {statusLabel}
               </span>
             </div>
-            <p className="max-w-xl text-sm font-medium leading-relaxed text-slate-600">
+            <p className="max-w-xl text-sm font-medium text-slate-600">
               Module secondaire pour projeter le nouveau congé supplémentaire applicable à partir du 1er juillet 2026,
               sous réserve des décrets d'application.
             </p>

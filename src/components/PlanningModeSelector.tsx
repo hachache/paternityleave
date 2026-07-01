@@ -79,15 +79,15 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
           ref={planningRef}
           className="max-w-3xl mx-auto mb-16 sm:mb-12 scroll-mt-28"
         >
-          <div className={`premium-card p-5 sm:p-8 ${isCoarsePointer ? '' : 'transition-all duration-300'}`}>
-            <div className="text-center mb-6 sm:mb-8">
+          <div className={`premium-card p-5 sm:p-7 ${isCoarsePointer ? '' : 'transition-all duration-300'}`}>
+            <div className="text-center mb-6 sm:mb-7">
               <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 text-white mb-3 sm:mb-4 shadow-lg shadow-brand-500/20">
                 <CalendarDaysIcon className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold font-display text-slate-900 mb-2">
                 Planifiez vos {totalFractionableDays} jours
               </h3>
-              <p className="text-sm sm:text-lg text-slate-500 max-w-md mx-auto leading-relaxed">
+              <p className="text-sm sm:text-lg text-slate-500 max-w-md mx-auto">
                 Deux modes au choix selon vos préférences.
               </p>
             </div>
@@ -191,7 +191,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
           ref={customModeRef}
           className="max-w-3xl mx-auto mb-16 sm:mb-12 scroll-mt-28"
         >
-          <div className="premium-card p-5 sm:p-8">
+          <div className="premium-card p-5 sm:p-7">
             <div className="flex items-start gap-4 sm:gap-5 mb-6 sm:mb-8">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 text-white flex items-center justify-center shadow-lg shadow-brand-600/20">
@@ -329,9 +329,9 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
       {isFinalStepVisible && (
         <div
           key="planning-final-step"
-          className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 max-w-3xl sm:sticky sm:inset-x-auto sm:bottom-auto sm:top-24 sm:z-30 sm:mx-auto sm:mb-12"
+          className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 max-w-[calc(100vw-1.5rem)] sm:max-w-3xl sm:sticky sm:inset-x-auto sm:bottom-auto sm:top-24 sm:z-30 sm:mx-auto sm:mb-12"
         >
-          <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50/90 to-emerald-50/70 backdrop-blur-md p-4 sm:p-5 shadow-lg shadow-emerald-500/10">
+          <div className="rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50/90 to-emerald-50/70 backdrop-blur-md p-4 sm:p-5 shadow-lg shadow-emerald-500/10">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center font-bold font-display text-lg sm:text-xl shadow-md shadow-emerald-500/20 flex-shrink-0">
                 2

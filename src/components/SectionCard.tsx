@@ -14,28 +14,28 @@ export function SectionCard({ title, description, children, accent = 'slate', ic
   const barColor = accent === 'brand' ? 'bg-gradient-to-b from-brand-500 to-brand-400' : 'bg-gradient-to-b from-slate-300 to-slate-200';
 
   return (
-    <section className={`premium-card p-4 sm:p-8 relative ${accentStyle}`}>
-      {/* Barre d'accent latérale pour les cartes brand */}
+    <section className={`premium-card p-5 sm:p-7 relative ${accentStyle}`}>
+      {/* Barre d'accent latérale */}
       <div
-        className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full opacity-80 ${barColor}`}
+        className={`absolute left-0 top-5 bottom-5 w-[3px] rounded-r-full opacity-80 ${barColor}`}
         aria-hidden="true"
       />
-      <header className="mb-3 sm:mb-6 relative z-10 pl-3 sm:pl-4">
+      <header className="mb-4 sm:mb-6 relative z-10 pl-4">
         <div className="flex items-start gap-3 sm:gap-4">
           {icon && (
-            <div className="p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm text-brand-600 border border-white/50">
+            <div className="p-2.5 sm:p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm text-brand-600 border border-white/50">
               {icon}
             </div>
           )}
           <div>
-            <h2 className="text-lg sm:text-2xl font-bold font-display text-slate-900 tracking-tight">{title}</h2>
+            <h2 className="text-xl sm:text-[1.6rem] font-bold font-display text-slate-900 tracking-tight leading-snug">{title}</h2>
             {description && (
-              <p className="mt-0.5 text-sm sm:mt-1.5 sm:text-base text-slate-500 font-medium leading-relaxed">{description}</p>
+              <p className="mt-1 text-sm sm:text-base text-slate-500 font-medium">{description}</p>
             )}
           </div>
         </div>
       </header>
-      <div className="relative z-10 pl-3 sm:pl-4">{children}</div>
+      <div className="relative z-10 pl-4">{children}</div>
     </section>
   );
 }
