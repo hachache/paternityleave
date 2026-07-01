@@ -33,7 +33,6 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
   }, [showSupplementaryLink]);
 
   const detectActiveSection = useCallback(() => {
-    // Fallback for environments without IntersectionObserver
     const sectionElements = sections
       .map(section => ({ id: section.id, element: document.getElementById(section.id) }))
       .filter(item => item.element);
@@ -50,7 +49,6 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
     setActiveSection(closestSection.id);
   }, [sections]);
 
-  // IntersectionObserver for active section tracking
   useEffect(() => {
     if (!show) return;
     if ('IntersectionObserver' in window) {
@@ -69,10 +67,8 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
             ratios.set(id, entry.intersectionRatio);
           });
 
-          // Debounce pour éviter le clignotement
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
-            // Pick the section with the highest ratio
             let bestId = '';
             let best = -1;
             ratios.forEach((ratio, id) => {
@@ -85,12 +81,12 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
               setActiveSection(bestId);
             }
             debounceTimerRef.current = null;
-          }, 150); // Debounce de 150ms pour plus de stabilité
+          }, 150);
         },
         {
           root: null,
           rootMargin: isMobile ? '-96px 0px -120px 0px' : '-80px 0px -80px 0px',
-          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] // Optimized: 5 thresholds instead of 13 for better performance
+          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
         }
       );
       targets.forEach(el => io.observe(el));
@@ -101,21 +97,18 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
         observerRef.current = null;
       };
     } else {
-      // Fallback: measure once
       detectActiveSection();
     }
   }, [show, isMobile, sections, detectActiveSection]);
 
   useEffect(() => {
     if (!show) return;
-    // Initial detection seulement si IntersectionObserver n'est pas supporté
     if (!('IntersectionObserver' in window)) {
       const id = globalThis.setTimeout(() => detectActiveSection(), 100);
       return () => globalThis.clearTimeout(id);
     }
   }, [show, detectActiveSection]);
 
-  // Navigation réutilisable
   const navContent = (
     <>
       {sections.map(section => {
@@ -126,16 +119,13 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
             href={`#${section.id}`}
             className={`
               relative isolate px-2 sm:px-3 md:px-5 py-3 sm:py-2 rounded-xl text-xs sm:text-sm md:text-sm
-              font-semibold whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[44px] transition-colors duration-200
+              font-semibold whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[44px] transition-all duration-300
               ${
                 isActive
-                  ? 'text-white bg-brand-600 shadow-lg'
-                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
+                  ? 'text-white bg-gradient-to-br from-brand-500 to-brand-600 shadow-lg shadow-brand-500/20 scale-100'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 scale-[0.98]'
               }
             `}
-            style={{
-              transform: isActive ? 'scale(1)' : 'scale(0.98)'
-            }}
             title={section.label}
             onClick={(e) => {
               e.preventDefault();
@@ -151,13 +141,12 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
     </>
   );
 
-  // Top nav desktop, bottom nav mobile
   return (
     show ? (
       <div className={`fixed bottom-0 sm:bottom-auto sm:top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-3 sm:py-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-4 pointer-events-none ${shouldReduce ? '' : 'reveal-subtle'}`}>
         <nav
           aria-label="Navigation de la page"
-          className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl bg-white/95 backdrop-blur-lg border border-slate-200/80 shadow-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start transition-colors duration-200"
+          className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/70 shadow-depth-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start transition-all duration-300"
         >
           {navContent}
         </nav>

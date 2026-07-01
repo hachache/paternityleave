@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Sparkles } from 'lucide-react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { LeaveScenarioConfig } from '../utils/paternityLeave';
 import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
@@ -14,6 +14,49 @@ interface CelebrationModalProps {
   showSupplementaryAction: boolean;
   onGoToSupplementary: () => void;
   onGoToLetter: () => void;
+}
+
+// Particules décoratives pour l'animation de célébration
+function CelebrationParticles() {
+  const particles = Array.from({ length: 8 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: 3 + Math.random() * 4,
+    delay: Math.random() * 0.5,
+    duration: 1.5 + Math.random() * 1,
+  }));
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+            backgroundColor: ['#0071e3', '#22c55e', '#f59e0b', '#8b5cf6'][p.id % 4],
+          }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{
+            opacity: [0, 1, 1, 0],
+            scale: [0, 1, 1.2, 0],
+            y: [0, -20 - Math.random() * 20],
+          }}
+          transition={{
+            duration: p.duration,
+            delay: p.delay,
+            repeat: Infinity,
+            repeatDelay: 1 + Math.random(),
+            ease: 'easeOut',
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export function CelebrationModal({
@@ -144,20 +187,20 @@ export function CelebrationModal({
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            className="fixed inset-0 bg-slate-900/30 flex items-center justify-center z-50 px-4"
+            className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 px-4"
             initial={shouldReduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={shouldReduce ? { duration: 0 } : { duration: 0.25 }}
-            style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+            transition={shouldReduce ? { duration: 0 } : { duration: 0.3 }}
+            style={{ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
             onClick={() => dismissWithAnimation(onClose)}
           >
             <motion.div
-              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-2xl bg-white p-5 shadow-xl sm:rounded-3xl sm:p-8 relative"
-              initial={shouldReduce ? false : { opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 15 }}
+              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-2xl bg-white/95 backdrop-blur-xl p-5 shadow-xl sm:rounded-3xl sm:p-8 relative border border-white/50"
+              initial={shouldReduce ? false : { opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: -5 }}
+              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 280, damping: 18, mass: 0.8 }}
               ref={dialogRef}
               role="dialog"
               aria-modal="true"
@@ -165,6 +208,8 @@ export function CelebrationModal({
               tabIndex={-1}
               onClick={event => event.stopPropagation()}
             >
+              <CelebrationParticles />
+
               <motion.div
                 className="text-center relative z-10"
                 initial="hidden"
@@ -173,12 +218,17 @@ export function CelebrationModal({
                 transition={transition}
               >
                 <div className="relative mb-4 inline-flex h-20 w-20 items-center justify-center sm:h-24 sm:w-24">
-                  <div className="relative z-10 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md sm:h-20 sm:w-20">
+                  <motion.div
+                    className="relative z-10 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 sm:h-20 sm:w-20"
+                    initial={shouldReduce ? false : { scale: 0, rotate: -15 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 12, delay: 0.1 }}
+                  >
                     <CheckCircle className="w-9 h-9 sm:w-12 sm:h-12" strokeWidth={2.5} aria-hidden="true" />
-                  </div>
+                  </motion.div>
                 </div>
 
-                <motion.h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3" variants={slideUp} transition={transition}>
+                <motion.h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 tracking-tight" variants={slideUp} transition={transition}>
                   Planification complète
                 </motion.h3>
 
@@ -187,19 +237,20 @@ export function CelebrationModal({
                 </motion.p>
 
                 <motion.div
-                  className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 sm:p-4 mt-4"
+                  className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-50/50 p-3.5 sm:p-4 mt-4 shadow-sm"
                   variants={slideUp}
                   transition={transition}
                 >
                   <p className="text-sm font-semibold text-emerald-900">
-                    ✓ {totalDays} jours planifiés avec succès
+                    <Sparkles className="w-4 h-4 inline-block mr-1.5 -mt-0.5 text-emerald-500" aria-hidden="true" />
+                    {totalDays} jours planifiés avec succès
                   </p>
-                  <p className="text-xs text-emerald-700 mt-1">
+                  <p className="text-xs text-emerald-700 mt-1 font-medium">
                     3 jours employeur + 4 jours obligatoires + {totalFractionableDays} jours fractionnés
                   </p>
                 </motion.div>
 
-                <motion.p className="text-xs text-slate-500 mt-4" variants={fadeIn} transition={transition}>
+                <motion.p className="text-xs text-slate-400 mt-4" variants={fadeIn} transition={transition}>
                   {subtitle}
                 </motion.p>
 
@@ -208,7 +259,7 @@ export function CelebrationModal({
                     <button
                       type="button"
                       onClick={() => dismissWithAnimation(onGoToSupplementary)}
-                      className="px-5 sm:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold w-full transition-colors active:scale-95 transition-transform"
+                      className="px-5 sm:px-6 py-3 bg-gradient-to-br from-brand-500 to-brand-700 hover:from-brand-600 hover:to-brand-800 text-white rounded-xl font-semibold w-full transition-all duration-300 active:scale-95 shadow-lg shadow-brand-500/20 hover:shadow-brand-600/30"
                       data-autofocus
                     >
                       Configurer le congé supplémentaire
@@ -217,10 +268,10 @@ export function CelebrationModal({
                   <button
                     type="button"
                     onClick={() => dismissWithAnimation(onGoToLetter)}
-                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-colors active:scale-95 transition-transform ${
+                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-all duration-300 active:scale-95 ${
                       showSupplementaryAction
-                        ? 'bg-white border-2 border-slate-200 text-slate-800 hover:bg-slate-50'
-                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        ? 'bg-white border-2 border-slate-200 text-slate-800 hover:bg-slate-50 hover:border-slate-300 shadow-sm'
+                        : 'bg-gradient-to-br from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white shadow-lg shadow-emerald-500/20'
                     }`}
                     data-autofocus={!showSupplementaryAction}
                   >

@@ -332,32 +332,31 @@ export const Calendar = memo(function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center text-sm sm:h-12 sm:text-base rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
+      // Classe de base
+      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center text-sm sm:h-12 sm:text-base rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation select-none ';
 
       if (!isCurrentMonthDay) {
-        // Make non-current month days much fainter
-        classes += ' text-slate-300 opacity-25';
+        classes += ' text-slate-200 opacity-20';
       }
-
-      const hasLeaveType = ['birth', 'employer', 'mandatory', 'remaining'].includes(metadata.type || '');
 
       if (metadata.type === 'birth') {
-        classes += ' bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/30 ring-2 ring-slate-900 ring-offset-2';
+        classes += ' bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/30 ring-2 ring-slate-900 ring-offset-2 scale-[1.02] z-10';
       } else if (metadata.type === 'employer') {
-        // Pattern diagonal + label "E" pour daltoniens (A1)
-        classes += ' bg-brand-300 text-white shadow-sm bg-[repeating-linear-gradient(45deg,transparent,transparent_3px,rgba(255,255,255,0.15)_3px,rgba(255,255,255,0.15)_6px)]';
+        classes += ' bg-brand-200 text-brand-800 shadow-sm bg-[repeating-linear-gradient(45deg,transparent,transparent_3px,rgba(255,255,255,0.3)_3px,rgba(255,255,255,0.3)_6px)] border-brand-200/50';
       } else if (metadata.type === 'mandatory') {
-        classes += ' bg-brand-600 text-white shadow-md shadow-brand-600/30 ring-1 ring-inset ring-white/20';
+        classes += ' bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/25 border-brand-400/30';
       } else if (metadata.type === 'remaining') {
-        classes += ' bg-success-500 text-white cursor-pointer' + (isCoarsePointer ? '' : ' hover:bg-success-600') + ' shadow-md shadow-success-500/30';
+        classes += ' bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md shadow-success-500/25' + (isCoarsePointer ? '' : ' hover:shadow-lg hover:shadow-success-500/30') + ' scale-[1.02] font-semibold';
       } else if (metadata.selectable && isCurrentMonthDay) {
-        classes += ' cursor-pointer text-slate-700' + (isCoarsePointer ? '' : ' hover:bg-brand-50 hover:text-brand-700');
+        classes += ' cursor-pointer text-slate-700' + (isCoarsePointer ? '' : ' hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm hover:border-brand-100');
       } else {
-        classes += ' cursor-not-allowed';
-        if (isCurrentMonthDay) classes += ' opacity-40';
+        classes += ' cursor-default';
+        if (isCurrentMonthDay) classes += ' opacity-35';
       }
 
-      if (!hasLeaveType && (weekend || holiday) && isCurrentMonthDay) classes += ' bg-slate-50 text-slate-500';
+      if (!['birth', 'employer', 'mandatory', 'remaining'].includes(metadata.type || '') && (weekend || holiday) && isCurrentMonthDay) {
+        classes += ' bg-slate-50 text-slate-400';
+      }
 
       return classes;
     },
@@ -365,50 +364,60 @@ export const Calendar = memo(function Calendar({
   );
 
   return (
-    <div className="rounded-card border border-white bg-white p-1 min-[360px]:p-3.5 sm:p-8 shadow-card relative">
+    <div className="rounded-card border border-white bg-white/90 backdrop-blur-sm p-1 min-[360px]:p-3.5 sm:p-8 shadow-card relative">
       {!birthDate && (
-        <div className="reveal-subtle mb-5 rounded-2xl bg-brand-50 p-4 sm:p-5 border border-brand-100">
-          <p className="text-sm sm:text-base text-brand-800 text-center font-semibold mb-1.5">
-            <span aria-hidden="true">📅</span> Sélectionnez la {vocabulary.eventDateActionLabel} pour commencer
-          </p>
-          <p className="text-xs sm:text-sm text-brand-600 text-center font-medium">
-            C'est la première étape pour calculer votre planning personnalisé.
-          </p>
+        <div className="reveal-subtle mb-5 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-50/50 p-4 sm:p-5 border border-brand-100/80 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center text-lg shadow-sm shadow-brand-500/20">
+              📅
+            </div>
+            <div>
+              <p className="text-sm sm:text-base text-brand-800 font-semibold mb-0.5">
+                Sélectionnez la {vocabulary.eventDateActionLabel} pour commencer
+              </p>
+              <p className="text-xs sm:text-sm text-brand-600 font-medium">
+                C'est la première étape pour calculer votre planning personnalisé.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
+      {/* Navigation mois */}
       <div className="flex items-center justify-between mb-5 sm:mb-8">
         <button
           type="button"
           onClick={previousMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-2.5 rounded-xl text-slate-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois précédent"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
 
-        <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900 capitalize tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900 tracking-tight">
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
 
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-2.5 rounded-xl text-slate-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois suivant"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
       </div>
 
+      {/* Jours de la semaine */}
       <div className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 mb-3 sm:mb-4">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-[10px] sm:text-xs uppercase tracking-wider font-bold text-slate-500 py-1.5 sm:py-2">
+          <div key={day} className="text-center text-[10px] sm:text-xs uppercase tracking-wider font-bold text-slate-400 py-1.5 sm:py-2">
             {day}
           </div>
         ))}
       </div>
 
+      {/* Grille des jours */}
       <div
         key={format(currentMonth, 'yyyy-MM')}
         role="grid"
@@ -417,57 +426,57 @@ export const Calendar = memo(function Calendar({
         onKeyDown={handleGridKeyDown}
         onClick={handleGridClick}
       >
-          {days.map(day => {
-            const dayStart = startOfDay(day);
-            const dayKey = dayStart.getTime();
-            const metadata = metadataByKey.get(dayKey) ?? { type: null, selectable: true, action: 'select' };
-            const isFocused = dayKey === startOfDay(focusedDate).getTime();
-            const isTodayDate = isSameDay(dayStart, today);
-            const ariaLabel = buildCalendarDayAriaLabel(dayStart, metadata, {
-              eventDateLabel: vocabulary.eventDateLabel,
-              eventDateActionLabel: vocabulary.eventDateActionLabel,
-              selectActionLabel: birthDate
-                ? 'ajouter une période à partir de cette date'
-                : `sélectionner cette date comme ${vocabulary.eventDateActionLabel}`
-            });
+        {days.map(day => {
+          const dayStart = startOfDay(day);
+          const dayKey = dayStart.getTime();
+          const metadata = metadataByKey.get(dayKey) ?? { type: null, selectable: true, action: 'select' };
+          const isFocused = dayKey === startOfDay(focusedDate).getTime();
+          const isTodayDate = isSameDay(dayStart, today);
+          const ariaLabel = buildCalendarDayAriaLabel(dayStart, metadata, {
+            eventDateLabel: vocabulary.eventDateLabel,
+            eventDateActionLabel: vocabulary.eventDateActionLabel,
+            selectActionLabel: birthDate
+              ? 'ajouter une période à partir de cette date'
+              : `sélectionner cette date comme ${vocabulary.eventDateActionLabel}`
+          });
 
-            const typeLetter =
-              metadata.type === 'employer' ? 'E' :
-              metadata.type === 'mandatory' ? 'O' :
-              metadata.type === 'remaining' ? 'P' :
-              metadata.type === 'birth' ? 'N' :
-              '';
+          const typeLetter =
+            metadata.type === 'employer' ? 'E' :
+            metadata.type === 'mandatory' ? 'O' :
+            metadata.type === 'remaining' ? 'P' :
+            metadata.type === 'birth' ? 'N' :
+            '';
 
-            return (
-              <button
-                key={dayKey}
-                ref={registerDayRef(dayKey)}
-                type="button"
-                data-date={dayKey}
-                data-day-type={metadata.type || 'none'}
-                className={`${getDayClasses(dayStart, metadata)} ${pressedDayKey === dayKey ? 'ring-2 ring-brand-400 ring-offset-1' : ''}`}
-                tabIndex={isFocused ? 0 : -1}
-                title={metadata.reason}
-                aria-label={ariaLabel}
-                aria-disabled={!metadata.selectable && metadata.action === 'static'}
-                aria-current={isTodayDate ? 'date' : undefined}
-                onFocus={handleCellFocus}
-              >
-                <span className="relative z-10">{dayStart.getDate()}</span>
-                {typeLetter && (
-                  <span
-                    className="absolute bottom-0.5 text-[8px] font-bold opacity-70 leading-none select-none"
-                    aria-hidden="true"
-                  >
-                    {typeLetter}
-                  </span>
-                )}
-                {isTodayDate && (
-                  <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-brand-500"></span>
-                )}
-              </button>
-            );
-          })}
+          return (
+            <button
+              key={dayKey}
+              ref={registerDayRef(dayKey)}
+              type="button"
+              data-date={dayKey}
+              data-day-type={metadata.type || 'none'}
+              className={`${getDayClasses(dayStart, metadata)} ${pressedDayKey === dayKey ? 'ring-2 ring-brand-400 ring-offset-1 scale-105' : ''}`}
+              tabIndex={isFocused ? 0 : -1}
+              title={metadata.reason}
+              aria-label={ariaLabel}
+              aria-disabled={!metadata.selectable && metadata.action === 'static'}
+              aria-current={isTodayDate ? 'date' : undefined}
+              onFocus={handleCellFocus}
+            >
+              <span className="relative z-10">{dayStart.getDate()}</span>
+              {typeLetter && (
+                <span
+                  className="absolute -bottom-0.5 text-[7px] font-bold opacity-60 leading-none select-none tracking-wider uppercase"
+                  aria-hidden="true"
+                >
+                  {typeLetter}
+                </span>
+              )}
+              {isTodayDate && (
+                <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-brand-400 shadow-sm shadow-brand-400/50"></span>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

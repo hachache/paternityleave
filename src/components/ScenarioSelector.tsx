@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { LEAVE_SCENARIOS, LeaveScenarioConfig, LeaveScenarioId } from '../utils/paternityLeave';
 import { FRACTIONABLE_PERIODS_HINT } from '../utils/scenarioVocabulary';
 
@@ -56,17 +57,16 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             role="radio"
             aria-checked={isSelected}
             onClick={() => onScenarioChange(config.id)}
-            className={`group relative rounded-2xl sm:rounded-card p-3 sm:p-6 text-left transition-colors duration-200 h-full flex flex-col border active:scale-[0.98] hover-lift ${
+            className={`group relative rounded-2xl sm:rounded-card p-3 sm:p-6 text-left transition-all duration-300 h-full flex flex-col border active:scale-[0.98] hover:-translate-y-0.5 ${
               isSelected
-                ? 'border-brand-500 bg-brand-50/50 shadow-md shadow-brand-500/10 sm:border-transparent sm:shadow-lg'
-                : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
+                ? 'border-brand-500 bg-gradient-to-br from-brand-50/80 to-white shadow-lg shadow-brand-500/10'
+                : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md hover:shadow-brand-500/5'
             }`}
           >
             {isSelected && (
-              <div
-                className="pointer-events-none absolute inset-0 rounded-card border-2 border-brand-500 hidden sm:block"
-              />
+              <div className="pointer-events-none absolute inset-0 rounded-card border-2 border-brand-500 hidden sm:block" />
             )}
+
             {/* Selection Indicator */}
             <div className={`flex items-start justify-between gap-3 sm:gap-4 ${isSelected ? 'mb-2 sm:mb-4' : 'mb-0 sm:mb-4'}`}>
               <div className="flex-1 min-w-0">
@@ -75,7 +75,7 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                     {config.label}
                   </p>
                   {config.id === 'standard' && (
-                    <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-600">
+                    <span className="rounded-full bg-gradient-to-r from-brand-500 to-brand-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
                       Standard
                     </span>
                   )}
@@ -85,22 +85,24 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
                 </p>
               </div>
               <div
-                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 items-center justify-center transition-colors duration-300 ${isSelected ? 'flex' : 'hidden sm:flex'} ${
-                  isSelected ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-200 group-hover:border-brand-300'
+                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 items-center justify-center transition-all duration-300 ${
+                  isSelected
+                    ? 'flex bg-brand-500 border-brand-500 text-white shadow-sm shadow-brand-500/20 scale-110'
+                    : 'hidden sm:flex border-slate-200 group-hover:border-brand-300'
                 }`}
               >
-                {isSelected && <span className="text-xs font-bold">✓</span>}
+                {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} aria-hidden="true" />}
               </div>
             </div>
 
             <div className="mt-auto pt-2.5 sm:pt-4 border-t border-slate-100/50 grid grid-cols-1 min-[420px]:grid-cols-2 gap-2 sm:gap-3">
-              <div className={`rounded-xl p-2.5 sm:p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
+              <div className={`rounded-xl p-2.5 sm:p-3 transition-all duration-300 ${isSelected ? 'bg-white shadow-sm' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
                 <p className="font-bold text-slate-900 text-xs sm:text-sm">{details.totalText}</p>
                 {details.bonusText && (
                   <p className="text-xs font-bold text-emerald-600 mt-0.5">{details.bonusText}</p>
                 )}
               </div>
-              <div className={`rounded-xl p-2.5 sm:p-3 transition-colors ${isSelected ? 'bg-white/60' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
+              <div className={`rounded-xl p-2.5 sm:p-3 transition-all duration-300 ${isSelected ? 'bg-white shadow-sm' : 'bg-slate-50 group-hover:bg-brand-50/30'}`}>
                 <p className="font-bold text-slate-900 text-xs sm:text-sm">{details.limitText}</p>
                 <p className="text-[10px] text-slate-500 mt-0.5 font-medium uppercase tracking-wide sm:hidden">
                   1 ou 2 périodes

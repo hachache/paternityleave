@@ -5,11 +5,17 @@ interface ScrollIndicatorProps {
 }
 
 export function ScrollIndicator({ show }: ScrollIndicatorProps) {
-  // Always render a fixed-height wrapper so the page layout stays stable.
   return (
     <div className="flex justify-center mb-6 h-8" aria-hidden={!show}>
-      <div className={`transition-opacity duration-200 ${show ? 'opacity-100' : 'opacity-0'}`}>
-        <ChevronDown className="w-6 h-6 text-slate-400" />
+      <div
+        className={`transition-all duration-500 ease-out flex items-center justify-center ${
+          show ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+        }`}
+      >
+        <ChevronDown
+          className="w-6 h-6 text-slate-400 animate-bounce"
+          strokeWidth={2}
+        />
       </div>
     </div>
   );

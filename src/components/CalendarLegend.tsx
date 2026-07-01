@@ -9,14 +9,14 @@ export function CalendarLegend({ scenario }: CalendarLegendProps) {
   const legendItems = getCalendarLegendItems(scenario);
 
   return (
-    <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-6">
+    <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 sm:gap-7">
       {legendItems.map(item => (
-        <div key={item.label} className="flex items-center gap-2.5 group">
+        <div key={item.label} className="flex items-center gap-2.5 group transition-all duration-200">
           <span
-            className={`inline-flex h-3 w-3 rounded-full ring-2 ring-white ${item.color}`}
+            className={`inline-flex h-3.5 w-3.5 rounded-full ring-2 ring-white shadow-sm ${item.color}`}
             aria-hidden="true"
           />
-          <span className="text-xs sm:text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
+          <span className="text-xs sm:text-sm font-medium text-slate-500 group-hover:text-slate-800 transition-colors duration-200">
             {item.label}
           </span>
         </div>
