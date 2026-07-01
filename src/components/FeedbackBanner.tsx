@@ -26,12 +26,12 @@ const iconStyles: Record<FeedbackBannerProps['tone'], string> = {
 };
 
 export function FeedbackBanner({ tone, message, title }: FeedbackBannerProps) {
-  const { transition } = useAppMotion();
+  const { shouldReduce, transition } = useAppMotion();
 
   return (
     <motion.div
       role="alert"
-      className={`backdrop-blur-sm rounded-2xl border px-5 py-4 shadow-soft ${toneStyles[tone]}`}
+      className={`rounded-2xl border px-5 py-4 shadow-soft ${shouldReduce ? '' : 'backdrop-blur-sm'} ${toneStyles[tone]}`}
       initial="hidden"
       animate="visible"
       variants={fadeInUp}

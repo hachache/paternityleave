@@ -74,7 +74,9 @@ export function SupplementaryLeaveCard({
   const maxDateValue = toInputValue(eligibility.limitDate);
   const effectiveStartDate = firstStartDate ?? earliestStartDate;
   const vocabulary = getScenarioVocabulary(scenario);
-  const { shouldReduce, transition } = useAppMotion();
+  const { allowLayoutMotion, transition } = useAppMotion();
+  const revealInitial = allowLayoutMotion ? { opacity: 0, y: -6 } : false;
+  const revealExit = allowLayoutMotion ? { opacity: 0, y: -6 } : undefined;
 
   const handleToggle = () => {
     if (!canPlan) return;
@@ -193,9 +195,9 @@ export function SupplementaryLeaveCard({
           <motion.div
             key="supplementary-configuration"
             className="overflow-hidden"
-            initial={shouldReduce ? false : { opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={revealInitial}
+            animate={{ opacity: 1, y: 0 }}
+            exit={revealExit}
             transition={transition}
           >
             <div className="mt-5">
@@ -213,7 +215,7 @@ export function SupplementaryLeaveCard({
                       type="button"
                       disabled={!canPlan}
                       onClick={() => onDurationChange(typedValue)}
-                      className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-[background-color,border-color,color,box-shadow,transform] duration-200 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                         selected
                           ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                           : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -240,7 +242,7 @@ export function SupplementaryLeaveCard({
                   type="date"
                   value={toInputValue(effectiveStartDate)}
                   min={toInputValue(earliestStartDate)}
-                  max={toInputValue(eligibility.limitDate ?? undefined)}
+                  max={toInputValue(eligibility.limitDate)}
                   disabled={!canPlan}
                   onChange={(event) => {
                     const value = event.target.value;
@@ -263,9 +265,9 @@ export function SupplementaryLeaveCard({
                 <motion.div
                   key="supplementary-mode"
                   className="mt-5 overflow-hidden"
-                  initial={shouldReduce ? false : { opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
+                  initial={revealInitial}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={revealExit}
                   transition={transition}
                 >
                   <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
@@ -287,7 +289,7 @@ export function SupplementaryLeaveCard({
                           type="button"
                           disabled={!canPlan}
                           onClick={() => onModeChange(option)}
-                          className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-[background-color,border-color,color,box-shadow,transform] duration-200 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                             selected
                               ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                               : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -307,9 +309,9 @@ export function SupplementaryLeaveCard({
                       <motion.div
                         key="supplementary-second-date"
                         className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                        initial={shouldReduce ? false : { opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
+                        initial={revealInitial}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={revealExit}
                         transition={transition}
                       >
                         <label htmlFor="supplementary-second-start" className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">

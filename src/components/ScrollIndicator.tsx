@@ -20,14 +20,24 @@ export function ScrollIndicator({ show }: ScrollIndicatorProps) {
   useEffect(() => {
     if (!visible) return;
 
+    let frameId = 0;
     const handleScroll = (): void => {
-      if (window.scrollY > 100) {
-        setVisible(false);
-      }
+      if (frameId !== 0) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        if (window.scrollY > 100) {
+          setVisible(false);
+        }
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frameId !== 0) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
   }, [visible]);
 
   // Always render a fixed-height wrapper so the page layout stays stable.

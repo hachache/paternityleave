@@ -1,3 +1,5 @@
+import { useAppMotion } from '../lib/motion';
+
 interface SectionCardProps {
   title: string;
   description?: string;
@@ -7,6 +9,7 @@ interface SectionCardProps {
 }
 
 export function SectionCard({ title, description, children, accent = 'slate', icon }: SectionCardProps) {
+  const { allowDecorativeMotion, shouldReduce } = useAppMotion();
   // On applique des styles conditionnels pour l'accentuation
   const accentStyle = accent === 'brand' 
     ? 'shadow-brand-500/10 border-brand-100/50' 
@@ -17,7 +20,9 @@ export function SectionCard({ title, description, children, accent = 'slate', ic
       <header className="mb-3 sm:mb-6 relative z-10">
         <div className="flex items-start gap-3 sm:gap-4">
           {icon && (
-            <div className="p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm text-brand-600 border border-white/50">
+            <div className={`p-3 rounded-xl shadow-sm text-brand-600 border border-white/50 ${
+              shouldReduce ? 'bg-white' : 'bg-white/80 backdrop-blur-sm'
+            }`}>
               {icon}
             </div>
           )}
@@ -30,7 +35,9 @@ export function SectionCard({ title, description, children, accent = 'slate', ic
       <div className="relative z-10">{children}</div>
       
       {/* Background decoration (subtle mesh gradient inside card) */}
-      <div className="hidden sm:block absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-gradient-to-br from-brand-50/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+      {allowDecorativeMotion && (
+        <div className="hidden sm:block absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-gradient-to-br from-brand-50/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+      )}
     </section>
   );
 }

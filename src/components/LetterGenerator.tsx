@@ -101,7 +101,7 @@ export function LetterGenerator({
   };
 
   return (
-    <div className="rounded-2xl sm:rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-8 shadow-soft transition-all duration-300">
+    <div className="rounded-2xl sm:rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-8 shadow-soft transition-[border-color,box-shadow] duration-200">
       <h2 className="text-xl sm:text-2xl font-bold font-display text-slate-900 mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
         <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-900 text-white shadow-md shadow-slate-900/10">
           <Mail className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
@@ -293,7 +293,7 @@ export function LetterGenerator({
             variant="primary"
             size="lg"
             fullWidth
-            className={`shadow-md transition-all duration-300 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-0.5'}`}
+            className={`shadow-md transition-[background-color,box-shadow,transform] duration-200 py-4 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800 hover:-translate-y-0.5'}`}
           >
             <AnimatePresence mode="wait" initial={false}>
               {copied ? (

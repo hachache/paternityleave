@@ -1,5 +1,5 @@
 import { memo, type ChangeEvent, type RefObject } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ArrowUp,
   CalendarDays as CalendarDaysIcon,
@@ -64,7 +64,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
   onCustomFirstBlockDaysChange
 }: PlanningModeSelectorProps) {
   const sliderPercentage = getSliderPercentage(customFirstBlockDays, sliderMax);
-  const { transition } = useAppMotion();
+  const { shouldReduce, transition } = useAppMotion();
   const firstBlockPercentage = getRatioPercentage(customFirstBlockDays, totalFractionableDays);
   const secondBlockPercentage = getRatioPercentage(secondBlockDays, totalFractionableDays);
 
@@ -73,7 +73,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
   };
 
   return (
-    <AnimatePresence initial={false} mode="wait">
+    <>
       {isChoiceVisible && (
         <motion.div
           key="planning-choice"
@@ -85,7 +85,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
           variants={fadeIn}
           transition={transition}
         >
-          <div className={`premium-card p-5 sm:p-8 ${isCoarsePointer ? '' : 'transition-all duration-300'}`}>
+          <div className={`premium-card p-5 sm:p-8 ${isCoarsePointer ? '' : 'transition-[background-color,border-color,box-shadow,transform] duration-200'}`}>
             <div className="text-center mb-6 sm:mb-8">
               <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-brand-50 text-brand-600 mb-3 sm:mb-4 shadow-inner">
                 <CalendarDaysIcon className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
@@ -99,7 +99,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
             </div>
 
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-              <div className="relative flex flex-col rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-4 sm:p-6 shadow-sm shadow-brand-500/10 transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/10">
+              <div className="relative flex flex-col rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-4 sm:p-6 shadow-sm shadow-brand-500/10 transition-[box-shadow,transform] duration-200 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/10">
                 <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md shadow-brand-500/30">
                   <Star className="h-3 w-3" aria-hidden="true" />
                   Recommandé
@@ -143,7 +143,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                 </Button>
               </div>
 
-              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-[border-color,box-shadow,transform] duration-200 active:scale-[0.98] hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
                 <div className="mb-4 sm:mb-5 flex items-center gap-3">
                   <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-sm">
                     <Settings2 className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
@@ -163,12 +163,12 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                   </div>
                   <div className="flex gap-2">
                     <motion.div
-                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700 transition-all duration-300 ease-out"
+                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700 transition-[background-color,border-color,color,transform] duration-200 ease-out"
                     >
                       {customFirstBlockDays}j
                     </motion.div>
                     <motion.div
-                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700 transition-all duration-300 ease-out"
+                      className="flex h-12 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-700 transition-[background-color,border-color,color,transform] duration-200 ease-out"
                     >
                       {secondBlockDays}j
                     </motion.div>
@@ -213,7 +213,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              <div className="bg-slate-50/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group backdrop-blur-sm">
+              <div className={`bg-slate-50/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-[background-color,border-color,box-shadow] duration-200 group ${shouldReduce ? '' : 'backdrop-blur-sm'}`}>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-white text-slate-700 border border-slate-200 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
                     <SlidersHorizontal className="h-6 w-6" aria-hidden="true" />
@@ -228,7 +228,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                 </p>
               </div>
 
-              <div className="bg-slate-50/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group relative overflow-hidden backdrop-blur-sm">
+              <div className={`bg-slate-50/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100 hover:border-brand-200 hover:bg-white hover:shadow-md transition-[background-color,border-color,box-shadow] duration-200 group relative overflow-hidden ${shouldReduce ? '' : 'backdrop-blur-sm'}`}>
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
@@ -255,7 +255,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
               </div>
             </div>
 
-            <div className="bg-slate-50/50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 mb-6 border border-slate-100 backdrop-blur-sm">
+            <div className={`bg-slate-50/50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 mb-6 border border-slate-100 ${shouldReduce ? '' : 'backdrop-blur-sm'}`}>
               <div className="text-center mb-6 sm:mb-8">
                 <p className="text-xs sm:text-sm font-bold uppercase tracking-widest text-slate-400 mb-5 sm:mb-6">
                   Répartition des jours
@@ -263,7 +263,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                 <div className="flex gap-4 justify-center items-center">
                   <div className="flex flex-col items-center">
                     <motion.div
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-brand-600 text-white shadow-md shadow-brand-600/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2 transition-all duration-300 ease-out"
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-brand-600 text-white shadow-md shadow-brand-600/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2 transition-[background-color,box-shadow,transform] duration-200 ease-out"
                     >
                       {customFirstBlockDays}
                     </motion.div>
@@ -272,7 +272,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                   <div className="text-2xl text-slate-300 font-light">+</div>
                   <div className="flex flex-col items-center">
                     <motion.div
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-emerald-500 text-white shadow-md shadow-emerald-500/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2 transition-all duration-300 ease-out"
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-emerald-500 text-white shadow-md shadow-emerald-500/20 flex items-center justify-center text-2xl sm:text-3xl font-bold font-display mb-2 transition-[background-color,box-shadow,transform] duration-200 ease-out"
                     >
                       {secondBlockDays}
                     </motion.div>
@@ -283,11 +283,11 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
 
               <div className="h-4 bg-slate-200 rounded-full overflow-hidden mb-6 flex">
                 <motion.div
-                  className="h-full bg-brand-500 transition-all duration-300 ease-out"
+                  className="h-full bg-brand-500 transition-[width] duration-150 ease-out"
                   style={{ width: `${firstBlockPercentage}%` }}
                 />
                 <motion.div
-                  className="h-full bg-emerald-500 transition-all duration-300 ease-out"
+                  className="h-full bg-emerald-500 transition-[width] duration-150 ease-out"
                   style={{ width: `${secondBlockPercentage}%` }}
                 />
               </div>
@@ -306,7 +306,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                   <div className="h-full bg-slate-300" style={{ width: `${sliderPercentage}%` }} />
                 </div>
                 <div
-                  className="absolute h-8 w-8 bg-white border-4 border-brand-500 rounded-full shadow-lg pointer-events-none transition-all duration-75"
+                  className="absolute h-8 w-8 bg-white border-4 border-brand-500 rounded-full shadow-lg pointer-events-none transition-[left] duration-75"
                   style={{ left: `calc(${sliderPercentage}% - 16px)` }}
                 />
               </div>
@@ -338,7 +338,9 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
           variants={fadeInUp}
           transition={transition}
         >
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/95 backdrop-blur-md p-4 sm:p-5 shadow-lg shadow-emerald-500/10">
+          <div className={`rounded-2xl border border-emerald-200 p-4 sm:p-5 shadow-lg shadow-emerald-500/10 ${
+            shouldReduce ? 'bg-emerald-50' : 'bg-emerald-50/95 backdrop-blur-md'
+          }`}>
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold font-display text-lg sm:text-xl shadow-md shadow-emerald-500/20 flex-shrink-0">
                 2
@@ -353,6 +355,6 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </>
   );
 });
