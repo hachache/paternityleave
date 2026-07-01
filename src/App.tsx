@@ -682,7 +682,7 @@ function App() {
             <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex min-h-10 items-center px-2 transition-colors hover:text-brand-600"
+              className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-brand-600"
             >
               Remonter ↑
             </button>

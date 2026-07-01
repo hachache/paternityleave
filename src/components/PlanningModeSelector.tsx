@@ -99,7 +99,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
             </div>
 
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-              <div className="relative flex flex-col rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-4 sm:p-6 shadow-sm shadow-brand-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/10">
+              <div className="relative flex flex-col rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50/80 to-white p-4 sm:p-6 shadow-sm shadow-brand-500/10 transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/10">
                 <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md shadow-brand-500/30">
                   <Star className="h-3 w-3" aria-hidden="true" />
                   Recommandé
@@ -143,7 +143,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                 </Button>
               </div>
 
-              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
                 <div className="mb-4 sm:mb-5 flex items-center gap-3">
                   <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-sm">
                     <Settings2 className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />

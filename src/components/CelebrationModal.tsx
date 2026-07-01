@@ -233,7 +233,7 @@ export function CelebrationModal({
                     <button
                       type="button"
                       onClick={() => dismissWithAnimation(onGoToSupplementary)}
-                      className="px-5 sm:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold w-full transition-colors"
+                      className="px-5 sm:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold w-full transition-colors active:scale-95 transition-transform"
                       data-autofocus
                     >
                       Configurer le congé supplémentaire
@@ -242,7 +242,7 @@ export function CelebrationModal({
                   <button
                     type="button"
                     onClick={() => dismissWithAnimation(onGoToLetter)}
-                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-colors ${
+                    className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-colors active:scale-95 transition-transform ${
                       showSupplementaryAction
                         ? 'bg-white border-2 border-slate-200 text-slate-800 hover:bg-slate-50'
                         : 'bg-emerald-600 hover:bg-emerald-700 text-white'

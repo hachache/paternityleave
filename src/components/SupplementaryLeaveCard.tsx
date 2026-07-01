@@ -178,7 +178,7 @@ export function SupplementaryLeaveCard({
                       type="button"
                       disabled={!canPlan}
                       onClick={() => onDurationChange(typedValue)}
-                      className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                         selected
                           ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                           : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -223,7 +223,7 @@ export function SupplementaryLeaveCard({
                           type="button"
                           disabled={!canPlan}
                           onClick={() => onModeChange(option)}
-                          className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`rounded-2xl border px-3 sm:px-4 py-3 text-left transition-all duration-300 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
                             selected
                               ? 'border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-900/20'
                               : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'

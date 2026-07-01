@@ -24,8 +24,31 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
   const { shouldReduce } = useAppMotion();
   const cardTransition = shouldReduce ? { duration: 0 } : springs.snappy;
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = scenarios.findIndex(s => s.id === selectedScenario);
+    const lastIndex = scenarios.length - 1;
+    let nextIndex = currentIndex;
+
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'ArrowRight':
+        event.preventDefault();
+        nextIndex = currentIndex === lastIndex ? 0 : currentIndex + 1;
+        break;
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        event.preventDefault();
+        nextIndex = currentIndex === 0 ? lastIndex : currentIndex - 1;
+        break;
+      default:
+        return;
+    }
+
+    onScenarioChange(scenarios[nextIndex].id);
+  };
+
   return (
-    <div role="radiogroup" aria-label="Choix de la situation" className="grid grid-cols-2 gap-2.5 sm:gap-4 auto-rows-auto sm:auto-rows-fr">
+    <div role="radiogroup" aria-label="Choix de la situation" onKeyDown={handleKeyDown} className="grid grid-cols-2 gap-2.5 sm:gap-4 auto-rows-auto sm:auto-rows-fr">
       {scenarios.map(config => {
         const isSelected = config.id === selectedScenario;
         const details = formatScenarioDetails(config);
