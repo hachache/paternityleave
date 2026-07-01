@@ -131,6 +131,36 @@ export function SupplementaryLeaveCard({
         </button>
       </div>
 
+      {/* Eligibility notice — shown when the toggle is disabled */}
+      {!canPlan && eligibility.reason && (
+        <div className="mt-5 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 flex gap-3">
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-bold text-amber-900 mb-1">
+              {eligibility.isEligibleBirthDate === false
+                ? 'Date de naissance non éligible'
+                : !eligibility.isRequestWindowOpen
+                  ? 'Demande pas encore ouverte'
+                  : 'Non disponible'}
+            </p>
+            <p className="text-sm font-medium text-amber-800 leading-relaxed">
+              {eligibility.reason}
+            </p>
+            {!eligibility.isEligibleBirthDate && (
+              <p className="mt-2 text-xs text-amber-700">
+                Le congé supplémentaire est réservé aux enfants nés ou adoptés à partir du{' '}
+                <strong>1er janvier 2026</strong>, conformément à la LFSS 2026 (article 99-V).
+              </p>
+            )}
+            {!eligibility.isRequestWindowOpen && eligibility.daysUntilRequestWindow !== null && (
+              <p className="mt-2 text-xs text-amber-700">
+                La demande pourra être préparée dans <strong>{eligibility.daysUntilRequestWindow} jours</strong>.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 sm:p-4">
           <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
