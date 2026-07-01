@@ -12,7 +12,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
   const [activeSection, setActiveSection] = useState<string>('calendar');
   const isMobile = useMediaQuery('(max-width: 767px)');
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const { shouldReduce } = useAppMotion();
+  const { scrollBehavior, shouldReduce } = useAppMotion();
 
   const sections = useMemo(() => {
     const items = [
@@ -47,16 +47,31 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
         closestSection = item;
       }
     });
-    setActiveSection(closestSection.id);
+    setActiveSection((current) => (current === closestSection.id ? current : closestSection.id));
   }, [sections]);
 
   useEffect(() => {
     if (!show || !isMobile) return;
 
-    const handleScroll = () => detectActiveSection();
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    let frameId = 0;
+    const requestDetection = () => {
+      if (frameId !== 0) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        detectActiveSection();
+      });
+    };
+
+    detectActiveSection();
+    window.addEventListener('scroll', requestDetection, { passive: true });
+    window.addEventListener('resize', requestDetection);
+    return () => {
+      window.removeEventListener('scroll', requestDetection);
+      window.removeEventListener('resize', requestDetection);
+      if (frameId !== 0) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
   }, [show, isMobile, detectActiveSection]);
 
   // IntersectionObserver for active section tracking (desktop)
@@ -91,7 +106,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
               }
             });
             if (bestId && best > 0.05) {
-              setActiveSection(bestId);
+              setActiveSection((current) => (current === bestId ? current : bestId));
             }
             debounceTimerRef.current = null;
           }, 150); // Debounce de 150ms pour plus de stabilité
@@ -151,15 +166,13 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
               e.preventDefault();
               const element = document.getElementById(section.id);
               if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
               }
             }}
           >
             {isActive && (
-              <motion.div
+              <div
                 className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-brand-600 to-brand-700 shadow-lg"
-                layoutId="nav-active-pill"
-                transition={shouldReduce ? { duration: 0 } : springs.soft}
               />
             )}
             <span className="relative z-10 hidden sm:inline">{section.label}</span>
@@ -183,7 +196,9 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
         >
           <nav
             aria-label="Navigation de la page"
-            className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl bg-white/95 backdrop-blur-lg border border-slate-200/80 shadow-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start"
+            className={`pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl border border-slate-200/80 shadow-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start ${
+              shouldReduce ? 'bg-white' : 'bg-white/95 backdrop-blur-lg'
+            }`}
             style={{
               transition: 'box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
             }}

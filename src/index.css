@@ -28,7 +28,8 @@
 @layer components {
   /* Carte Premium avec effet de profondeur */
   .premium-card {
-    @apply relative overflow-hidden rounded-2xl sm:rounded-[1.5rem] border border-white/60 bg-white/85 shadow-soft backdrop-blur-xl transition-all duration-300;
+    @apply relative overflow-hidden rounded-2xl sm:rounded-[1.5rem] border border-white/60 bg-white/85 shadow-soft backdrop-blur-xl transition-[background-color,border-color,box-shadow,transform] duration-200;
+    contain: layout paint style;
   }
 
   @media (hover: hover) {
@@ -47,7 +48,19 @@
   }
 
   .input-modern {
-    @apply bg-white/80 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all duration-200 placeholder:text-slate-500 text-slate-700 font-medium text-base shadow-sm hover:bg-white;
+    @apply bg-white/80 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-[background-color,border-color,box-shadow] duration-200 placeholder:text-slate-500 text-slate-700 font-medium text-base shadow-sm hover:bg-white;
+  }
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .premium-card {
+    @apply bg-white;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .premium-card::after {
+    display: none;
   }
 }
 

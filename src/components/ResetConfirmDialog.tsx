@@ -20,7 +20,7 @@ export function ResetConfirmDialog({
   title = 'Réinitialiser le planning ?',
   description = 'Toute votre progression actuelle sera perdue. Cette action est irréversible.'
 }: ResetConfirmDialogProps) {
-  const { shouldReduce, transition } = useAppMotion();
+  const { shouldReduce } = useAppMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
@@ -100,7 +100,9 @@ export function ResetConfirmDialog({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 px-4"
+          className={`fixed inset-0 flex items-center justify-center z-50 px-4 ${
+            shouldReduce ? 'bg-slate-900/45' : 'bg-slate-900/40 backdrop-blur-md'
+          }`}
           initial="hidden"
           animate="visible"
           exit={{ opacity: 0 }}
@@ -114,7 +116,9 @@ export function ResetConfirmDialog({
             aria-modal="true"
             aria-labelledby="reset-dialog-title"
             aria-describedby="reset-dialog-desc"
-            className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 transform transition-all border border-white/50"
+            className={`rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 border border-white/50 ${
+              shouldReduce ? 'bg-white' : 'bg-white/95 backdrop-blur-xl'
+            }`}
             initial={{ opacity: 0, scale: shouldReduce ? 1 : 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}

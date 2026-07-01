@@ -1,10 +1,13 @@
 import { useReducedMotion } from 'framer-motion';
 import type { Transition, Variants } from 'framer-motion';
+import { useMediaQuery } from '../hooks/useMediaQuery';
+
+const fluidEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export const springs = {
-  soft: { type: 'spring', stiffness: 260, damping: 26 },
-  snappy: { stiffness: 400, damping: 30 },
-  gentle: { stiffness: 180, damping: 22 }
+  soft: { type: 'spring', stiffness: 260, damping: 26, mass: 0.55 },
+  snappy: { stiffness: 360, damping: 32, mass: 0.55 },
+  gentle: { stiffness: 180, damping: 24, mass: 0.62 }
 } as const;
 
 export const fadeInUp: Variants = {
@@ -13,8 +16,8 @@ export const fadeInUp: Variants = {
 };
 
 export const expandIn: Variants = {
-  hidden: { opacity: 0, height: 0 },
-  visible: { opacity: 1, height: 'auto' }
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0 }
 };
 
 export const fadeIn: Variants = {
@@ -38,11 +41,47 @@ export function staggerContainer(delay = 0.08): Variants {
   };
 }
 
-export function useAppMotion(): { shouldReduce: boolean; transition: Transition } {
-  const shouldReduce = Boolean(useReducedMotion());
+interface MotionPolicyInput {
+  prefersReducedMotion: boolean;
+  isCoarsePointer: boolean;
+  isNarrowViewport: boolean;
+}
+
+interface AppMotionPolicy {
+  shouldReduce: boolean;
+  shouldConstrain: boolean;
+  allowDecorativeMotion: boolean;
+  allowLayoutMotion: boolean;
+  scrollBehavior: ScrollBehavior;
+  transition: Transition;
+}
+
+export function getAppMotionPolicy({
+  prefersReducedMotion,
+  isCoarsePointer,
+  isNarrowViewport
+}: MotionPolicyInput): AppMotionPolicy {
+  const shouldConstrain = isCoarsePointer || isNarrowViewport;
+  const shouldReduce = prefersReducedMotion || shouldConstrain;
 
   return {
     shouldReduce,
-    transition: shouldReduce ? { duration: 0 } : springs.soft
+    shouldConstrain,
+    allowDecorativeMotion: !shouldReduce,
+    allowLayoutMotion: !shouldReduce,
+    scrollBehavior: shouldReduce ? 'auto' : 'smooth',
+    transition: shouldReduce ? { duration: 0 } : { duration: 0.24, ease: fluidEase }
   };
+}
+
+export function useAppMotion(): AppMotionPolicy {
+  const prefersReducedMotion = Boolean(useReducedMotion());
+  const isCoarsePointer = useMediaQuery('(pointer: coarse)');
+  const isNarrowViewport = useMediaQuery('(max-width: 900px)');
+
+  return getAppMotionPolicy({
+    prefersReducedMotion,
+    isCoarsePointer,
+    isNarrowViewport
+  });
 }

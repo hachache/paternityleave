@@ -63,17 +63,15 @@ export function ScenarioSelector({ selectedScenario, onScenarioChange }: Scenari
             whileHover={shouldReduce ? undefined : { y: -2 }}
             whileTap={shouldReduce ? undefined : { scale: 0.98 }}
             transition={cardTransition}
-            className={`group relative rounded-2xl sm:rounded-3xl p-3 sm:p-6 text-left transition-all duration-300 h-full flex flex-col border ${isSelected ? 'col-span-2 sm:col-span-1' : ''} ${
+            className={`group relative rounded-2xl sm:rounded-3xl p-3 sm:p-6 text-left transition-[background-color,border-color,box-shadow,transform] duration-200 h-full flex flex-col border ${isSelected ? 'col-span-2 sm:col-span-1' : ''} ${
               isSelected
                 ? 'border-brand-500 bg-brand-50/50 shadow-md shadow-brand-500/10 sm:border-transparent sm:shadow-lg'
                 : 'border-slate-100 bg-white hover:border-brand-200 hover:shadow-md'
             }`}
           >
             {isSelected && (
-              <motion.div
-                layoutId="scenario-active-border"
+              <div
                 className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl border-2 border-brand-500 hidden sm:block"
-                transition={cardTransition}
               />
             )}
             {/* Selection Indicator */}

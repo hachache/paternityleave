@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Linkedin, Trash2 } from 'lucide-react';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { useScrollOrchestrator } from './hooks/useScrollOrchestrator';
@@ -20,7 +20,7 @@ import { ResetConfirmDialog } from './components/ResetConfirmDialog';
 import { HeroHeader } from './components/HeroHeader';
 import { PlanningModeSelector } from './components/PlanningModeSelector';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
-import { expandIn, fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
+import { fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
 
 // Lazy-loaded components (non-critiques pour l'affichage initial)
 const LetterGenerator = lazy(() => import('./components/LetterGenerator').then(m => ({ default: m.LetterGenerator })));
@@ -46,7 +46,7 @@ function App() {
   const [calendarHighlight, setCalendarHighlight] = useState(false);
   const calendarHighlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
-  const { shouldReduce, transition } = useAppMotion();
+  const { allowDecorativeMotion, shouldReduce, transition } = useAppMotion();
   const {
     birthDate,
     employerPeriod,
@@ -88,7 +88,6 @@ function App() {
     startVisualSelection,
     cancelVisualSelection,
     hideCelebration,
-    setScenarioId,
     handleScenarioChange,
     confirmScenarioChange,
     cancelScenarioChange,
@@ -279,7 +278,7 @@ function App() {
             className="space-y-0"
             initial="hidden"
             animate="visible"
-            variants={staggerContainer(shouldReduce ? 0 : 0.08)}
+            variants={staggerContainer(shouldReduce ? 0 : 0.04)}
           >
             <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
@@ -310,20 +309,19 @@ function App() {
                 fractionableDays={totalFractionableDays}
                 scenario={scenario}
               />
-              <AnimatePresence>
-                {birthDate && (
-                  <motion.p
-                    className="mt-4 text-center text-sm font-medium text-slate-500 bg-white/50 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm backdrop-blur-sm"
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    variants={fadeIn}
-                    transition={transition}
-                  >
-                    {totalPlannedDays} / {totalFractionableDays} jours planifiés
-                  </motion.p>
-                )}
-              </AnimatePresence>
+              {birthDate && (
+                <motion.p
+                  className={`mt-4 text-center text-sm font-medium text-slate-500 py-2 px-4 rounded-full inline-block mx-auto border border-white shadow-sm ${
+                    shouldReduce ? 'bg-white' : 'bg-white/50 backdrop-blur-sm'
+                  }`}
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeIn}
+                  transition={transition}
+                >
+                  {totalPlannedDays} / {totalFractionableDays} jours planifiés
+                </motion.p>
+              )}
             </motion.div>
 
             <motion.div
@@ -333,7 +331,9 @@ function App() {
               variants={fadeInUp}
               transition={transition}
             >
-              <div className="absolute inset-0 -z-10 hidden bg-brand-500/5 blur-3xl rounded-[2rem] transform scale-105 sm:block"></div>
+              {allowDecorativeMotion && (
+                <div className="absolute inset-0 -z-10 hidden bg-brand-500/5 blur-3xl rounded-[2rem] transform scale-105 sm:block"></div>
+              )}
               <Calendar
                 birthDate={birthDate}
                 onSelectBirthDate={handleSelectBirthDate}
@@ -413,49 +413,46 @@ function App() {
           description="Toutes vos périodes planifiées seront supprimées. Votre date de naissance sera conservée."
         />
 
-        <AnimatePresence>
-          {(error || (successMessage && !visualSelectionMode)) && (
-            <motion.div
-              key="feedback"
-              className="max-w-3xl mx-auto space-y-4 mb-8 overflow-hidden"
-              initial={isCoarsePointer ? false : 'hidden'}
-              animate="visible"
-              exit="hidden"
-              variants={expandIn}
-              transition={transition}
-            >
-              {error && (
-                <FeedbackBanner
-                  tone="error"
-                  title="Attention"
-                  message={error}
-                />
-              )}
+        {(error || (successMessage && !visualSelectionMode)) && (
+          <motion.div
+            key="feedback"
+            className="max-w-3xl mx-auto space-y-4 mb-8 overflow-hidden"
+            initial={isCoarsePointer ? false : 'hidden'}
+            animate="visible"
+            variants={fadeInUp}
+            transition={transition}
+          >
+            {error && (
+              <FeedbackBanner
+                tone="error"
+                title="Attention"
+                message={error}
+              />
+            )}
 
-              {successMessage && !visualSelectionMode && (
-                <FeedbackBanner
-                  tone="success"
-                  title="Succès"
-                  message={successMessage}
-                />
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {successMessage && !visualSelectionMode && (
+              <FeedbackBanner
+                tone="success"
+                title="Succès"
+                message={successMessage}
+              />
+            )}
+          </motion.div>
+        )}
 
         {/* Bannière d'instruction pour le mode sélection visuelle */}
-        <AnimatePresence>
-          {visualSelectionMode && selectionStep !== 'idle' && (
-            <motion.div
-              key="visual-selection-banner"
-              className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30 overflow-hidden"
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={expandIn}
-              transition={transition}
-            >
-              <div className="rounded-2xl border border-brand-200 bg-white/95 backdrop-blur-xl p-4 sm:p-5 shadow-lg shadow-brand-900/5 ring-1 ring-black/5">
+        {visualSelectionMode && selectionStep !== 'idle' && (
+          <motion.div
+            key="visual-selection-banner"
+            className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30 overflow-hidden"
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+            transition={transition}
+          >
+            <div className={`rounded-2xl border border-brand-200 p-4 sm:p-5 shadow-lg shadow-brand-900/5 ring-1 ring-black/5 ${
+              shouldReduce ? 'bg-white' : 'bg-white/95 backdrop-blur-xl'
+            }`}>
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold font-display text-lg sm:text-xl shadow-md shadow-brand-500/20">
@@ -489,9 +486,8 @@ function App() {
                   </Button>
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </motion.div>
+        )}
 
         <PlanningModeSelector
           isChoiceVisible={Boolean(birthDate && mandatoryPeriod && remainingBlocks.length === 0 && !customMode)}
@@ -514,139 +510,124 @@ function App() {
         />
 
         {/* Bouton Effacer tous les blocs */}
-        <AnimatePresence>
-          {remainingBlocks.length > 0 && (
-            <motion.div
-              key="clear-all-blocks"
-              className="max-w-3xl mx-auto mb-12 overflow-hidden"
-              initial={isCoarsePointer ? false : 'hidden'}
-              animate="visible"
-              exit="hidden"
-              variants={expandIn}
-              transition={transition}
+        {remainingBlocks.length > 0 && (
+          <motion.div
+            key="clear-all-blocks"
+            className="max-w-3xl mx-auto mb-12 overflow-hidden"
+            initial={isCoarsePointer ? false : 'hidden'}
+            animate="visible"
+            variants={fadeIn}
+            transition={transition}
+          >
+            <Button
+              onClick={handleClearAllBlocks}
+              variant="outline"
+              size="md"
+              fullWidth
+              className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
             >
-              <Button
-                onClick={handleClearAllBlocks}
-                variant="outline"
-                size="md"
-                fullWidth
-                className="bg-white text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group"
-              >
-                <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
-                Effacer mes périodes
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <Trash2 className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+              Effacer mes périodes
+            </Button>
+          </motion.div>
+        )}
 
-        <AnimatePresence>
-          {isPaternityPlanComplete && (
-            <motion.div
-              key="post-planning-nav"
-              className="overflow-hidden"
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={expandIn}
-              transition={transition}
-            >
-              <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isPaternityPlanComplete && (
+          <motion.div
+            key="post-planning-nav"
+            className="overflow-hidden"
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+            transition={transition}
+          >
+            <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
+          </motion.div>
+        )}
 
-        <AnimatePresence>
-          {birthDate && isPaternityPlanComplete && (
-            <motion.div
-              key="supplementary-leave-card"
-              ref={supplementaryLeaveRef}
-              id="conge-supplementaire"
-              className="max-w-3xl mx-auto mb-12 overflow-hidden"
-              initial={isCoarsePointer ? false : 'hidden'}
-              animate="visible"
-              exit="hidden"
-              variants={expandIn}
-              transition={transition}
-            >
-              <Suspense fallback={<LazyFallback height="h-[400px]" />}>
-                <SupplementaryLeaveCard
-                  enabled={supplementaryLeaveEnabled}
-                  duration={supplementaryLeaveDuration}
-                  mode={supplementaryLeaveMode}
-                  secondStartDate={supplementaryLeaveSecondStartDate}
-                  eligibility={supplementaryLeaveEligibility}
-                  firstStartDate={supplementaryLeaveFirstStartDate}
-                  earliestStartDate={supplementaryLeaveEarliestStartDate}
-                  periods={supplementaryLeavePeriods}
-                  error={supplementaryLeaveError}
-                  scenario={scenario}
-                  onEnabledChange={setSupplementaryLeaveEnabled}
-                  onDurationChange={setSupplementaryLeaveDuration}
-                  onModeChange={setSupplementaryLeaveMode}
-                  onFirstStartDateChange={setSupplementaryLeaveFirstStartDate}
-                  onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
-                />
-              </Suspense>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {birthDate && isPaternityPlanComplete && (
+          <motion.div
+            key="supplementary-leave-card"
+            ref={supplementaryLeaveRef}
+            id="conge-supplementaire"
+            className="max-w-3xl mx-auto mb-12 overflow-hidden"
+            initial={isCoarsePointer ? false : 'hidden'}
+            animate="visible"
+            variants={fadeInUp}
+            transition={transition}
+          >
+            <Suspense fallback={<LazyFallback height="h-[400px]" />}>
+              <SupplementaryLeaveCard
+                enabled={supplementaryLeaveEnabled}
+                duration={supplementaryLeaveDuration}
+                mode={supplementaryLeaveMode}
+                secondStartDate={supplementaryLeaveSecondStartDate}
+                eligibility={supplementaryLeaveEligibility}
+                firstStartDate={supplementaryLeaveFirstStartDate}
+                earliestStartDate={supplementaryLeaveEarliestStartDate}
+                periods={supplementaryLeavePeriods}
+                error={supplementaryLeaveError}
+                scenario={scenario}
+                onEnabledChange={setSupplementaryLeaveEnabled}
+                onDurationChange={setSupplementaryLeaveDuration}
+                onModeChange={setSupplementaryLeaveMode}
+                onFirstStartDateChange={setSupplementaryLeaveFirstStartDate}
+                onSecondStartDateChange={setSupplementaryLeaveSecondStartDate}
+              />
+            </Suspense>
+          </motion.div>
+        )}
 
-        <AnimatePresence>
-          {birthDate && (
-            <motion.div
-              key="summary"
-              className="max-w-3xl mx-auto mb-12 overflow-hidden"
-              id="summary"
-              initial={isCoarsePointer ? false : 'hidden'}
-              animate="visible"
-              exit="hidden"
-              variants={expandIn}
-              transition={transition}
-            >
-              <Summary
+        {birthDate && (
+          <motion.div
+            key="summary"
+            className="max-w-3xl mx-auto mb-12 overflow-hidden"
+            id="summary"
+            initial={isCoarsePointer ? false : 'hidden'}
+            animate="visible"
+            variants={fadeInUp}
+            transition={transition}
+          >
+            <Summary
+              birthDate={birthDate}
+              employerPeriod={employerPeriod}
+              mandatoryPeriod={mandatoryPeriod}
+              remainingBlocks={remainingBlocks}
+              onRemoveBlock={handleRemoveBlock}
+              totalFractionableDays={totalFractionableDays}
+              scenario={scenario}
+              supplementaryLeavePeriods={supplementaryLeavePeriods}
+              supplementaryLeaveDuration={supplementaryLeaveDuration}
+              supplementaryLeaveMode={supplementaryLeaveMode}
+            />
+          </motion.div>
+        )}
+
+        {birthDate && mandatoryPeriod && (
+          <motion.div
+            key="letter-generator"
+            ref={letterRef}
+            className="max-w-3xl mx-auto mb-12 overflow-hidden"
+            id="letter"
+            initial={isCoarsePointer ? false : 'hidden'}
+            animate="visible"
+            variants={fadeInUp}
+            transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
+          >
+            <Suspense fallback={<LazyFallback height="h-[600px]" />}>
+              <LetterGenerator
                 birthDate={birthDate}
                 employerPeriod={employerPeriod}
                 mandatoryPeriod={mandatoryPeriod}
                 remainingBlocks={remainingBlocks}
-                onRemoveBlock={handleRemoveBlock}
-                totalFractionableDays={totalFractionableDays}
                 scenario={scenario}
                 supplementaryLeavePeriods={supplementaryLeavePeriods}
                 supplementaryLeaveDuration={supplementaryLeaveDuration}
                 supplementaryLeaveMode={supplementaryLeaveMode}
               />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {birthDate && mandatoryPeriod && (
-            <motion.div
-              key="letter-generator"
-              ref={letterRef}
-              className="max-w-3xl mx-auto mb-12 overflow-hidden"
-              id="letter"
-              initial={isCoarsePointer ? false : 'hidden'}
-              animate="visible"
-              exit="hidden"
-              variants={expandIn}
-              transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
-            >
-              <Suspense fallback={<LazyFallback height="h-[600px]" />}>
-                <LetterGenerator
-                  birthDate={birthDate}
-                  employerPeriod={employerPeriod}
-                  mandatoryPeriod={mandatoryPeriod}
-                  remainingBlocks={remainingBlocks}
-                  scenario={scenario}
-                  supplementaryLeavePeriods={supplementaryLeavePeriods}
-                  supplementaryLeaveDuration={supplementaryLeaveDuration}
-                  supplementaryLeaveMode={supplementaryLeaveMode}
-                />
-              </Suspense>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </Suspense>
+          </motion.div>
+        )}
 
           <div className="mt-24 max-w-3xl mx-auto mb-16" id="legal">
             <LegalInfo onShowLegalReferences={handleShowLegalReferences} />

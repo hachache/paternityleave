@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'framer-motion';
+import { useAppMotion } from '../lib/motion';
 
 /**
  * Hook centralisant la logique de scroll (apparition de l'ancre, scroll fluide
@@ -44,7 +44,7 @@ export function useScrollOrchestrator({
   skipAutoScrollOnPlanningComplete
 }: UseScrollOrchestratorOptions): ScrollOrchestrator {
   const [hasScrolledPastStart, setHasScrolledPastStart] = useState(false);
-  const shouldReduce = useReducedMotion();
+  const { scrollBehavior } = useAppMotion();
   const calendarRef = useRef<HTMLDivElement>(null);
   const planningRef = useRef<HTMLDivElement>(null);
   const customModeRef = useRef<HTMLDivElement>(null);
@@ -53,28 +53,47 @@ export function useScrollOrchestrator({
   const previousScenarioId = useRef(scenarioId);
   const previousBirthDateTs = useRef<number | null>(null);
   const previousPlannedDays = useRef(totalPlannedDays);
+  const hasScrolledPastStartRef = useRef(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setHasScrolledPastStart(window.scrollY > 200);
+    let frameId = 0;
+
+    const updateScrollState = () => {
+      frameId = 0;
+      const nextValue = window.scrollY > 200;
+      if (hasScrolledPastStartRef.current === nextValue) return;
+      hasScrolledPastStartRef.current = nextValue;
+      setHasScrolledPastStart(nextValue);
     };
+
+    const handleScroll = () => {
+      if (frameId !== 0) return;
+      frameId = window.requestAnimationFrame(updateScrollState);
+    };
+
+    updateScrollState();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frameId !== 0) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
   }, []);
 
   const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>) => {
     const node = ref.current;
     if (!node) return;
-    node.scrollIntoView({ behavior: shouldReduce ? 'auto' : 'smooth', block: 'start' });
-  }, [shouldReduce]);
+    node.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
+  }, [scrollBehavior]);
 
   const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>) => {
     requestAnimationFrame(() => {
       const node = ref.current;
       if (!node) return;
-      node.scrollIntoView({ behavior: shouldReduce ? 'auto' : 'smooth', block: 'start' });
+      node.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
     });
-  }, [shouldReduce]);
+  }, [scrollBehavior]);
 
   const scrollIntoViewIfNeeded = useCallback(
     (ref: React.RefObject<HTMLDivElement>) => {

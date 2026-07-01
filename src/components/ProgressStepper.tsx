@@ -35,7 +35,9 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
       variants={slideUp}
       transition={transition}
     >
-      <div className="bg-white/85 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-white/60 p-3.5 sm:p-6 shadow-soft relative overflow-hidden">
+      <div className={`rounded-2xl sm:rounded-3xl border border-white/60 p-3.5 sm:p-6 shadow-soft relative overflow-hidden ${
+        shouldReduce ? 'bg-white' : 'bg-white/85 backdrop-blur-sm'
+      }`}>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-100 via-brand-50 to-transparent opacity-50" />
 
         <div className="flex items-center justify-between relative">
@@ -99,7 +101,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
                 </motion.div>
 
                 <div
-                  className={`mt-2 sm:mt-3 text-center transition-all duration-500 px-0.5 ${
+                  className={`mt-2 sm:mt-3 text-center transition-[opacity,transform] duration-200 px-0.5 ${
                     isCurrent ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-80'
                   }`}
                 >

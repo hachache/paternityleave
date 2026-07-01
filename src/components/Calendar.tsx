@@ -304,7 +304,7 @@ export const Calendar = memo(function Calendar({
       const holiday = isFrenchHoliday(date, holidays);
       const weekend = isWeekend(date);
 
-      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center text-sm sm:h-12 sm:text-base rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation ';
+      let classes = 'relative flex h-11 w-full min-w-0 flex-col items-center justify-center text-sm sm:h-12 sm:text-base rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-[background-color,border-color,color,box-shadow,transform] duration-150 touch-manipulation ';
 
       if (!isCurrentMonthDay) {
         // Make non-current month days much fainter
@@ -354,7 +354,9 @@ export const Calendar = memo(function Calendar({
   const dayTransition = shouldReduce ? { duration: 0 } : springs.snappy;
 
   return (
-    <div className="rounded-2xl sm:rounded-[1.5rem] border border-white bg-white/90 backdrop-blur-xl p-1 min-[360px]:p-3.5 sm:p-8 shadow-soft relative">
+    <div className={`rounded-2xl sm:rounded-[1.5rem] border border-white p-1 min-[360px]:p-3.5 sm:p-8 shadow-soft relative ${
+      shouldReduce ? 'bg-white' : 'bg-white/90 backdrop-blur-xl'
+    }`}>
       {!birthDate && (
         <motion.div
           className="mb-5 rounded-2xl bg-brand-50 p-4 sm:p-5 border border-brand-100"
@@ -376,7 +378,7 @@ export const Calendar = memo(function Calendar({
         <button
           type="button"
           onClick={previousMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-[background-color,color,transform] duration-150 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois précédent"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -389,7 +391,7 @@ export const Calendar = memo(function Calendar({
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-[background-color,color,transform] duration-150 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois suivant"
         >
           <ChevronRight className="h-6 w-6" />
