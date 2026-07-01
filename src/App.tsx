@@ -20,7 +20,7 @@ import { ResetConfirmDialog } from './components/ResetConfirmDialog';
 import { HeroHeader } from './components/HeroHeader';
 import { PlanningModeSelector } from './components/PlanningModeSelector';
 import { usePaternityPlanning } from './hooks/usePaternityPlanning';
-import { fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
+import { expandIn, fadeIn, fadeInUp, staggerContainer, useAppMotion } from './lib/motion';
 
 // Lazy-loaded components (non-critiques pour l'affichage initial)
 const LetterGenerator = lazy(() => import('./components/LetterGenerator').then(m => ({ default: m.LetterGenerator })));
@@ -415,11 +415,11 @@ function App() {
           {(error || (successMessage && !visualSelectionMode)) && (
             <motion.div
               key="feedback"
-              className="max-w-3xl mx-auto space-y-4 mb-8"
+              className="max-w-3xl mx-auto space-y-4 mb-8 overflow-hidden"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               {error && (
@@ -446,11 +446,11 @@ function App() {
           {visualSelectionMode && selectionStep !== 'idle' && (
             <motion.div
               key="visual-selection-banner"
-              className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30"
+              className="mb-6 max-w-3xl mx-auto sticky top-4 sm:top-24 z-30 overflow-hidden"
               initial="hidden"
               animate="visible"
               exit="hidden"
-              variants={fadeInUp}
+              variants={expandIn}
               transition={transition}
             >
               <div className="rounded-2xl border border-brand-200 bg-white/95 backdrop-blur-xl p-4 sm:p-5 shadow-lg shadow-brand-900/5 ring-1 ring-black/5">
@@ -516,11 +516,11 @@ function App() {
           {remainingBlocks.length > 0 && (
             <motion.div
               key="clear-all-blocks"
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               <Button
@@ -541,10 +541,11 @@ function App() {
           {isPaternityPlanComplete && (
             <motion.div
               key="post-planning-nav"
+              className="overflow-hidden"
               initial="hidden"
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               <PostPlanningNavBar showSupplementaryLink={isEligibleForSupplementaryLeave} />
@@ -558,11 +559,11 @@ function App() {
               key="supplementary-leave-card"
               ref={supplementaryLeaveRef}
               id="conge-supplementaire"
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               <Suspense fallback={<LazyFallback height="h-80" />}>
@@ -590,12 +591,12 @@ function App() {
           {birthDate && (
             <motion.div
               key="summary"
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               id="summary"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={transition}
             >
               <Summary
@@ -619,12 +620,12 @@ function App() {
             <motion.div
               key="letter-generator"
               ref={letterRef}
-              className="max-w-3xl mx-auto mb-12"
+              className="max-w-3xl mx-auto mb-12 overflow-hidden"
               id="letter"
               initial={isCoarsePointer ? false : 'hidden'}
               animate="visible"
               exit="hidden"
-              variants={fadeIn}
+              variants={expandIn}
               transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
             >
               <Suspense fallback={<LazyFallback height="h-96" />}>
