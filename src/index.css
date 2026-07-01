@@ -28,12 +28,12 @@
 @layer components {
   /* Carte Premium avec effet de profondeur */
   .premium-card {
-    @apply relative overflow-hidden rounded-2xl sm:rounded-[1.5rem] border border-white/60 bg-white/85 shadow-soft backdrop-blur-xl transition-all duration-300;
+    @apply relative overflow-hidden rounded-card border border-white/80 bg-white shadow-card transition-colors duration-200;
   }
 
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .premium-card {
-      @apply hover:-translate-y-0.5 hover:border-white hover:shadow-lg hover:shadow-brand-900/5;
+      @apply hover:border-white hover:shadow-card;
     }
 
     .premium-card::after {
@@ -47,8 +47,41 @@
   }
 
   .input-modern {
-    @apply bg-white/80 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all duration-200 placeholder:text-slate-500 text-slate-700 font-medium text-base shadow-sm hover:bg-white;
+    @apply bg-white/80 border border-slate-200 rounded-control px-4 py-3 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-colors duration-200 placeholder:text-slate-500 text-slate-700 font-medium text-base shadow-sm hover:bg-white;
   }
+
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 720px;
+  }
+
+  .reveal {
+    animation: reveal 220ms ease-out both;
+  }
+
+  .reveal-subtle {
+    animation: reveal-subtle 180ms ease-out both;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hover-lift {
+      @apply transition-transform duration-200 hover:-translate-y-0.5;
+    }
+
+    .hover-scale-icon {
+      @apply transition-transform duration-200 group-hover:scale-105;
+    }
+  }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes reveal-subtle {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Animations custom */

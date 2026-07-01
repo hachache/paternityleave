@@ -1,4 +1,4 @@
-import { useReducedMotion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import type { Transition, Variants } from 'framer-motion';
 
 export const springs = {
@@ -13,8 +13,13 @@ export const fadeInUp: Variants = {
 };
 
 export const expandIn: Variants = {
-  hidden: { opacity: 0, height: 0 },
-  visible: { opacity: 1, height: 'auto' }
+  hidden: { opacity: 0, y: -6 },
+  visible: { opacity: 1, y: 0 }
+};
+
+export const collapseFade: Variants = {
+  hidden: { opacity: 0, y: -4 },
+  visible: { opacity: 1, y: 0 }
 };
 
 export const fadeIn: Variants = {
@@ -39,7 +44,18 @@ export function staggerContainer(delay = 0.08): Variants {
 }
 
 export function useAppMotion(): { shouldReduce: boolean; transition: Transition } {
-  const shouldReduce = Boolean(useReducedMotion());
+  const [shouldReduce, setShouldReduce] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setShouldReduce(media.matches);
+    updatePreference();
+    media.addEventListener('change', updatePreference);
+    return () => media.removeEventListener('change', updatePreference);
+  }, []);
 
   return {
     shouldReduce,

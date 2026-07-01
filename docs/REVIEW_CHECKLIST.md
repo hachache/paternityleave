@@ -22,6 +22,11 @@
 - [ ] Pas de debordement horizontal.
 - [ ] Focus visible et controles accessibles.
 - [ ] Console navigateur sans erreur.
+- [ ] `prefers-reduced-motion` verifie.
+- [ ] Une seule navigation sticky visible a la fois.
+- [ ] Pas de saut layout visible apres chargement lazy.
+- [ ] Saisie courrier fluide sur mobile.
+- [ ] Trace Performance ou Lighthouse comparee pour changement UI majeur.
 
 ## Git
 - [ ] Branche dediee pour changement significatif.

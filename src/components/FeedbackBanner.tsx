@@ -1,6 +1,3 @@
-import { motion } from 'framer-motion';
-import { fadeInUp, useAppMotion } from '../lib/motion';
-
 interface FeedbackBannerProps {
   tone: 'success' | 'error' | 'info';
   message: string;
@@ -26,16 +23,10 @@ const iconStyles: Record<FeedbackBannerProps['tone'], string> = {
 };
 
 export function FeedbackBanner({ tone, message, title }: FeedbackBannerProps) {
-  const { transition } = useAppMotion();
-
   return (
-    <motion.div
+    <div
       role="alert"
       className={`backdrop-blur-sm rounded-2xl border px-5 py-4 shadow-soft ${toneStyles[tone]}`}
-      initial="hidden"
-      animate="visible"
-      variants={fadeInUp}
-      transition={transition}
     >
       <div className="flex items-start gap-4">
         <div className={`mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${iconStyles[tone]}`}>
@@ -46,6 +37,6 @@ export function FeedbackBanner({ tone, message, title }: FeedbackBannerProps) {
           <p className="text-base font-medium leading-relaxed">{message}</p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -41,6 +41,13 @@ export default {
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+        'card': '0 10px 30px -18px rgba(15, 23, 42, 0.32)',
+        'popover': '0 18px 48px -24px rgba(15, 23, 42, 0.36)',
+        'focus': '0 0 0 4px rgba(0, 113, 227, 0.14)',
+      },
+      borderRadius: {
+        card: '1.5rem',
+        control: '0.75rem',
       },
     },
   },

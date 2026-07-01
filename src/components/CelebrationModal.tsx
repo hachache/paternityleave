@@ -4,7 +4,7 @@ import { CheckCircle } from 'lucide-react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { LeaveScenarioConfig } from '../utils/paternityLeave';
 import { getScenarioVocabulary } from '../utils/scenarioVocabulary';
-import { fadeIn, slideUp, staggerContainer, useAppMotion } from '../lib/motion';
+import { fadeIn, slideUp, useAppMotion } from '../lib/motion';
 
 interface CelebrationModalProps {
   show: boolean;
@@ -15,14 +15,6 @@ interface CelebrationModalProps {
   onGoToSupplementary: () => void;
   onGoToLetter: () => void;
 }
-
-const successParticles = [
-  { x: -54, y: 2, size: 'h-2.5 w-2.5', color: 'bg-brand-100', delay: 0.08 },
-  { x: -40, y: 9, size: 'h-2 w-2', color: 'bg-amber-100', delay: 0.14 },
-  { x: 42, y: -22, size: 'h-3 w-3', color: 'bg-brand-100', delay: 0.18 },
-  { x: 54, y: -30, size: 'h-2.5 w-2.5', color: 'bg-amber-200', delay: 0.22 },
-  { x: 66, y: -42, size: 'h-3 w-3', color: 'bg-indigo-200', delay: 0.26 }
-] as const;
 
 export function CelebrationModal({
   show,
@@ -177,27 +169,10 @@ export function CelebrationModal({
                 className="text-center relative z-10"
                 initial="hidden"
                 animate="visible"
-                variants={staggerContainer(shouldReduce ? 0 : 0.08)}
+                variants={fadeIn}
+                transition={transition}
               >
-                <div className="relative mb-4 inline-flex h-20 w-28 items-center justify-center sm:h-24 sm:w-32">
-                  {successParticles.map((particle, index) => (
-                    <motion.span
-                      key={`${particle.x}-${particle.y}-${index}`}
-                      className={`absolute left-1/2 top-1/2 rounded-full ${particle.size} ${particle.color}`}
-                      aria-hidden="true"
-                      initial={
-                        shouldReduce
-                          ? false
-                          : { opacity: 0, scale: 0.7, x: particle.x, y: particle.y + 4 }
-                      }
-                      animate={{ opacity: 0.85, scale: 1, x: particle.x, y: particle.y }}
-                      transition={
-                        shouldReduce
-                          ? { duration: 0 }
-                          : { duration: 0.28, delay: particle.delay, ease: 'easeOut' }
-                      }
-                    />
-                  ))}
+                <div className="relative mb-4 inline-flex h-20 w-20 items-center justify-center sm:h-24 sm:w-24">
                   <div className="relative z-10 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md sm:h-20 sm:w-20">
                     <CheckCircle className="w-9 h-9 sm:w-12 sm:h-12" strokeWidth={2.5} aria-hidden="true" />
                   </div>

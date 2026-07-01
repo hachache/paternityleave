@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'framer-motion';
+import { scrollElementIntoView } from '../lib/scroll';
+import { useAppMotion } from '../lib/motion';
 
 /**
  * Hook centralisant la logique de scroll (apparition de l'ancre, scroll fluide
@@ -44,7 +45,7 @@ export function useScrollOrchestrator({
   skipAutoScrollOnPlanningComplete
 }: UseScrollOrchestratorOptions): ScrollOrchestrator {
   const [hasScrolledPastStart, setHasScrolledPastStart] = useState(false);
-  const shouldReduce = useReducedMotion();
+  const { shouldReduce } = useAppMotion();
   const calendarRef = useRef<HTMLDivElement>(null);
   const planningRef = useRef<HTMLDivElement>(null);
   const customModeRef = useRef<HTMLDivElement>(null);
@@ -63,16 +64,12 @@ export function useScrollOrchestrator({
   }, []);
 
   const smoothScrollTo = useCallback((ref: React.RefObject<HTMLDivElement>) => {
-    const node = ref.current;
-    if (!node) return;
-    node.scrollIntoView({ behavior: shouldReduce ? 'auto' : 'smooth', block: 'start' });
+    scrollElementIntoView(ref.current, shouldReduce);
   }, [shouldReduce]);
 
   const scheduleSmoothScroll = useCallback((ref: React.RefObject<HTMLDivElement>) => {
     requestAnimationFrame(() => {
-      const node = ref.current;
-      if (!node) return;
-      node.scrollIntoView({ behavior: shouldReduce ? 'auto' : 'smooth', block: 'start' });
+      scrollElementIntoView(ref.current, shouldReduce);
     });
   }, [shouldReduce]);
 

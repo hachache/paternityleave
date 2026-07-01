@@ -28,9 +28,6 @@ export function SectionCard({ title, description, children, accent = 'slate', ic
         </div>
       </header>
       <div className="relative z-10">{children}</div>
-      
-      {/* Background decoration (subtle mesh gradient inside card) */}
-      <div className="hidden sm:block absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-gradient-to-br from-brand-50/30 to-transparent rounded-full blur-3xl pointer-events-none" />
     </section>
   );
 }

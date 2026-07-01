@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { RotateCcw } from 'lucide-react';
 import { Button } from './Button';
-import { fadeIn, useAppMotion } from '../lib/motion';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 
 interface ResetConfirmDialogProps {
@@ -20,7 +18,6 @@ export function ResetConfirmDialog({
   title = 'Réinitialiser le planning ?',
   description = 'Toute votre progression actuelle sera perdue. Cette action est irréversible.'
 }: ResetConfirmDialogProps) {
-  const { shouldReduce, transition } = useAppMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
@@ -96,29 +93,20 @@ export function ResetConfirmDialog({
     };
   }, [open]);
 
+  if (!open) return null;
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
+        <div
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 px-4"
-          initial="hidden"
-          animate="visible"
-          exit={{ opacity: 0 }}
-          variants={fadeIn}
-          transition={shouldReduce ? { duration: 0 } : { duration: 0.25 }}
           onClick={onCancel}
         >
-          <motion.div
+          <div
             ref={dialogRef}
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="reset-dialog-title"
             aria-describedby="reset-dialog-desc"
-            className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 transform transition-all border border-white/50"
-            initial={{ opacity: 0, scale: shouldReduce ? 1 : 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={shouldReduce ? { duration: 0 } : { duration: 0.2 }}
+            className="reveal-subtle bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 transform transition-all border border-white/50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center mb-6 sm:mb-8">
@@ -141,9 +129,7 @@ export function ResetConfirmDialog({
                 Confirmer
               </Button>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
   );
 }
