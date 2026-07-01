@@ -47,8 +47,8 @@ export function CelebrationModal({
       return;
     }
     setIsVisible(false);
-    setTimeout(action, isCoarsePointer ? 300 : 400);
-  }, [isCoarsePointer, shouldReduce]);
+    setTimeout(action, 250);
+  }, [shouldReduce]);
 
   useEffect(() => {
     setIsVisible(show);
@@ -131,6 +131,15 @@ export function CelebrationModal({
       previouslyFocusedRef.current = null;
     }
   }, [show, isCoarsePointer]);
+
+  useEffect(() => {
+    if (show && isVisible) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [show, isVisible]);
 
   if (!show && !isVisible) return null;
 
