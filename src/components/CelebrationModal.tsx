@@ -165,7 +165,7 @@ export function CelebrationModal({
               initial={shouldReduce ? false : { opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 15 }}
+              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 15 }}
               ref={dialogRef}
               role="dialog"
               aria-modal="true"

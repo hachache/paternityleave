@@ -254,7 +254,7 @@ function App() {
               ← Retour au planificateur
             </Button>
           </div>
-          <Suspense fallback={<LazyFallback height="h-96" />}>
+          <Suspense fallback={<LazyFallback height="h-[600px]" />}>
             <LegalReferences />
           </Suspense>
         </main>
@@ -327,7 +327,7 @@ function App() {
             <motion.div
               ref={calendarRef}
               id="calendar"
-              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-2xl sm:rounded-[2rem] transition-shadow duration-500 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
+              className={`mb-8 sm:mb-12 max-w-3xl -mx-4 sm:mx-auto scroll-mt-28 relative z-20 rounded-2xl sm:rounded-[2rem] transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
               variants={fadeInUp}
               transition={transition}
             >
@@ -566,7 +566,7 @@ function App() {
               variants={expandIn}
               transition={transition}
             >
-              <Suspense fallback={<LazyFallback height="h-80" />}>
+              <Suspense fallback={<LazyFallback height="h-[400px]" />}>
                 <SupplementaryLeaveCard
                   enabled={supplementaryLeaveEnabled}
                   duration={supplementaryLeaveDuration}
@@ -628,7 +628,7 @@ function App() {
               variants={expandIn}
               transition={{ ...transition, delay: shouldReduce || isCoarsePointer ? 0 : 0.15 }}
             >
-              <Suspense fallback={<LazyFallback height="h-96" />}>
+              <Suspense fallback={<LazyFallback height="h-[600px]" />}>
                 <LetterGenerator
                   birthDate={birthDate}
                   employerPeriod={employerPeriod}
