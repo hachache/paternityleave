@@ -409,7 +409,6 @@ export const Calendar = memo(function Calendar({
           key={format(currentMonth, 'yyyy-MM')}
           role="grid"
           className="grid grid-cols-7 gap-0 min-[360px]:gap-0.5 sm:gap-2 md:gap-3"
-          layout
           custom={monthDirection}
           variants={monthGridVariants}
           initial="enter"
@@ -454,7 +453,6 @@ export const Calendar = memo(function Calendar({
                 aria-label={ariaLabel}
                 aria-disabled={!metadata.selectable && metadata.action === 'static'}
                 aria-current={isTodayDate ? 'date' : undefined}
-                layout
                 whileTap={metadata.selectable && !shouldReduce ? { scale: 0.92 } : undefined}
                 transition={dayTransition}
                 onFocus={handleCellFocus}

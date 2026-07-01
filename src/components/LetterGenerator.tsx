@@ -218,7 +218,7 @@ export function LetterGenerator({
                     key={index}
                     className="block min-h-[1em]"
                     variants={fadeIn}
-                    transition={shouldReduce ? { duration: 0 } : { duration: 0.2, delay: index * 0.03 }}
+                    transition={{ ...(shouldReduce ? { duration: 0 } : { duration: 0.2 }) }}
                   >
                     {line || '\u00a0'}
                   </motion.span>
