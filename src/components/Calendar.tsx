@@ -364,7 +364,7 @@ export function Calendar({
           transition={transition}
         >
           <p className="text-sm sm:text-base text-brand-800 text-center font-semibold mb-1.5">
-            📅 Sélectionnez la {vocabulary.eventDateActionLabel} pour commencer
+            <span aria-hidden="true">📅</span> Sélectionnez la {vocabulary.eventDateActionLabel} pour commencer
           </p>
           <p className="text-xs sm:text-sm text-brand-600 text-center font-medium">
             C'est la première étape pour calculer votre planning personnalisé.

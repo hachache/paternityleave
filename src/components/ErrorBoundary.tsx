@@ -1,4 +1,4 @@
-import { Component, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface ErrorBoundaryProps {
@@ -9,13 +9,25 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  retryCount: number;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false, error: null };
+const MAX_RETRIES = 2;
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { hasError: false, error: null, retryCount: 0 };
+
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    console.error(
+      '[ErrorBoundary] Uncaught error:',
+      error.message,
+      '\nComponent stack:',
+      info.componentStack
+    );
   }
 
   handleRefresh = () => {
@@ -23,7 +35,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   handleReset = () => {
-    this.setState({ hasError: false, error: null });
+    const nextCount = this.state.retryCount + 1;
+    this.setState({ hasError: false, error: null, retryCount: nextCount });
   };
 
   render() {
@@ -31,6 +44,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       if (this.props.fallback) {
         return this.props.fallback;
       }
+
+      const canRetry = this.state.retryCount < MAX_RETRIES;
 
       return (
         <div className="min-h-screen bg-surface-100 flex items-center justify-center p-4 sm:p-8">
@@ -44,7 +59,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </h1>
 
             <p className="text-sm sm:text-base text-slate-600 mb-8 leading-relaxed">
-              Une erreur inattendue est survenue. Vous pouvez rafraîchir la page pour réessayer.
+              {canRetry
+                ? 'Une erreur inattendue est survenue. Vous pouvez tenter de reprendre ou rafraîchir la page.'
+                : 'L\'erreur persiste. Un rafraîchissement complet de la page est nécessaire.'}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -59,9 +76,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <button
                 type="button"
                 onClick={this.handleReset}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                disabled={!canRetry}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Réessayer sans rafraîchir
+                {canRetry ? 'Réessayer sans rafraîchir' : 'Nouvelle tentative impossible'}
               </button>
             </div>
 
