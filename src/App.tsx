@@ -303,7 +303,7 @@ function App() {
             />
 
             {/* Section: Situation */}
-            <div className="reveal max-w-3xl mx-auto mb-8 sm:mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-12">
               <SectionCard
                 title="Votre situation"
                 description="Adaptez le calendrier à votre cas spécifique"
@@ -314,7 +314,7 @@ function App() {
             </div>
 
             {/* Section: Progression + Calendrier */}
-            <div className="reveal max-w-3xl mx-auto mb-8 sm:mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-12">
               <ProgressStepper
                 currentStep={planningStep}
                 fractionableDays={totalFractionableDays}
@@ -330,7 +330,7 @@ function App() {
             <div
               ref={calendarRef}
               id="calendar"
-              className={`mb-8 sm:mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
+              className={`mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
             >
               <Calendar
                 birthDate={birthDate}

@@ -364,7 +364,7 @@ export const Calendar = memo(function Calendar({
   );
 
   return (
-    <div className="rounded-card border border-white bg-white/90 backdrop-blur-sm p-3 sm:p-6 shadow-card relative">
+    <div className="rounded-card border border-white bg-white/90 backdrop-blur-sm p-4 sm:p-6 shadow-card relative">
       {!birthDate && (
         <div className="reveal-subtle mb-5 rounded-xl bg-gradient-to-br from-brand-50 to-brand-50/50 p-4 sm:p-5 border border-brand-100/80 shadow-sm">
           <div className="flex items-center gap-3">
