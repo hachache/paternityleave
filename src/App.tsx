@@ -292,7 +292,7 @@ function App() {
 
       <main id={mainContentId} className="flex-1 relative z-10">
         <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
-          <div className="space-y-0">
+          <div>
             <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
             <ScrollIndicator show={birthDate !== null && !hasScrolledPastStart} />
