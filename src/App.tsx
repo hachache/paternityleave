@@ -30,10 +30,10 @@ const CelebrationModal = lazy(() => import('./components/CelebrationModal').then
 /** Skeleton de chargement premium */
 function LazyFallback({ height = 'h-64' }: { height?: string }) {
   return (
-    <div className={`${height} rounded-card bg-white/70 border border-slate-100 animate-pulse flex items-center justify-center shadow-sm overflow-hidden`}>
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-slate-200 shimmer-bg" />
-        <div className="w-32 h-3 rounded-full bg-slate-200 shimmer-bg" />
+    <div className={`${height} rounded-card bg-white/60 border border-surface-200/40 animate-pulse flex items-center justify-center shadow-sm overflow-hidden`}>
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 rounded-xl bg-surface-200 shimmer-bg" />
+        <div className="w-40 h-4 rounded-full bg-surface-200 shimmer-bg" />
       </div>
     </div>
   );
@@ -291,7 +291,7 @@ function App() {
       </a>
 
       <main id={mainContentId} className="flex-1 relative z-10">
-        <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
+        <div className="container mx-auto px-5 sm:px-10 lg:px-12 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
           <div>
             <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
@@ -303,7 +303,7 @@ function App() {
             />
 
             {/* Section: Situation */}
-            <div className="reveal max-w-3xl mx-auto mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-16 sm:mb-20">
               <SectionCard
                 title="Votre situation"
                 description="Adaptez le calendrier à votre cas spécifique"
@@ -314,7 +314,7 @@ function App() {
             </div>
 
             {/* Section: Progression + Calendrier */}
-            <div className="reveal max-w-3xl mx-auto mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-16 sm:mb-20">
               <ProgressStepper
                 currentStep={planningStep}
                 fractionableDays={totalFractionableDays}
@@ -330,7 +330,7 @@ function App() {
             <div
               ref={calendarRef}
               id="calendar"
-              className={`mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
+              className={`mb-16 sm:mb-20 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
             >
               <Calendar
                 birthDate={birthDate}
@@ -346,7 +346,7 @@ function App() {
             </div>
 
             {/* Section: Next Steps */}
-            <div className="reveal max-w-3xl mx-auto mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-16 sm:mb-20">
               <SectionCard
                 title="Prochaines étapes"
                 description="Votre guide pour finaliser la demande"
@@ -503,14 +503,14 @@ function App() {
           {remainingBlocks.length > 0 && (
             <div
               key="clear-all-blocks"
-              className="reveal-subtle max-w-3xl mx-auto mb-12 overflow-hidden"
+              className="reveal-subtle max-w-3xl mx-auto mb-16 sm:mb-20 overflow-hidden"
             >
               <Button
                 onClick={handleClearAllBlocks}
-                variant="outline"
+                variant="ghost"
                 size="md"
                 fullWidth
-                className="bg-white/80 backdrop-blur-sm text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300 group"
+                className="text-surface-400 hover:text-red-500 hover:bg-red-50/50 transition-all duration-300 group"
               >
                 <Trash2 className="mr-2 h-4 w-4 transition-transform duration-200 group-hover:scale-110" aria-hidden="true" />
                 Effacer mes périodes
@@ -595,7 +595,7 @@ function App() {
             </div>
           )}
 
-          <div className="content-auto mt-16 sm:mt-24 max-w-3xl mx-auto mb-16" id="legal">
+          <div className="content-auto mt-20 sm:mt-28 max-w-3xl mx-auto mb-20" id="legal">
             <Suspense fallback={<LazyFallback height="h-40" />}>
               <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
             </Suspense>
@@ -603,39 +603,39 @@ function App() {
         </div>
       </main>
 
-      <footer className="bg-white/80 backdrop-blur-xl border-t border-slate-100 py-8 sm:py-10 relative z-10 mt-auto">
-        <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center gap-6">
+      <footer className="bg-white/70 backdrop-blur-xl border-t border-surface-200/50 py-10 sm:py-12 relative z-10 mt-auto">
+        <div className="container mx-auto px-5 flex flex-col items-center justify-center text-center gap-8">
           {/* Logo & Tagline */}
           <div>
-            <p className="text-slate-900 font-bold font-display text-lg">
+            <p className="text-slate-900 font-bold font-display text-xl tracking-tight">
               Congé Paternité
             </p>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-sm text-surface-500 font-medium mt-1">
               Simplifiez vos démarches administratives.
             </p>
           </div>
 
           {/* Signature Badge */}
-          <div className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-slate-100 shadow-md transition-all duration-300 hover:bg-white hover:shadow-lg">
-            <span className="text-xs text-slate-500 font-medium">Créé par</span>
-            <a
-              href="https://www.linkedin.com/in/hedi-a-2382551a1/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-10 items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors hover:text-brand-600"
-            >
+          <a
+            href="https://www.linkedin.com/in/hedi-a-2382551a1/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 px-5 py-3 bg-white rounded-full border border-surface-200 shadow-sm transition-all duration-300 hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 group"
+          >
+            <span className="text-xs text-surface-400 font-medium">Créé par</span>
+            <span className="flex items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors group-hover:text-brand-600">
               <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" aria-hidden="true" />
               Hedi ACHACHE
-            </a>
-          </div>
+            </span>
+          </a>
 
           {/* Copyright & Back to top */}
-          <div className="flex items-center gap-4 text-xs text-slate-400 font-medium">
+          <div className="flex items-center gap-4 text-xs text-surface-400 font-medium">
             <span>© {currentYear}</span>
-            <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
+            <span className="w-1 h-1 rounded-full bg-surface-300" aria-hidden="true" />
             <button
               onClick={() => scrollToTop(shouldReduce)}
-              className="inline-flex min-h-11 items-center px-2 transition-all duration-200 hover:text-brand-600 hover:scale-105"
+              className="inline-flex min-h-10 items-center px-2 transition-all duration-200 hover:text-brand-600"
             >
               Remonter ↑
             </button>

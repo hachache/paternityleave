@@ -333,29 +333,29 @@ export const Calendar = memo(function Calendar({
       const weekend = isWeekend(date);
 
       // Classe de base
-      let classes = 'relative flex h-10 sm:h-12 w-full min-w-0 flex-col items-center justify-center text-sm sm:text-[0.9375rem] rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation select-none ';
+      let classes = 'relative flex h-11 sm:h-14 lg:h-16 w-full min-w-0 flex-col items-center justify-center text-base sm:text-lg rounded-xl font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 border border-transparent transition-all duration-200 touch-manipulation select-none ';
 
       if (!isCurrentMonthDay) {
-        classes += ' text-slate-200 opacity-20';
+        classes += ' text-surface-300 opacity-30';
       }
 
       if (metadata.type === 'birth') {
         classes += ' bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/30 ring-2 ring-slate-900 ring-offset-2 scale-[1.02] z-10';
       } else if (metadata.type === 'employer') {
-        classes += ' bg-brand-200 text-brand-800 shadow-sm bg-[repeating-linear-gradient(45deg,transparent,transparent_3px,rgba(255,255,255,0.3)_3px,rgba(255,255,255,0.3)_6px)] border-brand-200/50';
+        classes += ' bg-brand-100 text-brand-800 shadow-sm bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,rgba(37,99,235,0.12)_2px,rgba(37,99,235,0.12)_4px)] border-brand-200/50';
       } else if (metadata.type === 'mandatory') {
-        classes += ' bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/25 border-brand-400/30';
+        classes += ' bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/25 border-brand-400/30 ring-2 ring-inset ring-white/20';
       } else if (metadata.type === 'remaining') {
-        classes += ' bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md shadow-success-500/25' + (isCoarsePointer ? '' : ' hover:shadow-lg hover:shadow-success-500/30') + ' scale-[1.02] font-semibold';
+        classes += ' bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md shadow-success-500/25' + (isCoarsePointer ? '' : ' hover:shadow-lg hover:shadow-success-500/30') + ' scale-[1.02] font-semibold hover:scale-[1.06] bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[length:6px_6px]';
       } else if (metadata.selectable && isCurrentMonthDay) {
-        classes += ' cursor-pointer text-slate-700' + (isCoarsePointer ? '' : ' hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm hover:border-brand-100');
+        classes += ' cursor-pointer text-slate-700' + (isCoarsePointer ? '' : ' hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm hover:border-brand-100 hover:scale-105');
       } else {
         classes += ' cursor-default';
         if (isCurrentMonthDay) classes += ' opacity-35';
       }
 
       if (!['birth', 'employer', 'mandatory', 'remaining'].includes(metadata.type || '') && (weekend || holiday) && isCurrentMonthDay) {
-        classes += ' bg-slate-50 text-slate-400';
+        classes += ' bg-slate-50 text-slate-500';
       }
 
       return classes;
@@ -364,18 +364,18 @@ export const Calendar = memo(function Calendar({
   );
 
   return (
-    <div className="rounded-card border border-white bg-white/90 backdrop-blur-sm p-4 sm:p-6 shadow-card relative">
+    <div className="rounded-card border border-surface-200/40 bg-white/90 backdrop-blur-sm p-5 sm:p-8 lg:p-10 shadow-depth-md relative">
       {!birthDate && (
-        <div className="reveal-subtle mb-5 rounded-xl bg-gradient-to-br from-brand-50 to-brand-50/50 p-4 sm:p-5 border border-brand-100/80 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center text-base shadow-sm shadow-brand-500/20">
+        <div className="reveal-subtle mb-6 sm:mb-8 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-50/50 p-5 sm:p-6 border border-brand-100/60 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white flex items-center justify-center text-lg shadow-md shadow-brand-500/20">
               📅
             </div>
             <div>
-              <p className="text-sm sm:text-base text-brand-800 font-semibold">
+              <p className="text-sm sm:text-base text-brand-900 font-bold font-display">
                 Sélectionnez la {vocabulary.eventDateActionLabel} pour commencer
               </p>
-              <p className="text-xs sm:text-sm text-brand-600 font-medium mt-0.5">
+              <p className="text-xs sm:text-sm text-brand-600 font-medium mt-1">
                 C'est la première étape pour calculer votre planning personnalisé.
               </p>
             </div>
@@ -384,34 +384,34 @@ export const Calendar = memo(function Calendar({
       )}
 
       {/* Navigation mois */}
-      <div className="flex items-center justify-between mb-5 sm:mb-8">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <button
           type="button"
           onClick={previousMonth}
-          className="p-2.5 rounded-xl text-slate-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-3 rounded-full text-surface-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois précédent"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
 
-        <h2 className="text-xl sm:text-2xl font-display font-bold text-slate-900 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 tracking-tight">
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
 
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2.5 rounded-xl text-slate-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-3 rounded-full text-surface-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois suivant"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
       </div>
 
       {/* Jours de la semaine */}
-      <div className="grid grid-cols-7 gap-0.5 min-[380px]:gap-1 sm:gap-2 mb-3 sm:mb-4">
+      <div className="grid grid-cols-7 gap-0.5 min-[380px]:gap-1 sm:gap-2 mb-4 sm:mb-5">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-[11px] sm:text-xs uppercase tracking-wider font-bold text-slate-400 py-1 sm:py-2">
+          <div key={day} className="text-center text-[11px] sm:text-xs uppercase tracking-wider font-bold text-surface-400 py-1 sm:py-2">
             {day}
           </div>
         ))}

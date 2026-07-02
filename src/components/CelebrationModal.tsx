@@ -16,49 +16,6 @@ interface CelebrationModalProps {
   onGoToLetter: () => void;
 }
 
-// Particules décoratives pour l'animation de célébration
-function CelebrationParticles() {
-  const particles = Array.from({ length: 8 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: 3 + Math.random() * 4,
-    delay: Math.random() * 0.5,
-    duration: 1.5 + Math.random() * 1,
-  }));
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: p.size,
-            height: p.size,
-            backgroundColor: ['#0071e3', '#22c55e', '#f59e0b', '#8b5cf6'][p.id % 4],
-          }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{
-            opacity: [0, 1, 1, 0],
-            scale: [0, 1, 1.2, 0],
-            y: [0, -20 - Math.random() * 20],
-          }}
-          transition={{
-            duration: p.duration,
-            delay: p.delay,
-            repeat: Infinity,
-            repeatDelay: 1 + Math.random(),
-            ease: 'easeOut',
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export function CelebrationModal({
   show,
   onClose,
@@ -187,20 +144,20 @@ export function CelebrationModal({
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 px-4"
+            className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 px-4"
             initial={shouldReduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={shouldReduce ? { duration: 0 } : { duration: 0.3 }}
-            style={{ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+            transition={shouldReduce ? { duration: 0 } : { duration: 0.25 }}
+            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
             onClick={() => dismissWithAnimation(onClose)}
           >
             <motion.div
-              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-2xl bg-white/95 backdrop-blur-xl p-6 shadow-xl sm:rounded-3xl sm:p-8 relative border border-white/50"
-              initial={shouldReduce ? false : { opacity: 0, scale: 0.92, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: -5 }}
-              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 280, damping: 18, mass: 0.8 }}
+              className="max-h-[calc(100vh-2rem)] max-w-md w-full overflow-y-auto rounded-3xl bg-white/95 backdrop-blur-xl p-8 shadow-xl sm:p-10 relative border border-white/50"
+              initial={shouldReduce ? false : { opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 16, mass: 0.8 }}
               ref={dialogRef}
               role="dialog"
               aria-modal="true"
@@ -208,19 +165,17 @@ export function CelebrationModal({
               tabIndex={-1}
               onClick={event => event.stopPropagation()}
             >
-              <CelebrationParticles />
-
               <motion.div
-                className="text-center relative z-10"
+                className="text-center"
                 initial="hidden"
                 animate="visible"
                 variants={fadeIn}
                 transition={transition}
               >
-                <div className="relative mb-4 inline-flex h-20 w-20 items-center justify-center sm:h-24 sm:w-24">
+                <div className="relative mb-5 inline-flex h-20 w-20 items-center justify-center sm:h-24 sm:w-24">
                   <motion.div
-                    className="relative z-10 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 sm:h-20 sm:w-20"
-                    initial={shouldReduce ? false : { scale: 0, rotate: -15 }}
+                    className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 sm:h-20 sm:w-20"
+                    initial={shouldReduce ? false : { scale: 0, rotate: -12 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={shouldReduce ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 12, delay: 0.1 }}
                   >
@@ -228,16 +183,16 @@ export function CelebrationModal({
                   </motion.div>
                 </div>
 
-                <motion.h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 tracking-tight" variants={slideUp} transition={transition}>
+                <motion.h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 tracking-tight font-display" variants={slideUp} transition={transition}>
                   Planification complète
                 </motion.h3>
 
-                <motion.p className="text-sm sm:text-base text-slate-600 mb-2" variants={slideUp} transition={transition}>
+                <motion.p className="text-sm sm:text-base text-slate-500 mb-3" variants={slideUp} transition={transition}>
                   Votre planning de {vocabulary.initialLeaveLabel} est complet
                 </motion.p>
 
                 <motion.div
-                  className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-50/50 p-3.5 sm:p-4 mt-4 shadow-sm"
+                  className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-50/50 p-4 sm:p-5 shadow-sm"
                   variants={slideUp}
                   transition={transition}
                 >
@@ -254,7 +209,7 @@ export function CelebrationModal({
                   {subtitle}
                 </motion.p>
 
-                <div className="mt-5 sm:mt-6 space-y-3">
+                <div className="mt-6 space-y-3">
                   {showSupplementaryAction && (
                     <button
                       type="button"
@@ -270,7 +225,7 @@ export function CelebrationModal({
                     onClick={() => dismissWithAnimation(onGoToLetter)}
                     className={`px-5 sm:px-6 py-3 rounded-xl font-semibold w-full transition-all duration-300 active:scale-95 ${
                       showSupplementaryAction
-                        ? 'bg-white border-2 border-slate-200 text-slate-800 hover:bg-slate-50 hover:border-slate-300 shadow-sm'
+                        ? 'bg-white border-2 border-surface-200 text-slate-800 hover:bg-slate-50 hover:border-slate-300 shadow-sm'
                         : 'bg-gradient-to-br from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white shadow-lg shadow-emerald-500/20'
                     }`}
                     data-autofocus={!showSupplementaryAction}

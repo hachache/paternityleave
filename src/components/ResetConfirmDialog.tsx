@@ -106,12 +106,12 @@ export function ResetConfirmDialog({
             aria-modal="true"
             aria-labelledby="reset-dialog-title"
             aria-describedby="reset-dialog-desc"
-            className="reveal-subtle bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-5 sm:p-8 transform transition-all border border-white/50"
+            className="reveal-subtle bg-white/95 backdrop-blur-xl rounded-3xl shadow-lg sm:shadow-xl shadow-brand-900/10 max-w-md w-full p-6 sm:p-8 transform transition-all border border-white/50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center mb-6 sm:mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-amber-100 text-amber-600 mb-4 sm:mb-5 shadow-inner">
-                <RotateCcw className="w-6 h-6 sm:w-8 sm:h-8" aria-hidden="true" />
+              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-50 text-warm-500 mb-4 sm:mb-5 shadow-sm border border-amber-100">
+                <RotateCcw className="w-6 h-6 sm:w-7 sm:h-7" aria-hidden="true" />
               </div>
               <h3 id="reset-dialog-title" className="text-xl sm:text-2xl font-bold font-display text-slate-900 mb-3">
                 {title}

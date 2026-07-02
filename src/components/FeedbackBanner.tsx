@@ -5,9 +5,9 @@ interface FeedbackBannerProps {
 }
 
 const containerStyles: Record<FeedbackBannerProps['tone'], string> = {
-  success: 'bg-gradient-to-r from-emerald-50 to-emerald-50/60 border-emerald-200 text-emerald-900 shadow-emerald-500/5',
-  error: 'bg-gradient-to-r from-red-50 to-red-50/60 border-red-200 text-red-900 shadow-red-500/5',
-  info: 'bg-gradient-to-r from-blue-50 to-blue-50/60 border-blue-200 text-blue-900 shadow-blue-500/5'
+  success: 'bg-gradient-to-r from-emerald-50/90 to-emerald-50/50 border-emerald-200/80 text-emerald-900 shadow-sm shadow-emerald-500/5',
+  error: 'bg-gradient-to-r from-red-50/90 to-red-50/50 border-red-200/80 text-red-900 shadow-sm shadow-red-500/5',
+  info: 'bg-gradient-to-r from-blue-50/90 to-blue-50/50 border-blue-200/80 text-blue-900 shadow-sm shadow-blue-500/5'
 };
 
 const iconStyles: Record<FeedbackBannerProps['tone'], string> = {
@@ -26,7 +26,7 @@ export function FeedbackBanner({ tone, message, title }: FeedbackBannerProps) {
   return (
     <div
       role="alert"
-      className={`backdrop-blur-sm rounded-xl border px-4 py-4 shadow-soft ${containerStyles[tone]}`}
+      className={`backdrop-blur-xl rounded-2xl border px-5 py-4 shadow-soft ${containerStyles[tone]}`}
     >
       <div className="flex items-start gap-4">
         <div
