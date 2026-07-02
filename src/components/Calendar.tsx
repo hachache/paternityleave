@@ -388,10 +388,10 @@ export const Calendar = memo(function Calendar({
         <button
           type="button"
           onClick={previousMonth}
-          className="p-2.5 rounded-xl text-slate-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-3 rounded-full text-surface-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois précédent"
         >
-          <ChevronLeft className="h-6 w-6 sm:h-7 sm:w-7" />
+          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
 
         <h2 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 tracking-tight">
@@ -401,10 +401,10 @@ export const Calendar = memo(function Calendar({
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2.5 rounded-xl text-slate-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="p-3 rounded-full text-surface-400 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm transition-all active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
           aria-label="Mois suivant"
         >
-          <ChevronRight className="h-6 w-6 sm:h-7 sm:w-7" />
+          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
       </div>
 

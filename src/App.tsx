@@ -507,10 +507,10 @@ function App() {
             >
               <Button
                 onClick={handleClearAllBlocks}
-                variant="outline"
+                variant="ghost"
                 size="md"
                 fullWidth
-                className="bg-white/80 backdrop-blur-sm text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300 group"
+                className="text-surface-400 hover:text-red-500 hover:bg-red-50/50 transition-all duration-300 group"
               >
                 <Trash2 className="mr-2 h-4 w-4 transition-transform duration-200 group-hover:scale-110" aria-hidden="true" />
                 Effacer mes périodes

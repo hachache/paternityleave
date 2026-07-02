@@ -5,7 +5,6 @@ import {
   MousePointer2,
   Settings2,
   SlidersHorizontal,
-  Sparkles,
   Zap
 } from 'lucide-react';
 import { Button } from './Button';
@@ -36,14 +35,6 @@ function getRatioPercentage(value: number, total: number) {
 function getSliderPercentage(value: number, max: number) {
   if (max <= 5) return 0;
   return ((value - 5) / (max - 5)) * 100;
-}
-
-function SparkleDecor() {
-  return (
-    <span aria-hidden="true" className="absolute -top-1 -right-1">
-      <Sparkles className="w-3 h-3 text-yellow-300 animate-pulse-soft" />
-    </span>
-  );
 }
 
 export const PlanningModeSelector = memo(function PlanningModeSelector({
@@ -93,13 +84,8 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
             </div>
 
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-              {/* Mode simple - Carte recommandée */}
-              <div className="relative flex flex-col rounded-2xl border-2 border-brand-200 bg-gradient-to-br from-brand-50/90 to-white p-4 sm:p-6 shadow-md shadow-brand-500/10 transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-500/15">
-                <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-warm-400 to-warm-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-warm-400/40">
-                  <Sparkles className="h-3 w-3" aria-hidden="true" />
-                  Recommandé
-                  <SparkleDecor />
-                </span>
+              {/* Mode simple */}
+              <div className="relative flex flex-col rounded-2xl border border-surface-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md">
 
                 <div className="mb-4 sm:mb-5 flex items-center gap-3">
                   <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-md shadow-brand-500/20">
@@ -113,7 +99,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                   </div>
                 </div>
 
-                <div className="mb-4 sm:mb-5 rounded-xl border border-brand-100 bg-white/90 p-3.5 sm:p-4 shadow-sm">
+                <div className="mb-4 sm:mb-5 rounded-xl border border-surface-200 bg-white/90 p-3.5 sm:p-4 shadow-sm">
                   <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Période unique
                   </p>
@@ -140,9 +126,9 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
               </div>
 
               {/* Mode personnalisé */}
-              <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+              <div className="flex flex-col rounded-2xl border border-surface-200 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md">
                 <div className="mb-4 sm:mb-5 flex items-center gap-3">
-                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-sm">
+                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 text-slate-700 shadow-sm">
                     <Settings2 className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
                   </div>
                   <div>
