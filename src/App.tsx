@@ -161,6 +161,7 @@ function App() {
 
   const handleResetConfirm = useCallback(() => {
     confirmReset();
+    scrollToTop(true);
   }, [confirmReset]);
 
   const handleResetCancel = useCallback(() => {
