@@ -291,7 +291,7 @@ function App() {
       </a>
 
       <main id={mainContentId} className="flex-1 relative z-10">
-        <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
+        <div className="container mx-auto px-5 sm:px-10 lg:px-12 py-6 sm:py-12 max-w-5xl pt-8 sm:pt-24 pb-28 sm:pb-12">
           <div>
             <HeroHeader hasBirthDate={Boolean(birthDate)} onResetRequest={handleResetRequest} />
 
@@ -303,7 +303,7 @@ function App() {
             />
 
             {/* Section: Situation */}
-            <div className="reveal max-w-3xl mx-auto mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-16 sm:mb-20">
               <SectionCard
                 title="Votre situation"
                 description="Adaptez le calendrier à votre cas spécifique"
@@ -314,7 +314,7 @@ function App() {
             </div>
 
             {/* Section: Progression + Calendrier */}
-            <div className="reveal max-w-3xl mx-auto mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-16 sm:mb-20">
               <ProgressStepper
                 currentStep={planningStep}
                 fractionableDays={totalFractionableDays}
@@ -330,7 +330,7 @@ function App() {
             <div
               ref={calendarRef}
               id="calendar"
-              className={`mb-12 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
+              className={`mb-16 sm:mb-20 max-w-3xl mx-auto scroll-mt-28 relative z-20 rounded-card transition-shadow duration-300 ${calendarHighlight ? 'animate-calendar-focus ring-4 ring-brand-400/60 shadow-[0_0_42px_-16px_rgba(0,113,227,0.4)]' : ''}`}
             >
               <Calendar
                 birthDate={birthDate}
@@ -346,7 +346,7 @@ function App() {
             </div>
 
             {/* Section: Next Steps */}
-            <div className="reveal max-w-3xl mx-auto mb-12">
+            <div className="reveal max-w-3xl mx-auto mb-16 sm:mb-20">
               <SectionCard
                 title="Prochaines étapes"
                 description="Votre guide pour finaliser la demande"
@@ -503,7 +503,7 @@ function App() {
           {remainingBlocks.length > 0 && (
             <div
               key="clear-all-blocks"
-              className="reveal-subtle max-w-3xl mx-auto mb-12 overflow-hidden"
+              className="reveal-subtle max-w-3xl mx-auto mb-16 sm:mb-20 overflow-hidden"
             >
               <Button
                 onClick={handleClearAllBlocks}
@@ -595,7 +595,7 @@ function App() {
             </div>
           )}
 
-          <div className="content-auto mt-16 sm:mt-24 max-w-3xl mx-auto mb-16" id="legal">
+          <div className="content-auto mt-20 sm:mt-28 max-w-3xl mx-auto mb-20" id="legal">
             <Suspense fallback={<LazyFallback height="h-40" />}>
               <LegalInfo onShowLegalReferences={handleShowLegalReferences} />
             </Suspense>

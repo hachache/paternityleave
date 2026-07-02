@@ -101,7 +101,7 @@ export function LetterGenerator({
   };
 
   return (
-    <div className="rounded-card border border-slate-200 bg-white p-5 sm:p-7 shadow-soft transition-[border-color,box-shadow] duration-200">
+    <div className="rounded-card border border-surface-200/40 bg-white p-6 sm:p-8 lg:p-10 shadow-depth-md transition-[border-color,box-shadow] duration-200">
       <h2 className="text-xl sm:text-[1.6rem] font-bold font-display text-slate-900 mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
         <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900 text-white shadow-md shadow-slate-900/10">
           <Mail className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
@@ -209,11 +209,11 @@ export function LetterGenerator({
 
         {/* Prévisualisation "Papier" */}
         <div className="mt-6 sm:mt-8">
-          <div className="bg-slate-100 rounded-2xl sm:rounded-3xl p-3 sm:p-8 border border-slate-200/60 shadow-inner">
-            <div id="letter-preview-text" className="bg-white rounded-xl shadow-md sm:shadow-xl shadow-slate-300/20 p-5 sm:p-12 min-h-[320px] sm:min-h-[400px] flex flex-col text-slate-800 text-xs sm:text-base font-serif leading-relaxed relative max-w-3xl mx-auto">
+          <div className="bg-surface-100 rounded-2xl sm:rounded-3xl p-3 sm:p-8 border border-surface-200/60 shadow-inner">
+            <div id="letter-preview-text" className="bg-white rounded-xl shadow-md sm:shadow-xl shadow-slate-300/20 p-5 sm:p-12 text-slate-800 text-xs sm:text-base font-serif leading-relaxed relative max-w-3xl mx-auto">
               {/* Grain texture overlay (subtle) */}
               <div className="absolute inset-0 bg-slate-50 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")' }}></div>
-              
+
               <motion.div
                 className="relative z-10 whitespace-pre-line"
                 initial={shouldReduce ? false : 'hidden'}

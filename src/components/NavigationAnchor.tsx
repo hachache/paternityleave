@@ -12,12 +12,12 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
   const [activeSection, setActiveSection] = useState<string>('calendar');
   const isMobile = useMediaQuery('(max-width: 767px)');
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const navRef = useRef<HTMLElement>(null);
   const { shouldReduce } = useAppMotion();
 
   const sections = useMemo(() => {
     const items = [
-      { id: 'calendar', label: 'Calendrier', shortLabel: 'Date' },
-      { id: 'summary', label: 'Résumé', shortLabel: 'Récap' }
+      { id: 'calendar', label: 'Calendrier', shortLabel: 'Date' }
     ] as Array<{ id: string; label: string; shortLabel: string }>;
 
     if (showSupplementaryLink) {
@@ -25,6 +25,7 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
     }
 
     items.push(
+      { id: 'summary', label: 'Résumé', shortLabel: 'Récap' },
       { id: 'letter', label: 'Courrier', shortLabel: 'Doc' },
       { id: 'legal', label: 'Légal', shortLabel: 'Légal' }
     );
@@ -109,46 +110,47 @@ export function NavigationAnchor({ show, showSupplementaryLink = false }: Naviga
     }
   }, [show, detectActiveSection]);
 
-  const navContent = (
-    <>
-      {sections.map(section => {
-        const isActive = activeSection === section.id;
-        return (
-          <a
-            key={section.id}
-            href={`#${section.id}`}
-            className={`
-              relative isolate px-2 sm:px-3 md:px-5 py-2.5 sm:py-2 rounded-xl text-xs sm:text-sm
-              font-semibold whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[40px] sm:min-h-[44px] transition-all duration-300
-              ${
-                isActive
-                  ? 'text-white bg-gradient-to-br from-brand-500 to-brand-600 shadow-lg shadow-brand-500/20 scale-100'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 scale-[0.98]'
-              }
-            `}
-            title={section.label}
-            onClick={(e) => {
-              e.preventDefault();
-              const element = document.getElementById(section.id);
-              scrollElementIntoView(element, shouldReduce);
-            }}
-          >
-            <span className="relative z-10 hidden sm:inline">{section.label}</span>
-            <span className="relative z-10 sm:hidden">{section.shortLabel}</span>
-          </a>
-        );
-      })}
-    </>
-  );
-
   return (
     show ? (
       <div className={`fixed bottom-0 sm:bottom-auto sm:top-0 left-0 right-0 z-40 flex justify-center px-2 sm:px-4 py-2 sm:py-4 pb-[calc(0.5rem+env(safe-area-inset-bottom))] sm:pb-4 pointer-events-none ${shouldReduce ? '' : 'reveal-subtle'}`}>
         <nav
+          ref={navRef}
           aria-label="Navigation de la page"
-          className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2.5 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/70 shadow-depth-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start transition-all duration-300"
+          className="pointer-events-auto flex gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2.5 rounded-2xl sm:rounded-full bg-white/80 backdrop-blur-xl border border-surface-200/60 shadow-depth-md w-full max-w-md sm:max-w-none sm:w-auto justify-between sm:justify-start transition-all duration-300"
         >
-          {navContent}
+          {sections.map(section => {
+            const isActive = activeSection === section.id;
+            return (
+              <a
+                key={section.id}
+                href={`#${section.id}`}
+                className={`
+                  relative isolate px-2 sm:px-3 md:px-5 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-xs sm:text-sm
+                  font-semibold whitespace-nowrap flex-1 sm:flex-none text-center flex items-center justify-center min-h-[40px] sm:min-h-[44px] transition-all duration-300
+                  ${
+                    isActive
+                      ? 'text-white scale-100'
+                      : 'text-slate-500 hover:text-slate-800 hover:bg-white/60 scale-[0.98]'
+                  }
+                `}
+                title={section.label}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById(section.id);
+                  scrollElementIntoView(element, shouldReduce);
+                }}
+              >
+                {isActive && (
+                  <span
+                    className="absolute inset-0 rounded-xl sm:rounded-full bg-gradient-to-br from-brand-500 to-brand-600 shadow-lg shadow-brand-500/20 transition-all duration-300"
+                    aria-hidden="true"
+                  />
+                )}
+                <span className="relative z-10 hidden sm:inline">{section.label}</span>
+                <span className="relative z-10 sm:hidden">{section.shortLabel}</span>
+              </a>
+            );
+          })}
         </nav>
       </div>
     ) : null

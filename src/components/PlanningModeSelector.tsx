@@ -95,7 +95,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
               {/* Mode simple - Carte recommandée */}
               <div className="relative flex flex-col rounded-2xl border-2 border-brand-200 bg-gradient-to-br from-brand-50/90 to-white p-4 sm:p-6 shadow-md shadow-brand-500/10 transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-500/15">
-                <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-brand-600 to-brand-700 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-500/30">
+                <span className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-warm-400 to-warm-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-warm-400/40">
                   <Sparkles className="h-3 w-3" aria-hidden="true" />
                   Recommandé
                   <SparkleDecor />
@@ -285,7 +285,7 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
               </div>
 
               {/* Slider */}
-              <div className="relative h-14 flex items-center px-1">
+              <div className="relative h-16 flex items-center px-1">
                 <input
                   type="range"
                   min="5"
@@ -293,10 +293,10 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                   value={customFirstBlockDays}
                   onChange={handleCustomFirstBlockDaysChange}
                   aria-label="Répartition de la première période"
-                  className="w-full absolute inset-0 z-20 opacity-0 cursor-pointer"
+                  className="w-full absolute inset-0 z-20 opacity-0 cursor-pointer h-16"
                 />
                 {/* Track background */}
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-brand-500 to-brand-400 transition-all duration-150 ease-out rounded-full"
                     style={{ width: `${sliderPercentage}%` }}
@@ -304,8 +304,8 @@ export const PlanningModeSelector = memo(function PlanningModeSelector({
                 </div>
                 {/* Thumb personnalisé */}
                 <div
-                  className="absolute h-8 w-8 bg-white border-[3px] border-brand-500 rounded-full shadow-lg shadow-brand-500/20 pointer-events-none transition-all duration-75 z-10"
-                  style={{ left: `calc(${sliderPercentage}% - 16px)` }}
+                  className="absolute h-10 w-10 bg-white border-[3px] border-brand-500 rounded-full shadow-lg shadow-brand-500/20 pointer-events-none transition-all duration-75 z-10"
+                  style={{ left: `calc(${sliderPercentage}% - 20px)` }}
                 />
               </div>
               <p className="text-xs text-center text-slate-400 font-medium mt-2">

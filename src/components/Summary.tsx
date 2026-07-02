@@ -41,7 +41,7 @@ export const Summary = memo(function Summary({
   const vocabulary = getScenarioVocabulary(scenario);
 
   return (
-    <div className="rounded-card border border-slate-200 bg-white p-5 sm:p-7 shadow-depth-md">
+    <div className="rounded-card border border-surface-200/40 bg-white p-6 sm:p-8 lg:p-10 shadow-depth-md">
       <header className="mb-6 sm:mb-7 flex items-center gap-3 sm:gap-4">
         <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-md shadow-brand-500/20">
           <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -68,7 +68,7 @@ export const Summary = memo(function Summary({
         </div>
 
         {/* Timeline */}
-        <div className="relative pl-4 border-l-2 border-slate-200 space-y-6 sm:space-y-8">
+        <div className="relative pl-5 border-l-[2px] border-surface-200 space-y-8 sm:space-y-10">
           {/* Date de départ */}
           <div className="relative">
             <div className="absolute -left-[21px] top-1 h-4 w-4 rounded-full border-[3px] border-white bg-slate-900 shadow-sm shadow-slate-900/20" />
@@ -133,15 +133,15 @@ export const Summary = memo(function Summary({
             </div>
 
             {remainingBlocks.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {remainingBlocks.map((block, index) => (
                   <div
                     key={index}
-                    className="group flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-white border border-slate-200 hover:border-red-200 hover:bg-red-50/30 transition-all duration-200 shadow-sm"
+                    className="group flex items-center justify-between gap-3 p-4 sm:p-5 rounded-2xl bg-white border border-surface-200 hover:border-red-200 hover:bg-red-50/30 transition-all duration-200 shadow-sm"
                   >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex flex-col items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-success-500 to-success-600 text-white font-bold text-xs shadow-sm shadow-success-500/20">
-                        <span>{countCalendarDays(block.start, block.end)}j</span>
+                    <div className="flex min-w-0 items-center gap-4">
+                      <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-success-500 to-success-600 text-white font-bold text-xs shadow-md shadow-success-500/20">
+                        <span className="text-sm">{countCalendarDays(block.start, block.end)}j</span>
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-bold text-slate-900">Période {index + 1}</p>
@@ -153,7 +153,7 @@ export const Summary = memo(function Summary({
                     <button
                       onClick={() => onRemoveBlock(index)}
                       type="button"
-                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-300 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-surface-300 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
                       title="Supprimer cette période"
                       aria-label={`Supprimer la période ${index + 1}`}
                     >
@@ -163,7 +163,7 @@ export const Summary = memo(function Summary({
                 ))}
               </div>
             ) : (
-              <div className="p-6 rounded-xl border-2 border-dashed border-slate-200 text-center bg-slate-50/50">
+              <div className="p-8 rounded-2xl border-2 border-dashed border-surface-200 text-center bg-surface-50/50">
                 <p className="text-sm text-slate-500 font-medium">Aucune période planifiée</p>
                 <p className="text-xs text-slate-400 mt-1">Cliquez sur une date dans le calendrier pour placer une période (min. 5 jours consécutifs)</p>
               </div>

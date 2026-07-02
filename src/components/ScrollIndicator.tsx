@@ -13,8 +13,8 @@ export function ScrollIndicator({ show }: ScrollIndicatorProps) {
         }`}
       >
         <ChevronDown
-          className="w-6 h-6 text-slate-400 animate-bounce"
-          strokeWidth={2}
+          className="w-6 h-6 text-surface-400 animate-bounce"
+          strokeWidth={2.5}
         />
       </div>
     </div>
