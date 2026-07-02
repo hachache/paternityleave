@@ -15,9 +15,7 @@ export function ProgressStepper({ currentStep, fractionableDays, scenario }: Pro
 
   return (
     <div className="reveal max-w-3xl mx-auto mb-8">
-      <div className="glass-card p-5 sm:p-7 relative overflow-hidden">
-        {/* Barre lumineuse supérieure */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300 opacity-50" />
+      <div className="glass-card p-5 sm:p-7">
 
         <div className="flex items-center justify-between relative">
           {/* Ligne de progression de fond */}

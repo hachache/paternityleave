@@ -346,9 +346,9 @@ export const Calendar = memo(function Calendar({
       } else if (metadata.type === 'mandatory') {
         classes += ' bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/25 border-brand-400/30 ring-2 ring-inset ring-white/20';
       } else if (metadata.type === 'remaining') {
-        classes += ' bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md shadow-success-500/25' + (isCoarsePointer ? '' : ' hover:shadow-lg hover:shadow-success-500/30') + ' scale-[1.02] font-semibold bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[length:6px_6px]';
+        classes += ' bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md shadow-success-500/25' + (isCoarsePointer ? '' : ' hover:shadow-lg hover:shadow-success-500/30') + ' scale-[1.02] font-semibold hover:scale-[1.06] bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[length:6px_6px]';
       } else if (metadata.selectable && isCurrentMonthDay) {
-        classes += ' cursor-pointer text-slate-700' + (isCoarsePointer ? '' : ' hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm hover:border-brand-100');
+        classes += ' cursor-pointer text-slate-700' + (isCoarsePointer ? '' : ' hover:bg-brand-50 hover:text-brand-700 hover:shadow-sm hover:border-brand-100 hover:scale-105');
       } else {
         classes += ' cursor-default';
         if (isCurrentMonthDay) classes += ' opacity-35';

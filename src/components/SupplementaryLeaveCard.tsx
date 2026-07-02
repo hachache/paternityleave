@@ -88,8 +88,8 @@ export function SupplementaryLeaveCard({
   );
 
   return (
-    <section className="rounded-card border border-slate-200 bg-white p-5 sm:p-7 shadow-depth-md">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <section className="rounded-card border border-surface-200/40 bg-white p-6 sm:p-8 lg:p-10 shadow-depth-md">
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-4">
           <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-md shadow-slate-900/20">
             <CalendarDays className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
@@ -99,11 +99,11 @@ export function SupplementaryLeaveCard({
               <h2 id="supplementary-leave-title" className="text-xl sm:text-[1.5rem] font-bold font-display text-slate-900">
                 Congé supplémentaire 2026
               </h2>
-              <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-600 shadow-sm">
+              <span className="rounded-full border border-surface-200 bg-white px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-600 shadow-sm">
                 {statusLabel}
               </span>
             </div>
-            <p className="max-w-xl text-sm font-medium text-slate-600">
+            <p className="max-w-xl text-sm font-medium text-slate-500">
               Module secondaire pour projeter le nouveau congé supplémentaire applicable à partir du 1er juillet 2026,
               sous réserve des décrets d'application.
             </p>
@@ -126,7 +126,7 @@ export function SupplementaryLeaveCard({
           className={`inline-flex h-11 w-[4.25rem] shrink-0 items-center rounded-full border-2 p-1 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 ${
             enabled
               ? 'border-brand-600 bg-brand-600 shadow-sm shadow-brand-500/20'
-              : 'border-slate-200 bg-slate-100'
+              : 'border-surface-200 bg-surface-100'
           }`}
         >
           <span
@@ -135,7 +135,7 @@ export function SupplementaryLeaveCard({
             }`}
           />
         </button>
-      </div>
+      </header>
 
       {/* Eligibility notice */}
       {!canPlan && eligibility.reason && (
@@ -169,8 +169,8 @@ export function SupplementaryLeaveCard({
 
       {/* Info cards */}
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-3.5 sm:p-4 shadow-sm">
-          <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+        <div className="rounded-2xl border border-surface-100 bg-gradient-to-br from-surface-50 to-white p-4 sm:p-5 shadow-sm">
+          <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-surface-400">
             <Clock3 className="h-4 w-4" aria-hidden="true" />
             Délai légal
           </div>
@@ -179,8 +179,8 @@ export function SupplementaryLeaveCard({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-3.5 sm:p-4 shadow-sm">
-          <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+        <div className="rounded-2xl border border-surface-100 bg-gradient-to-br from-surface-50 to-white p-4 sm:p-5 shadow-sm">
+          <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-surface-400">
             <CalendarDays className="h-4 w-4" aria-hidden="true" />
             Début projeté
           </div>
@@ -253,7 +253,7 @@ export function SupplementaryLeaveCard({
                     }
                     onFirstStartDateChange(startOfDay(new Date(value)));
                   }}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 shadow-sm hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
+                  className="w-full rounded-xl border border-surface-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 shadow-sm hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
                 />
                 <p className="mt-2 text-xs leading-relaxed text-slate-500">
                   Au plus tôt le {formatDate(earliestStartDate)}. Laissez vide pour utiliser la date la plus proche.
@@ -310,7 +310,7 @@ export function SupplementaryLeaveCard({
                     {isSplitActive && (
                       <motion.div
                         key="supplementary-second-date"
-                        className="mt-4 overflow-clip rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm"
+                        className="mt-4 overflow-clip rounded-2xl border border-surface-200 bg-gradient-to-br from-surface-50 to-white p-4 shadow-sm"
                         initial={shouldReduce ? false : 'hidden'}
                         animate="visible"
                         exit="hidden"
@@ -335,7 +335,7 @@ export function SupplementaryLeaveCard({
                             }
                             onSecondStartDateChange(startOfDay(new Date(value)));
                           }}
-                          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 shadow-sm hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
+                          className="w-full rounded-xl border border-surface-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 shadow-sm hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
                         />
                         <p className="mt-2 text-xs leading-relaxed text-slate-500">
                           Doit débuter après la fin du congé initial et se terminer avant la date limite légale.
@@ -352,7 +352,7 @@ export function SupplementaryLeaveCard({
       </AnimatePresence>
 
       {/* Indemnisation */}
-      <div className="mt-5 rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
+      <div className="mt-5 rounded-2xl border border-surface-100 bg-gradient-to-br from-surface-50 to-white p-4 sm:p-5 shadow-sm">
         <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
           <Wallet className="h-4 w-4" aria-hidden="true" />
           Indemnisation (salariés)
@@ -378,7 +378,7 @@ export function SupplementaryLeaveCard({
       </div>
 
       {/* Bénéficiaires */}
-      <div className="mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+      <div className="mt-3 rounded-2xl border border-surface-100 bg-white p-4 sm:p-5 shadow-sm">
         <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
           <Users className="h-4 w-4" aria-hidden="true" />
           Bénéficiaires
@@ -393,7 +393,7 @@ export function SupplementaryLeaveCard({
       {/* Status/Error */}
       {(disabledReason || planningNotice || error || periodsValidated) && (
         <div
-          className={`mt-5 rounded-2xl border p-4 shadow-sm ${
+          className={`mt-5 rounded-2xl border p-4 sm:p-5 shadow-sm ${
             periodsValidated
               ? 'border-emerald-200 bg-gradient-to-r from-emerald-50 to-emerald-50/60 text-emerald-900'
               : 'border-amber-200 bg-gradient-to-r from-amber-50 to-amber-50/60 text-amber-900'

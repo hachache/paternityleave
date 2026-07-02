@@ -30,10 +30,10 @@ const CelebrationModal = lazy(() => import('./components/CelebrationModal').then
 /** Skeleton de chargement premium */
 function LazyFallback({ height = 'h-64' }: { height?: string }) {
   return (
-    <div className={`${height} rounded-card bg-white/70 border border-slate-100 animate-pulse flex items-center justify-center shadow-sm overflow-hidden`}>
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-slate-200 shimmer-bg" />
-        <div className="w-32 h-3 rounded-full bg-slate-200 shimmer-bg" />
+    <div className={`${height} rounded-card bg-white/60 border border-surface-200/40 animate-pulse flex items-center justify-center shadow-sm overflow-hidden`}>
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 rounded-xl bg-surface-200 shimmer-bg" />
+        <div className="w-40 h-4 rounded-full bg-surface-200 shimmer-bg" />
       </div>
     </div>
   );
@@ -603,39 +603,39 @@ function App() {
         </div>
       </main>
 
-      <footer className="bg-white/80 backdrop-blur-xl border-t border-slate-100 py-8 sm:py-10 relative z-10 mt-auto">
-        <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center gap-6">
+      <footer className="bg-white/70 backdrop-blur-xl border-t border-surface-200/50 py-10 sm:py-12 relative z-10 mt-auto">
+        <div className="container mx-auto px-5 flex flex-col items-center justify-center text-center gap-8">
           {/* Logo & Tagline */}
           <div>
-            <p className="text-slate-900 font-bold font-display text-lg">
+            <p className="text-slate-900 font-bold font-display text-xl tracking-tight">
               Congé Paternité
             </p>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-sm text-surface-500 font-medium mt-1">
               Simplifiez vos démarches administratives.
             </p>
           </div>
 
           {/* Signature Badge */}
-          <div className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-slate-100 shadow-md transition-all duration-300 hover:bg-white hover:shadow-lg">
-            <span className="text-xs text-slate-500 font-medium">Créé par</span>
-            <a
-              href="https://www.linkedin.com/in/hedi-a-2382551a1/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-10 items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors hover:text-brand-600"
-            >
+          <a
+            href="https://www.linkedin.com/in/hedi-a-2382551a1/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 px-5 py-3 bg-white rounded-full border border-surface-200 shadow-sm transition-all duration-300 hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 group"
+          >
+            <span className="text-xs text-surface-400 font-medium">Créé par</span>
+            <span className="flex items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors group-hover:text-brand-600">
               <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" aria-hidden="true" />
               Hedi ACHACHE
-            </a>
-          </div>
+            </span>
+          </a>
 
           {/* Copyright & Back to top */}
-          <div className="flex items-center gap-4 text-xs text-slate-400 font-medium">
+          <div className="flex items-center gap-4 text-xs text-surface-400 font-medium">
             <span>© {currentYear}</span>
-            <span className="w-1 h-1 rounded-full bg-slate-300" aria-hidden="true" />
+            <span className="w-1 h-1 rounded-full bg-surface-300" aria-hidden="true" />
             <button
               onClick={() => scrollToTop(shouldReduce)}
-              className="inline-flex min-h-11 items-center px-2 transition-all duration-200 hover:text-brand-600 hover:scale-105"
+              className="inline-flex min-h-10 items-center px-2 transition-all duration-200 hover:text-brand-600"
             >
               Remonter ↑
             </button>

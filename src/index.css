@@ -68,7 +68,13 @@
 
   /* Glass card */
   .glass-card {
-    @apply relative overflow-hidden rounded-card border border-white/80 bg-white/70 backdrop-blur-xl shadow-depth transition-all duration-300;
+    @apply relative overflow-hidden rounded-card border border-white/80 bg-white/70 backdrop-blur-xl shadow-sm transition-all duration-300;
+  }
+
+  /* Barre lumineuse supérieure */
+  .glass-card::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300 opacity-60 pointer-events-none;
   }
 
   @media (hover: hover) and (pointer: fine) {
